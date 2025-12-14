@@ -5,10 +5,19 @@ from apps.backend.accounts.forms import RegisterForm
 
 
 def login_page(request):
+    data = request.POST if request.method == "POST" else None
+    form = AuthenticationForm(request=request, data=data)
+    if request.method == "POST" and form.is_valid():
+        user = form.get_user()
+        login(request, user)
+        if user.groups.filter(name="trainer user").exists():
+            return redirect("trainer")
+        return redirect("health")
+
     return render(
         request,
         "accounts/login.html",
-        {"title": "Login", "cta": "Welcome back"},
+        {"title": "Login", "cta": "Welcome back", "form": form},
     )
 
 
