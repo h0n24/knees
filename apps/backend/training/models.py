@@ -101,9 +101,9 @@ class ExerciseLog(models.Model):
 
 class RecoveryLog(models.Model):
     class NutritionQuality(models.TextChoices):
-        BELOW_AVERAGE = "below_average", "Below average"
-        AVERAGE = "average", "Average"
-        AMAZING = "amazing", "Amazing"
+        GREAT = "great", "Great"
+        OK = "ok", "OK"
+        POOR = "poor", "Poor"
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recovery_logs")
     recorded_for = models.DateField(default=timezone.localdate)
@@ -112,7 +112,7 @@ class RecoveryLog(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(100)]
     )
     nutrition = models.CharField(
-        max_length=20, choices=NutritionQuality.choices, default=NutritionQuality.AVERAGE
+        max_length=20, choices=NutritionQuality.choices, default=NutritionQuality.OK
     )
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

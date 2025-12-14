@@ -83,7 +83,7 @@ class ExerciseSessionTests(TestCase):
             {
                 "sleep_duration": "7:20",
                 "sleep_quality": 80,
-                "nutrition": RecoveryLog.NutritionQuality.AMAZING,
+                "nutrition": RecoveryLog.NutritionQuality.GREAT,
                 "comment": "Felt great",
             },
         )
@@ -92,7 +92,7 @@ class ExerciseSessionTests(TestCase):
 
         log = RecoveryLog.objects.get(user=self.user, recorded_for=timezone.localdate())
         self.assertEqual(log.sleep_quality, 80)
-        self.assertEqual(log.nutrition, RecoveryLog.NutritionQuality.AMAZING)
+        self.assertEqual(log.nutrition, RecoveryLog.NutritionQuality.GREAT)
         self.assertEqual(log.comment, "Felt great")
         self.assertEqual(int(log.sleep_duration.total_seconds()), (7 * 60 + 20) * 60)
 
@@ -110,7 +110,7 @@ class ExerciseSessionTests(TestCase):
             {
                 "sleep_duration": "720",  # missing colon
                 "sleep_quality": 80,
-                "nutrition": RecoveryLog.NutritionQuality.AVERAGE,
+                "nutrition": RecoveryLog.NutritionQuality.OK,
                 "comment": "",
             },
         )
