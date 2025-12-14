@@ -8,18 +8,14 @@ This plan models a folder structure that satisfies the functional scope in `READ
 │   ├── backend/                     # Django project (API + admin)
 │   │   ├── config/                  # Django settings, ASGI entry
 │   │   ├── accounts/                # auth, roles, profile models
-│   │   ├── training/                # plans, plan items, logs
-│   │   ├── checkins/                # daily recovery inputs
-│   │   ├── reports/                 # aggregation + dashboards
-│   │   └── pages/                   # about/privacy pages
+│   │   └── pages/                   # landing and informational pages
 ├── docs/
 │   ├── STRUCTURE_PLAN.md            # this file
 │   └── resources/
 │       ├── requirements/            # requirements snapshots, briefs
 │       └── wireframes/              # design PDFs
 ├── tests/
-│   ├── backend/                     # Django unit/integration tests
-│   └── frontend/                    # Browser-driven UI tests for templates
+│   └── backend/                     # Django unit/integration tests
 ├── static/                          # collected static files for Django
 ├── templates/                       # Django templates for server-rendered fallbacks
 ├── exercises.json                   # seed data for starter plans

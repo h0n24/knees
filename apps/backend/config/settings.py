@@ -6,7 +6,8 @@ from pathlib import Path
 
 import dj_database_url
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+# Project root (repository root) so shared assets like templates resolve correctly
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "insecure-skeleton-key")
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
@@ -20,9 +21,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "apps.backend.accounts",
-    "apps.backend.training",
-    "apps.backend.checkins",
-    "apps.backend.reports",
     "apps.backend.pages",
 ]
 
@@ -57,9 +55,8 @@ TEMPLATES = [
 WSGI_APPLICATION = "apps.backend.config.wsgi.application"
 ASGI_APPLICATION = "apps.backend.config.asgi.application"
 
-DATABASES = {
-    "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
-}
+DB_PATH = BASE_DIR / "apps" / "backend" / "db.sqlite3"
+DATABASES = {"default": dj_database_url.config(default=f"sqlite:///{DB_PATH}")}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
