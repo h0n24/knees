@@ -23,7 +23,7 @@ def _library_path() -> Path:
     return Path(settings.BASE_DIR) / "exercises.json"
 
 
-def _ensure_training_tables_ready() -> None:
+def ensure_training_tables_ready() -> None:
     """Apply migrations if the training tables have not been created yet.
 
     When the project is first run it's easy to forget the ``migrate`` step,
@@ -47,7 +47,7 @@ def _ensure_training_tables_ready() -> None:
 def ensure_library_loaded() -> List[Exercise]:
     """Load exercises from the bundled JSON file into the database if missing."""
 
-    _ensure_training_tables_ready()
+    ensure_training_tables_ready()
 
     path = _library_path()
     with path.open() as handle:
