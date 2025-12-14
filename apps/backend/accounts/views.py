@@ -7,15 +7,22 @@ from apps.backend.accounts.forms import RegisterForm
 from apps.backend.training.services import create_weekly_plan_for_user
 
 
+def _redirect_authenticated_user(user):
+    if user.groups.filter(name="trainer user").exists():
+        return redirect("trainer")
+    return redirect("health")
+
+
 def login_page(request):
+    if request.user.is_authenticated:
+        return _redirect_authenticated_user(request.user)
+
     data = request.POST if request.method == "POST" else None
     form = AuthenticationForm(request=request, data=data)
     if request.method == "POST" and form.is_valid():
         user = form.get_user()
         login(request, user)
-        if user.groups.filter(name="trainer user").exists():
-            return redirect("trainer")
-        return redirect("health")
+        return _redirect_authenticated_user(user)
 
     return render(
         request,
