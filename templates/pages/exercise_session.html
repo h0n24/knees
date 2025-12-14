@@ -91,16 +91,13 @@
                     {% csrf_token %}
                     <p class="eyebrow">Feedback</p>
                     <h2>Fatigue Assessment (5 questions)</h2>
-                    <p class="muted">Answer how you usually feel. Two of these questions are reversed in the original scale.</p>
+                    <p class="muted">Answer how you usually feel.</p>
 
                     <div class="fas-questions">
                         {% for question in fas_questions %}
                             <div class="fas-question">
                                 <div class="fas-question__meta">
                                     <p class="eyebrow">Question {{ forloop.counter }}</p>
-                                    {% if question.reversed %}
-                                        <span class="pill pill--subtle">Reversed</span>
-                                    {% endif %}
                                 </div>
                                 <h3>{{ question.text }}</h3>
                                 <div class="fas-question__scale">
@@ -147,13 +144,41 @@
 
                         const min = Number(slider.min || 0);
                         const max = Number(slider.max || 1);
-                        const percent = ((value - min) / (max - min)) * 100;
-                        bubble.style.left = `calc(${percent}% + 8px)`;
+                        const percent = (value - min) / (max - min);
+
+                        const trackWidth = slider.clientWidth;
+                        const thumbWidth = 22;
+                        const available = Math.max(trackWidth - thumbWidth, 0);
+                        const position = percent * available + thumbWidth / 2;
+
+                        bubble.style.left = `${position}px`;
                     }
 
                     document.querySelectorAll(".fas-slider").forEach((slider) => {
+                        let hideTimeout;
+                        const field = slider.closest(".slider-field");
+
+                        function showBubble() {
+                            clearTimeout(hideTimeout);
+                            field.classList.add("is-active");
+                        }
+
+                        function hideBubble() {
+                            hideTimeout = setTimeout(() => field.classList.remove("is-active"), 250);
+                        }
+
                         updateBubble(slider);
-                        slider.addEventListener("input", () => updateBubble(slider));
+
+                        slider.addEventListener("input", () => {
+                            updateBubble(slider);
+                            showBubble();
+                            hideBubble();
+                        });
+
+                        slider.addEventListener("pointerdown", showBubble);
+                        slider.addEventListener("pointerup", hideBubble);
+                        slider.addEventListener("pointerleave", hideBubble);
+                        slider.addEventListener("blur", hideBubble);
                     });
                 })();
             </script>
