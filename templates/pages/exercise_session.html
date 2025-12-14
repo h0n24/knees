@@ -87,16 +87,76 @@
             </div>
         {% elif post_exercise_stage == 1 %}
             <div class="session__body">
-                <div class="session__text-card">
+                <form method="post" class="session__text-card session__form fas-form">
+                    {% csrf_token %}
                     <p class="eyebrow">Feedback</p>
-                    <h2>FAS / fatigue questionnaire</h2>
-                    <p class="muted">Answer a few quick questions about how your body feels after training.</p>
-                    <form method="post" class="session__actions">
-                        {% csrf_token %}
+                    <h2>Fatigue Assessment (5 questions)</h2>
+                    <p class="muted">Answer how you usually feel. Two of these questions are reversed in the original scale.</p>
+
+                    <div class="fas-questions">
+                        {% for question in fas_questions %}
+                            <div class="fas-question">
+                                <div class="fas-question__meta">
+                                    <p class="eyebrow">Question {{ forloop.counter }}</p>
+                                    {% if question.reversed %}
+                                        <span class="pill pill--subtle">Reversed</span>
+                                    {% endif %}
+                                </div>
+                                <h3>{{ question.text }}</h3>
+                                <div class="fas-question__scale">
+                                    <div class="slider-field">
+                                        <div class="slider__bubble" aria-hidden="true">
+                                            <span class="slider__value">Never</span>
+                                            <span class="slider__detail">About monthly or less</span>
+                                            <span class="slider__arrow"></span>
+                                        </div>
+                                        {{ question.form_field }}
+                                        <div class="slider__labels">
+                                            <span>Never</span>
+                                            <span>Always</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="session__actions">
                         <button type="submit" class="button primary">Next</button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
+            {{ fas_options|json_script:"fas-options-data" }}
+            <script>
+                (function () {
+                    const options = JSON.parse(document.getElementById("fas-options-data").textContent);
+
+                    function findOption(value) {
+                        return options.find((option) => option.value === value) || options[0];
+                    }
+
+                    function updateBubble(slider) {
+                        const bubble = slider.parentElement.querySelector(".slider__bubble");
+                        const value = Number(slider.value);
+                        const option = findOption(value);
+
+                        bubble.querySelector(".slider__value").textContent = option.label;
+                        const detail = bubble.querySelector(".slider__detail");
+                        detail.textContent = option.detail || "";
+                        detail.style.display = option.detail ? "block" : "none";
+
+                        const min = Number(slider.min || 0);
+                        const max = Number(slider.max || 1);
+                        const percent = ((value - min) / (max - min)) * 100;
+                        bubble.style.left = `calc(${percent}% - 28px)`;
+                    }
+
+                    document.querySelectorAll(".fas-slider").forEach((slider) => {
+                        updateBubble(slider);
+                        slider.addEventListener("input", () => updateBubble(slider));
+                    });
+                })();
+            </script>
         {% else %}
             <div class="session__body">
                 <div class="session__text-card">
