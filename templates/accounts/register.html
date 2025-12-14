@@ -4,38 +4,15 @@
 <section>
     <h1>{{ title }}</h1>
     <p>{{ cta }}</p>
-    <form method="post" novalidate>
-        {% csrf_token %}
-        {% if form.non_field_errors %}
-            <ul class="errors">
-                {% for error in form.non_field_errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        <label>Username
-            {{ form.username }}
-            {% for error in form.username.errors %}
-                <span class="errors">{{ error }}</span>
-            {% endfor %}
-        </label>
+    <form>
         <label>Email
-            {{ form.email }}
-            {% for error in form.email.errors %}
-                <span class="errors">{{ error }}</span>
-            {% endfor %}
+            <input type="email" placeholder="you@example.com" />
         </label>
         <label>Password
-            {{ form.password1 }}
-            {% for error in form.password1.errors %}
-                <span class="errors">{{ error }}</span>
-            {% endfor %}
+            <input type="password" placeholder="Create a strong password" />
         </label>
         <label>Confirm Password
-            {{ form.password2 }}
-            {% for error in form.password2.errors %}
-                <span class="errors">{{ error }}</span>
-            {% endfor %}
+            <input type="password" placeholder="Repeat your password" />
         </label>
         <button type="submit">Create account</button>
     </form>
