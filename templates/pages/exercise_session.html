@@ -1,0 +1,86 @@
+{% extends "base_authenticated.html" %}
+
+{% block title %}Exercise session | Knees{% endblock %}
+
+{% block content %}
+<section class="session">
+    <div class="session__header">
+        <div>
+            <p class="eyebrow">{{ headline }}</p>
+            <h1>{{ title }}</h1>
+        </div>
+        <div class="session__progress-meta">
+            <span>Step {{ current_step_number }} of {{ total_steps }}</span>
+            <span class="muted">{{ progress_percent|floatformat:0 }}% complete</span>
+        </div>
+    </div>
+
+    <div class="progress">
+        <div class="progress__track">
+            <div class="progress__fill" style="width: {{ progress_percent }}%"></div>
+        </div>
+    </div>
+
+    {% if steps %}
+        {% if current_step %}
+            <div class="session__body">
+                <div class="session__media">
+                    <div class="media-placeholder">
+                        <div class="play-icon">▶</div>
+                    </div>
+                </div>
+                <div class="session__details">
+                    <p class="eyebrow">Set {{ current_step.set_number }} of {{ current_step.daily_exercise.sets|default:1 }}</p>
+                    <h2>{{ current_step.daily_exercise.exercise.name }}</h2>
+                    <p class="reps">{{ current_step.daily_exercise.repetitions|default:"Repetitions not specified" }}</p>
+                    <p class="muted">Difficulty {{ current_step.daily_exercise.exercise.difficulty_range }}</p>
+
+                    <form method="post" class="session__actions">
+                        {% csrf_token %}
+                        <button type="submit" class="button primary">
+                            Next
+                            <span class="icon">▶</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% elif post_exercise_stage == 0 %}
+            <div class="session__body">
+                <div class="session__text-card">
+                    <p class="eyebrow">Recovery</p>
+                    <h2>Sleep &amp; nutrition check-in</h2>
+                    <p class="muted">Take a moment to record how you rested and what you ate today.</p>
+                    <form method="post" class="session__actions">
+                        {% csrf_token %}
+                        <button type="submit" class="button primary">Next</button>
+                    </form>
+                </div>
+            </div>
+        {% elif post_exercise_stage == 1 %}
+            <div class="session__body">
+                <div class="session__text-card">
+                    <p class="eyebrow">Feedback</p>
+                    <h2>FAS / fatigue questionnaire</h2>
+                    <p class="muted">Answer a few quick questions about how your body feels after training.</p>
+                    <form method="post" class="session__actions">
+                        {% csrf_token %}
+                        <button type="submit" class="button primary">Next</button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div class="session__body">
+                <div class="session__text-card">
+                    <h2>All done for today</h2>
+                    <p class="muted">You completed all exercises and check-ins. Great work!</p>
+                    <div class="session__actions">
+                        <a class="button" href="{% url 'health' %}">Back to health overview</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <p>No exercises scheduled for today yet. Come back after your plan is generated.</p>
+    {% endif %}
+</section>
+{% endblock %}
