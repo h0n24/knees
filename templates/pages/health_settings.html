@@ -1,0 +1,60 @@
+{% extends "base_authenticated.html" %}
+
+{% block title %}Settings | Knees{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero__text">
+        <h1>{{ title }}</h1>
+        <p>{{ headline }}</p>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="panel__heading">
+        <h2>Profile</h2>
+        <span class="pill">Update your details</span>
+    </div>
+
+    {% if saved %}
+    <div class="notice is-success">Your settings have been saved.</div>
+    {% endif %}
+
+    <form method="post" class="form-grid">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <label for="{{ form.username.id_for_label }}">Username
+            {{ form.username }}
+            {{ form.username.errors }}
+        </label>
+
+        <label for="{{ form.first_name.id_for_label }}">First name
+            {{ form.first_name }}
+            {{ form.first_name.errors }}
+        </label>
+
+        <label for="{{ form.last_name.id_for_label }}">Last name
+            {{ form.last_name }}
+            {{ form.last_name.errors }}
+        </label>
+
+        <div class="full-width">
+            <p><strong>Password</strong></p>
+            <p>Enter a new password twice to update it. Leave blank to keep your current password.</p>
+        </div>
+
+        <label for="{{ form.password1.id_for_label }}">New password
+            {{ form.password1 }}
+            {{ form.password1.errors }}
+        </label>
+
+        <label for="{{ form.password2.id_for_label }}">Confirm new password
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+        </label>
+
+        <button type="submit" class="button wide">Save changes</button>
+    </form>
+</section>
+{% endblock %}
