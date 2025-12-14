@@ -70,9 +70,96 @@ body {
 }
 
 .app-main {
-  max-width: 960px;
+  max-width: 1240px;
   margin: 1.5rem auto 4rem;
   padding: 0 1rem 2rem;
+}
+
+.trainer-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1rem;
+  max-width: 1180px;
+  margin: 0 auto 3rem;
+  padding: 1rem;
+}
+
+.trainer-sidebar {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 20px 30px rgba(15, 23, 42, 0.06);
+  display: grid;
+  gap: 1rem;
+  align-self: start;
+}
+
+.trainer-brand {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.trainer-brand__logo {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.trainer-nav {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.trainer-nav__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  color: #0f172a;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.trainer-nav__item.is-active {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #1e1b4b;
+}
+
+.trainer-nav__item.is-disabled {
+  color: #94a3b8;
+  border-color: var(--border);
+}
+
+.trainer-content {
+  background: #f8fbff;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 20px 30px rgba(15, 23, 42, 0.06);
+}
+
+.trainer-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.trainer-headline {
+  margin: 0;
+}
+
+.trainer-panel {
+  background: #fff;
 }
 
 .grid {
@@ -82,6 +169,10 @@ body {
 
 .grid.two-columns {
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.grid.three-columns {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .panel {
@@ -455,6 +546,15 @@ footer {
   border-bottom: 1px solid var(--border);
 }
 
+.table-title {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.table-title__primary {
+  font-weight: 800;
+}
+
 .data-table th {
   font-size: 0.95rem;
   color: #475569;
@@ -493,6 +593,24 @@ footer {
 .stat-row dd {
   margin: 0;
   font-weight: 800;
+}
+
+.card.small {
+  padding: 0.85rem 1rem;
+}
+
+.card-title {
+  margin: 0;
+}
+
+.trainer-stats {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 700;
 }
 
 .session__actions .button.primary {

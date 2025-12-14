@@ -1,0 +1,122 @@
+{% extends "pages/trainer_base.html" %}
+
+{% block trainer_header_actions %}
+<a class="button" href="{% url 'trainer' %}">Back to users</a>
+{% endblock %}
+
+{% block trainer_content %}
+<div class="grid two-columns">
+  <section class="panel trainer-panel">
+    <div class="panel__heading">
+      <h2>Reports</h2>
+      <p class="hero__subdued">Recent adherence and recovery snapshots</p>
+    </div>
+    <div class="grid two-columns">
+      {% for report in reports %}
+      <div class="card report-card">
+        <div class="card__header">
+          <div>
+            <p class="eyebrow">{{ report.title }}</p>
+            <h3 class="card-title">{{ report.range }}</h3>
+          </div>
+          <span class="pill">{{ report.adherence }}% adherence</span>
+        </div>
+        <dl class="stat-list">
+          <div class="stat-row">
+            <dt>Training load</dt>
+            <dd>{{ report.training_minutes }} min</dd>
+          </div>
+          <div class="stat-row">
+            <dt>Avg sleep</dt>
+            <dd>{% if report.average_sleep %}{{ report.average_sleep }} hrs{% else %}—{% endif %}</dd>
+          </div>
+          <div class="stat-row">
+            <dt>Avg fatigue</dt>
+            <dd>{{ report.average_fatigue }}</dd>
+          </div>
+        </dl>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="panel trainer-panel">
+    <div class="panel__heading">
+      <h2>Generate new week</h2>
+      <p class="hero__subdued">Build a fresh 7-day plan for this athlete.</p>
+    </div>
+
+    {% if plan_message %}
+    <div class="notice is-success">
+      Updated {{ plan_message.user.username }} starting {{ plan_message.start_date }} with
+      {{ plan_message.created }} scheduled exercises{% if plan_message.replace_existing %}
+      (replaced existing entries){% endif %}.
+    </div>
+    {% endif %}
+
+    <form method="post" class="form-grid">
+      {% csrf_token %}
+      {{ plan_form.user }}
+      <label>{{ plan_form.start_date.label }}{{ plan_form.start_date }}<small class="muted">Start any day to roll a 7-day plan.</small></label>
+      <label class="full-width checkbox-row">{{ plan_form.replace_existing }} {{ plan_form.replace_existing.label }}</label>
+      {% if plan_form.errors %}
+        <div class="form-errors">{{ plan_form.errors }}</div>
+      {% endif %}
+      <button type="submit" class="button">Generate week</button>
+    </form>
+  </section>
+</div>
+
+<section class="panel trainer-panel">
+  <div class="panel__heading">
+    <h2>Training snapshot</h2>
+    <p class="hero__subdued">Latest recovery and plan details</p>
+  </div>
+  {% if summary %}
+  <div class="grid three-columns trainer-stats">
+    <div class="card small">
+      <p class="eyebrow">Sleep</p>
+      <h3 class="card-title">{% if summary.sleep_hours %}{{ summary.sleep_hours }} hrs{% else %}—{% endif %}</h3>
+      <p class="muted">Last recorded</p>
+    </div>
+    <div class="card small">
+      <p class="eyebrow">Nutrition</p>
+      <h3 class="card-title">{% if summary.nutrition %}{{ summary.nutrition }}{% else %}—{% endif %}</h3>
+      <p class="muted">Most recent</p>
+    </div>
+    <div class="card small">
+      <p class="eyebrow">Fatigue</p>
+      <h3 class="card-title">{% if summary.fatigue %}{{ summary.fatigue }} / 50{% else %}—{% endif %}</h3>
+      <p class="muted">Latest check-in</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Exercise</th>
+          <th>Sets</th>
+          <th>Reps</th>
+          <th>Difficulty</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in upcoming_plan %}
+        <tr>
+          <td>{{ row.date }}</td>
+          <td>{{ row.name }}</td>
+          <td>{% if row.sets %}{{ row.sets }}{% else %}—{% endif %}</td>
+          <td>{% if row.reps %}{{ row.reps }}{% else %}—{% endif %}</td>
+          <td>{{ row.difficulty }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No upcoming exercises scheduled.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
