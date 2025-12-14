@@ -66,13 +66,13 @@ class HealthTaskListTests(TestCase):
             recorded_for=timezone.localdate(),
             sleep_duration=sleep_duration,
             sleep_quality=85,
-            nutrition=RecoveryLog.NutritionQuality.AMAZING,
+            nutrition=RecoveryLog.NutritionQuality.GREAT,
             comment="Feeling great",
         )
 
         response = self.client.get(reverse("health"))
         self.assertContains(response, "7:30")
-        self.assertContains(response, "Amazing")
+        self.assertContains(response, "Great")
 
     def test_fatigue_score_scaled_and_translated(self):
         FatigueLog.objects.create(

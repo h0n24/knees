@@ -57,7 +57,7 @@ class HealthCtaTests(TestCase):
             recorded_for=timezone.localdate(),
             sleep_duration=timedelta(hours=6, minutes=30),
             sleep_quality=70,
-            nutrition=RecoveryLog.NutritionQuality.AVERAGE,
+            nutrition=RecoveryLog.NutritionQuality.OK,
             comment="Felt okay",
         )
 
@@ -134,7 +134,7 @@ class HealthCtaTests(TestCase):
             {
                 "sleep_duration": "7:45",
                 "sleep_quality": 85,
-                "nutrition": RecoveryLog.NutritionQuality.AMAZING,
+                "nutrition": RecoveryLog.NutritionQuality.GREAT,
                 "comment": "Updated after reflection",
             },
             follow=True,
@@ -144,7 +144,7 @@ class HealthCtaTests(TestCase):
 
         recovery_log = RecoveryLog.objects.get(user=self.user, recorded_for=timezone.localdate())
         self.assertEqual(recovery_log.sleep_quality, 85)
-        self.assertEqual(recovery_log.nutrition, RecoveryLog.NutritionQuality.AMAZING)
+        self.assertEqual(recovery_log.nutrition, RecoveryLog.NutritionQuality.GREAT)
         self.assertEqual(recovery_log.comment, "Updated after reflection")
         self.assertEqual(recovery_log.sleep_duration, timedelta(hours=7, minutes=45))
 
