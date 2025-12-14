@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
 
 
 def landing_page(request):
@@ -12,16 +13,24 @@ def landing_page(request):
     )
 
 
+@login_required
 def health_page(request):
     return render(
         request,
         "pages/health.html",
-        {"status": "ok", "message": "Backend is responding normally."},
+        {
+            "title": "Health Check",
+            "headline": "Keep your own training on track.",
+        },
         status=200,
     )
 
 
+@login_required
 def trainer_page(request):
+    if not request.user.groups.filter(name="trainer user").exists():
+        return redirect("health")
+
     return render(
         request,
         "pages/trainer.html",
