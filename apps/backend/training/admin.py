@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.backend.training.models import DailyExercise, Exercise, ExerciseLog
+from apps.backend.training.models import DailyExercise, Exercise, ExerciseLog, RecoveryLog
 
 
 @admin.register(Exercise)
@@ -33,3 +33,19 @@ class ExerciseLogAdmin(admin.ModelAdmin):
     search_fields = ("daily_exercise__exercise__name", "user__username")
     ordering = ("-completed_at", "user", "daily_exercise")
     autocomplete_fields = ("user", "daily_exercise")
+
+
+@admin.register(RecoveryLog)
+class RecoveryLogAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "recorded_for",
+        "sleep_duration",
+        "sleep_quality",
+        "nutrition",
+        "created_at",
+    )
+    list_filter = ("recorded_for", "nutrition", "user")
+    search_fields = ("user__username", "comment")
+    ordering = ("-recorded_for", "-created_at")
+    autocomplete_fields = ("user",)

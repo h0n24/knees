@@ -1,10 +1,11 @@
-from django.contrib.auth.decorators import login_required
 from datetime import datetime
 
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from apps.backend.training.models import DailyExercise, ExerciseLog
+from apps.backend.pages.forms import RecoveryLogForm
+from apps.backend.training.models import DailyExercise, ExerciseLog, RecoveryLog
 from apps.backend.training.services import ensure_training_tables_ready
 
 
@@ -85,6 +86,12 @@ def _build_exercise_steps(todays_exercises):
     return ordered_sets
 
 
+def _format_sleep_duration(duration):
+    total_minutes = int(duration.total_seconds() // 60)
+    hours, minutes = divmod(total_minutes, 60)
+    return f"{hours}:{minutes:02d}"
+
+
 @login_required
 def exercise_session_page(request):
     ensure_training_tables_ready()
@@ -107,6 +114,13 @@ def exercise_session_page(request):
     if completed_logs < len(exercise_steps):
         post_exercise_stage = 0
 
+    recorded_for = timezone.localdate()
+    recovery_log = RecoveryLog.objects.filter(user=request.user, recorded_for=recorded_for).first()
+
+    if recovery_log and completed_logs >= len(exercise_steps) and post_exercise_stage == 0:
+        post_exercise_stage = 1
+        request.session["post_exercise_stage"] = post_exercise_stage
+
     completed_steps = completed_logs + min(post_exercise_stage, 2)
     current_step_number = min(completed_steps + 1, total_steps)
     progress_percent = (completed_steps / total_steps) * 100 if total_steps else 0
@@ -118,6 +132,8 @@ def exercise_session_page(request):
         session_started_at = request.session["current_step_started_at"]
     else:
         session_started_at = float(session_started_at)
+
+    recovery_form = None
 
     if request.method == "POST":
         started_at = datetime.fromtimestamp(session_started_at, tz=timezone.get_current_timezone())
@@ -136,12 +152,36 @@ def exercise_session_page(request):
                 },
             )
             request.session["post_exercise_stage"] = 0
+            request.session["current_step_started_at"] = timezone.now().timestamp()
+            return redirect("exercise_session")
+        elif post_exercise_stage == 0:
+            recovery_form = RecoveryLogForm(request.POST)
+            if recovery_form.is_valid():
+                RecoveryLog.objects.update_or_create(
+                    user=request.user,
+                    recorded_for=recorded_for,
+                    defaults=recovery_form.cleaned_data,
+                )
+                post_exercise_stage = 1
+                request.session["post_exercise_stage"] = post_exercise_stage
+                request.session["current_step_started_at"] = timezone.now().timestamp()
+                return redirect("exercise_session")
         else:
             post_exercise_stage = min(post_exercise_stage + 1, 2)
             request.session["post_exercise_stage"] = post_exercise_stage
+            request.session["current_step_started_at"] = timezone.now().timestamp()
+            return redirect("exercise_session")
 
-        request.session["current_step_started_at"] = timezone.now().timestamp()
-        return redirect("exercise_session")
+    if recovery_form is None and post_exercise_stage == 0:
+        initial = {}
+        if recovery_log:
+            initial = {
+                "sleep_duration": _format_sleep_duration(recovery_log.sleep_duration),
+                "sleep_quality": recovery_log.sleep_quality,
+                "nutrition": recovery_log.nutrition,
+                "comment": recovery_log.comment,
+            }
+        recovery_form = RecoveryLogForm(initial=initial)
 
     context = {
         "title": "Exercise session",
@@ -153,6 +193,7 @@ def exercise_session_page(request):
         "current_step_number": current_step_number,
         "progress_percent": progress_percent,
         "post_exercise_stage": post_exercise_stage,
+        "recovery_form": recovery_form,
     }
 
     return render(request, "pages/exercise_session.html", context)
