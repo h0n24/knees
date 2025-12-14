@@ -172,12 +172,12 @@
                         slider.addEventListener("input", () => {
                             updateBubble(slider);
                             showBubble();
-                            hideBubble();
                         });
 
+                        slider.addEventListener("pointerenter", showBubble);
                         slider.addEventListener("pointerdown", showBubble);
-                        slider.addEventListener("pointerup", hideBubble);
                         slider.addEventListener("pointerleave", hideBubble);
+                        slider.addEventListener("focus", showBubble);
                         slider.addEventListener("blur", hideBubble);
                     });
                 })();
