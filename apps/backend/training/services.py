@@ -141,6 +141,35 @@ def create_weekly_plan_for_user(user: User) -> list[DailyExercise]:
     return created
 
 
+@transaction.atomic
+def generate_daily_exercises_for_day(
+    day: date, user: User | None = None, set_size: int = EXERCISE_COUNT_PER_DAY
+) -> int:
+    exercises = ensure_library_loaded()
+    created = 0
+
+    for account in _target_users(user):
+        DailyExercise.objects.filter(user=account, scheduled_for=day).delete()
+        daily_selection = _pick_daily_set(exercises)[:set_size]
+
+        new_entries = [
+            DailyExercise(
+                user=account,
+                exercise=exercise,
+                scheduled_for=day,
+                order=index,
+                sets=_min_prescription_value(exercise, "sets"),
+                repetitions=_min_prescription_value(exercise, "reps"),
+            )
+            for index, exercise in enumerate(daily_selection)
+        ]
+
+        DailyExercise.objects.bulk_create(new_entries)
+        created += len(new_entries)
+
+    return created
+
+
 def _sample_responses() -> list[dict]:
     questions = [
         "How do your knees feel today?",
