@@ -1,5 +1,3 @@
-from django.contrib.auth import login
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import Group
 from django.shortcuts import redirect, render
 
@@ -7,11 +5,8 @@ from apps.backend.accounts.forms import RegisterForm
 
 
 def login_page(request):
-    if request.method == "POST":
-        form = AuthenticationForm(request=request, data=request.POST)
-    else:
-        form = AuthenticationForm(request=request)
-
+    data = request.POST if request.method == "POST" else None
+    form = AuthenticationForm(request=request, data=data)
     if request.method == "POST" and form.is_valid():
         user = form.get_user()
         login(request, user)

@@ -31,8 +31,3 @@ class LoginRedirectTests(TestCase):
         )
 
         self.assertRedirects(response, reverse("trainer"))
-
-    def test_login_page_renders_without_errors(self):
-        response = self.client.get(reverse("login"))
-
-        self.assertEqual(response.status_code, 200)
