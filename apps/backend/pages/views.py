@@ -1,10 +1,12 @@
 import random
 from datetime import datetime
 
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
+from apps.backend.accounts.forms import UserSettingsForm
 from apps.backend.pages.forms import FatigueAssessmentForm, RecoveryLogForm
 from apps.backend.training.models import DailyExercise, ExerciseLog, FatigueLog, RecoveryLog
 from apps.backend.training.services import ensure_training_tables_ready
@@ -64,6 +66,32 @@ def health_page(request):
             "todays_exercises": todays_exercises,
         },
         status=200,
+    )
+
+
+@login_required
+def health_settings_page(request):
+    form = UserSettingsForm(request.user, instance=request.user)
+    saved = False
+
+    if request.method == "POST":
+        form = UserSettingsForm(request.user, request.POST, instance=request.user)
+        if form.is_valid():
+            user = form.save()
+            if form.cleaned_data.get("password1"):
+                update_session_auth_hash(request, user)
+            saved = True
+            form = UserSettingsForm(user, instance=user)
+
+    return render(
+        request,
+        "pages/health_settings.html",
+        {
+            "title": "Account settings",
+            "headline": "Manage your sign-in details and personal info.",
+            "form": form,
+            "saved": saved,
+        },
     )
 
 
