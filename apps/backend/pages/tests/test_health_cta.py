@@ -159,3 +159,37 @@ class HealthCtaTests(TestCase):
 
         fatigue_log.refresh_from_db()
         self.assertTrue(all(entry["value"] == 4 for entry in fatigue_log.responses))
+
+    def test_deleting_fatigue_log_reopens_checkins(self):
+        daily = self._create_daily_exercise("Exercise 1")
+        self._complete_exercise(daily)
+        self._create_recovery_log()
+        fatigue_log = self._create_fatigue_log()
+
+        session = self.client.session
+        session["post_exercise_stage"] = 2
+        session.save()
+
+        fatigue_log.delete()
+
+        response = self.client.get(reverse("exercise_session"))
+
+        self.assertContains(response, "Fatigue Assessment")
+        self.assertEqual(self.client.session.get("post_exercise_stage"), 1)
+
+    def test_deleting_recovery_log_reopens_checkins(self):
+        daily = self._create_daily_exercise("Exercise 1")
+        self._complete_exercise(daily)
+        recovery_log = self._create_recovery_log()
+        self._create_fatigue_log()
+
+        session = self.client.session
+        session["post_exercise_stage"] = 2
+        session.save()
+
+        recovery_log.delete()
+
+        response = self.client.get(reverse("exercise_session"))
+
+        self.assertContains(response, "Sleep &amp; nutrition check-in")
+        self.assertEqual(self.client.session.get("post_exercise_stage"), 0)
