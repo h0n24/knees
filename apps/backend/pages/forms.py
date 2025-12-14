@@ -47,3 +47,26 @@ class RecoveryLogForm(forms.ModelForm):
             raise ValidationError("Minutes must be between 0 and 59.")
 
         return timedelta(hours=hours, minutes=minutes)
+
+
+class FatigueAssessmentForm(forms.Form):
+    def __init__(self, *args, questions: list[dict] | None = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        questions = questions or []
+
+        for question in questions:
+            self.fields[question["field_name"]] = forms.IntegerField(
+                min_value=1,
+                max_value=5,
+                initial=1,
+                widget=forms.NumberInput(
+                    attrs={
+                        "type": "range",
+                        "class": "fas-slider",
+                        "min": 1,
+                        "max": 5,
+                        "step": 1,
+                        "aria-label": question["text"],
+                    }
+                ),
+            )

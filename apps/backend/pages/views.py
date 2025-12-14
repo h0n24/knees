@@ -1,10 +1,11 @@
+import random
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from apps.backend.pages.forms import RecoveryLogForm
+from apps.backend.pages.forms import FatigueAssessmentForm, RecoveryLogForm
 from apps.backend.training.models import DailyExercise, ExerciseLog, RecoveryLog
 from apps.backend.training.services import ensure_training_tables_ready
 
@@ -92,6 +93,56 @@ def _format_sleep_duration(duration):
     return f"{hours}:{minutes:02d}"
 
 
+FAS_OPTIONS = [
+    {"value": 1, "label": "Never", "detail": ""},
+    {"value": 2, "label": "Sometimes", "detail": "About monthly or less"},
+    {"value": 3, "label": "Regularly", "detail": "A few times a month"},
+    {"value": 4, "label": "Often", "detail": "About weekly"},
+    {"value": 5, "label": "Always", "detail": "About every day"},
+]
+
+FAS_QUESTIONS = [
+    {"id": 1, "text": "I am bothered by fatigue", "reversed": False},
+    {"id": 2, "text": "I get tired very quickly", "reversed": False},
+    {"id": 3, "text": "I don't do much during the day", "reversed": False},
+    {"id": 4, "text": "I have enough energy for everyday life", "reversed": True},
+    {"id": 5, "text": "Physically I feel exhausted", "reversed": False},
+    {"id": 6, "text": "I have problems to start things", "reversed": False},
+    {"id": 7, "text": "I have problems to think clearly", "reversed": False},
+    {"id": 8, "text": "I feel no desire to do anything", "reversed": False},
+    {"id": 9, "text": "Mentally I feel exhausted", "reversed": False},
+    {"id": 10, "text": "When doing something, I can concentrate well", "reversed": True},
+]
+
+
+def _select_fas_questions(session):
+    selected_ids = session.get("fas_question_ids")
+
+    if selected_ids:
+        selected = [
+            question
+            for question in FAS_QUESTIONS
+            if question["id"] in selected_ids
+        ]
+    else:
+        selected = random.sample(FAS_QUESTIONS, 5)
+        session["fas_question_ids"] = [question["id"] for question in selected]
+
+    return [
+        {**question, "field_name": f"question_{question['id']}"}
+        for question in selected
+    ]
+
+
+def _calculate_fas_score(responses, questions):
+    total = 0
+    for question in questions:
+        value = responses.get(question["field_name"], 0)
+        adjusted_value = 6 - value if question["reversed"] else value
+        total += adjusted_value
+    return total
+
+
 @login_required
 def exercise_session_page(request):
     ensure_training_tables_ready()
@@ -114,6 +165,11 @@ def exercise_session_page(request):
     if completed_logs < len(exercise_steps):
         post_exercise_stage = 0
 
+    if post_exercise_stage == 0:
+        request.session.pop("fas_question_ids", None)
+        request.session.pop("fas_responses", None)
+        request.session.pop("fas_total_score", None)
+
     recorded_for = timezone.localdate()
     recovery_log = RecoveryLog.objects.filter(user=request.user, recorded_for=recorded_for).first()
 
@@ -134,6 +190,8 @@ def exercise_session_page(request):
         session_started_at = float(session_started_at)
 
     recovery_form = None
+    fas_form = None
+    fas_questions = []
 
     if request.method == "POST":
         started_at = datetime.fromtimestamp(session_started_at, tz=timezone.get_current_timezone())
@@ -166,6 +224,21 @@ def exercise_session_page(request):
                 request.session["post_exercise_stage"] = post_exercise_stage
                 request.session["current_step_started_at"] = timezone.now().timestamp()
                 return redirect("exercise_session")
+        elif post_exercise_stage == 1:
+            fas_questions = _select_fas_questions(request.session)
+            fas_form = FatigueAssessmentForm(request.POST, questions=fas_questions)
+            if fas_form.is_valid():
+                responses = {
+                    field: fas_form.cleaned_data[field]
+                    for field in fas_form.fields
+                }
+                total_score = _calculate_fas_score(responses, fas_questions)
+                request.session["fas_responses"] = responses
+                request.session["fas_total_score"] = total_score
+                post_exercise_stage = min(post_exercise_stage + 1, 2)
+                request.session["post_exercise_stage"] = post_exercise_stage
+                request.session["current_step_started_at"] = timezone.now().timestamp()
+                return redirect("exercise_session")
         else:
             post_exercise_stage = min(post_exercise_stage + 1, 2)
             request.session["post_exercise_stage"] = post_exercise_stage
@@ -183,6 +256,15 @@ def exercise_session_page(request):
             }
         recovery_form = RecoveryLogForm(initial=initial)
 
+    if post_exercise_stage == 1:
+        if not fas_questions:
+            fas_questions = _select_fas_questions(request.session)
+        if fas_form is None:
+            fas_form = FatigueAssessmentForm(questions=fas_questions)
+        if fas_form and fas_questions:
+            for question in fas_questions:
+                question["form_field"] = fas_form[question["field_name"]]
+
     context = {
         "title": "Exercise session",
         "headline": "Work through today\'s plan one set at a time.",
@@ -194,6 +276,9 @@ def exercise_session_page(request):
         "progress_percent": progress_percent,
         "post_exercise_stage": post_exercise_stage,
         "recovery_form": recovery_form,
+        "fas_form": fas_form,
+        "fas_questions": fas_questions,
+        "fas_options": FAS_OPTIONS,
     }
 
     return render(request, "pages/exercise_session.html", context)

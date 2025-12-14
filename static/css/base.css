@@ -380,6 +380,125 @@ footer {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
+.fas-form {
+    display: grid;
+    gap: 1rem;
+}
+
+.fas-questions {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.fas-question {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    background: white;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.04);
+}
+
+.fas-question__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+}
+
+.fas-question h3 {
+    margin: 0.25rem 0 0.5rem;
+}
+
+.pill--subtle {
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+.slider-field {
+    position: relative;
+    padding-top: 2.5rem;
+}
+
+.slider__bubble {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 10px);
+    transform: translateX(-50%);
+    background: #0f172a;
+    color: white;
+    padding: 0.4rem 0.65rem 0.5rem;
+    border-radius: 0.5rem;
+    min-width: 110px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.14);
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    pointer-events: none;
+}
+
+.slider__value {
+    font-weight: 800;
+}
+
+.slider__detail {
+    font-size: 0.8rem;
+    color: #cbd5e1;
+}
+
+.slider__arrow {
+    position: absolute;
+    bottom: -7px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 7px solid #0f172a;
+}
+
+.fas-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    outline: none;
+}
+
+.fas-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.fas-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.slider__labels {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    color: #475569;
+    margin-top: 0.5rem;
+}
+
 .eyebrow {
     text-transform: uppercase;
     letter-spacing: 0.08em;
