@@ -31,7 +31,7 @@
             {% endfor %}
         </div>
         <div class="cta">
-            <a class="button wide" href="{% url 'exercise_session' %}">Start today session</a>
+            <a class="button wide" href="{% url 'exercise_session' %}{{ session_cta_suffix }}">{{ session_cta_label }}</a>
         </div>
     </div>
 

@@ -70,6 +70,17 @@ def health_page(request):
         user=request.user, recorded_for=timezone.localdate()
     ).first()
 
+    session_started = bool(completed_exercise_logs or recovery_log or fatigue_log)
+    session_finished = bool(exercises_complete and recovery_log and fatigue_log)
+
+    cta_label = "Start today session"
+    cta_suffix = ""
+    if session_finished:
+        cta_label = "Update recovery and fatigue"
+        cta_suffix = "?edit_checkins=1"
+    elif session_started:
+        cta_label = "Continue today session"
+
     sleep_label = _format_sleep_duration(recovery_log.sleep_duration) if recovery_log else None
     nutrition_label = recovery_log.get_nutrition_display() if recovery_log else None
 
@@ -114,6 +125,8 @@ def health_page(request):
             "headline": "Keep your own training on track.",
             "todays_exercises": todays_exercises,
             "tasks": tasks,
+            "session_cta_label": cta_label,
+            "session_cta_suffix": cta_suffix,
         },
         status=200,
     )
@@ -246,10 +259,24 @@ FAS_QUESTIONS = [
 ]
 
 
-def _select_fas_questions(session):
+def _select_fas_questions(session, responses=None):
     selected_ids = session.get("fas_question_ids")
 
-    if selected_ids:
+    if responses:
+        selected = [
+            {
+                "id": response["question_id"],
+                "text": response.get("question")
+                or next(
+                    (q["text"] for q in FAS_QUESTIONS if q["id"] == response["question_id"]),
+                    "",
+                ),
+                "reversed": response.get("reversed", False),
+            }
+            for response in responses
+        ]
+        session["fas_question_ids"] = [question["id"] for question in selected]
+    elif selected_ids:
         selected = [
             question
             for question in FAS_QUESTIONS
@@ -263,6 +290,16 @@ def _select_fas_questions(session):
         {**question, "field_name": f"question_{question['id']}"}
         for question in selected
     ]
+
+
+def _fas_initial_from_responses(responses):
+    if not responses:
+        return {}
+
+    return {
+        f"question_{response['question_id']}": response.get("value", 1)
+        for response in responses
+    }
 
 
 def _calculate_fas_score(responses, questions):
@@ -303,8 +340,37 @@ def exercise_session_page(request):
 
     recorded_for = timezone.localdate()
     recovery_log = RecoveryLog.objects.filter(user=request.user, recorded_for=recorded_for).first()
+    fatigue_log = FatigueLog.objects.filter(user=request.user, recorded_for=recorded_for).first()
 
-    if recovery_log and completed_logs >= len(exercise_steps) and post_exercise_stage == 0:
+    session_finished = (
+        exercise_steps
+        and completed_logs >= len(exercise_steps)
+        and recovery_log
+        and fatigue_log
+    )
+
+    editing_checkins = session_finished and (
+        request.GET.get("edit_checkins") == "1"
+        or request.session.get("editing_checkins")
+    )
+    if editing_checkins:
+        request.session["editing_checkins"] = True
+        if post_exercise_stage >= 2 or post_exercise_stage == 0:
+            post_exercise_stage = 0
+            request.session["current_step_started_at"] = timezone.now().timestamp()
+            request.session.pop("fas_question_ids", None)
+            request.session.pop("fas_responses", None)
+            request.session.pop("fas_total_score", None)
+        request.session["post_exercise_stage"] = post_exercise_stage
+    else:
+        request.session.pop("editing_checkins", None)
+
+    if (
+        recovery_log
+        and completed_logs >= len(exercise_steps)
+        and post_exercise_stage == 0
+        and not editing_checkins
+    ):
         post_exercise_stage = 1
         request.session["post_exercise_stage"] = post_exercise_stage
 
@@ -323,6 +389,7 @@ def exercise_session_page(request):
     recovery_form = None
     fas_form = None
     fas_questions = []
+    fas_initial = _fas_initial_from_responses(fatigue_log.responses if fatigue_log else None)
 
     if request.method == "POST":
         started_at = datetime.fromtimestamp(session_started_at, tz=timezone.get_current_timezone())
@@ -356,7 +423,9 @@ def exercise_session_page(request):
                 request.session["current_step_started_at"] = timezone.now().timestamp()
                 return redirect("exercise_session")
         elif post_exercise_stage == 1:
-            fas_questions = _select_fas_questions(request.session)
+            fas_questions = _select_fas_questions(
+                request.session, responses=fatigue_log.responses if fatigue_log else None
+            )
             fas_form = FatigueAssessmentForm(request.POST, questions=fas_questions)
             if fas_form.is_valid():
                 responses = {
@@ -385,11 +454,13 @@ def exercise_session_page(request):
                 request.session["fas_total_score"] = total_score
                 post_exercise_stage = min(post_exercise_stage + 1, 2)
                 request.session["post_exercise_stage"] = post_exercise_stage
+                request.session.pop("editing_checkins", None)
                 request.session["current_step_started_at"] = timezone.now().timestamp()
                 return redirect("exercise_session")
         else:
             post_exercise_stage = min(post_exercise_stage + 1, 2)
             request.session["post_exercise_stage"] = post_exercise_stage
+            request.session.pop("editing_checkins", None)
             request.session["current_step_started_at"] = timezone.now().timestamp()
             return redirect("exercise_session")
 
@@ -406,9 +477,11 @@ def exercise_session_page(request):
 
     if post_exercise_stage == 1:
         if not fas_questions:
-            fas_questions = _select_fas_questions(request.session)
+            fas_questions = _select_fas_questions(
+                request.session, responses=fatigue_log.responses if fatigue_log else None
+            )
         if fas_form is None:
-            fas_form = FatigueAssessmentForm(questions=fas_questions)
+            fas_form = FatigueAssessmentForm(questions=fas_questions, initial=fas_initial)
         if fas_form and fas_questions:
             for question in fas_questions:
                 question["form_field"] = fas_form[question["field_name"]]
