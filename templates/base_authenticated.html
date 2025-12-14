@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/static/css/base.css" />
   </head>
   <body class="app-shell">
+    {% load user_groups %}
     <header class="app-header">
       <div class="app-header__inner">
         <div class="brand">Knees</div>
@@ -14,9 +15,13 @@
           {% url 'health' as health_url %}
           {% url 'health_progress' as progress_url %}
           {% url 'health_settings' as settings_url %}
+          {% url 'trainer' as trainer_url %}
           <a href="{{ health_url }}" {% if request.path == health_url %}aria-current="page"{% endif %}>Home</a>
           <a href="{{ progress_url }}" {% if request.path == progress_url %}aria-current="page"{% endif %}>Progress</a>
           <a href="{{ settings_url }}" {% if request.path == settings_url %}aria-current="page"{% endif %}>Settings</a>
+          {% if request.user.is_staff or request.user|has_group:"trainer user" %}
+          <a href="{{ trainer_url }}" {% if request.path == trainer_url %}aria-current="page"{% endif %}>Trainer</a>
+          {% endif %}
           <a href="/auth/logout/">Logout</a>
         </nav>
       </div>
@@ -32,6 +37,12 @@
           <span class="mobile-nav__icon">📈</span>
           <span>Progress</span>
         </a>
+        {% if request.user.is_staff or request.user|has_group:"trainer user" %}
+        <a href="{{ trainer_url }}" {% if request.path == trainer_url %}aria-current="page"{% endif %}>
+          <span class="mobile-nav__icon">🧭</span>
+          <span>Trainer</span>
+        </a>
+        {% endif %}
         <a href="{{ settings_url }}" {% if request.path == settings_url %}aria-current="page"{% endif %}>
           <span class="mobile-nav__icon">⚙️</span>
           <span>Settings</span>

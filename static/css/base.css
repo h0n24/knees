@@ -274,10 +274,21 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
+.form-errors {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
 .form-grid label {
   display: grid;
   gap: 0.35rem;
   font-weight: 700;
+}
+
+.checkbox-row {
+  align-items: center;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
 }
 
 .form-grid input {
@@ -318,7 +329,7 @@ footer {
   max-width: 960px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: 0.5rem;
 }
 
@@ -426,6 +437,62 @@ footer {
 
 .session__actions {
   margin-top: 1rem;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.stat-list {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+}
+
+.stat-row dt {
+  margin: 0;
+  color: #475569;
+}
+
+.stat-row dd {
+  margin: 0;
+  font-weight: 800;
 }
 
 .session__actions .button.primary {

@@ -2,14 +2,17 @@ import random
 from datetime import datetime, timedelta
 
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.db.models import Avg, Sum
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from apps.backend.accounts.forms import UserSettingsForm
-from apps.backend.pages.forms import FatigueAssessmentForm, RecoveryLogForm
-from apps.backend.training.models import DailyExercise, ExerciseLog, FatigueLog, RecoveryLog
-from apps.backend.training.services import ensure_training_tables_ready
+from apps.backend.pages.forms import FatigueAssessmentForm, PlanEditorForm, RecoveryLogForm
+from apps.backend.training.models import DailyExercise, Exercise, ExerciseLog, FatigueLog, RecoveryLog
+from apps.backend.training.services import create_weekly_plan_for_user, ensure_library_loaded, ensure_training_tables_ready
 
 
 def landing_page(request):
@@ -43,6 +46,48 @@ def privacy_page(request):
             "description": "We only collect the information needed to keep your training plan on track.",
         },
     )
+
+
+def _user_is_trainer(user: User) -> bool:
+    return user.is_staff or user.groups.filter(name="trainer user").exists()
+
+
+@login_required
+def trainer_page(request):
+    if not _user_is_trainer(request.user):
+        return redirect("health")
+
+    ensure_training_tables_ready()
+    ensure_library_loaded()
+
+    plan_form = PlanEditorForm(request.POST or None)
+    plan_message = None
+    if request.method == "POST" and plan_form.is_valid():
+        user = plan_form.cleaned_data["user"]
+        start_date = plan_form.cleaned_data["start_date"]
+        replace_existing = plan_form.cleaned_data["replace_existing"]
+        created = create_weekly_plan_for_user(
+            user, start_date=start_date, replace_existing=replace_existing
+        )
+        plan_message = {
+            "user": user,
+            "created": len(created),
+            "start_date": start_date,
+            "replace_existing": replace_existing,
+        }
+        plan_form = PlanEditorForm(initial=plan_form.cleaned_data)
+
+    context = {
+        "title": "Trainer console",
+        "description": "View adherence, adjust plans, and keep tabs on fatigue trends.",
+        "reports": _trainer_reports(),
+        "people": _trainer_people(),
+        "exercise_library": Exercise.objects.all(),
+        "plan_form": plan_form,
+        "plan_message": plan_message,
+    }
+
+    return render(request, "pages/trainer.html", context)
 
 
 @login_required
@@ -211,6 +256,106 @@ def health_settings_page(request):
     )
 
 
+def _trainer_reports():
+    today = timezone.localdate()
+    return [
+        _report_card("Today", today, today),
+        _report_card("Last 7 days", today - timedelta(days=6), today),
+        _report_card("Last 30 days", today - timedelta(days=29), today),
+    ]
+
+
+def _report_card(title: str, start_date, end_date):
+    training_seconds = (
+        ExerciseLog.objects.filter(completed_at__date__range=(start_date, end_date))
+        .aggregate(total=Sum("duration_seconds"))
+        .get("total")
+        or 0
+    )
+    planned = DailyExercise.objects.filter(
+        scheduled_for__range=(start_date, end_date)
+    ).count()
+    completed = (
+        ExerciseLog.objects.filter(completed_at__date__range=(start_date, end_date))
+        .values("daily_exercise_id")
+        .distinct()
+        .count()
+    )
+    adherence = round((completed / planned) * 100) if planned else 0
+
+    average_sleep = (
+        RecoveryLog.objects.filter(recorded_for__range=(start_date, end_date))
+        .aggregate(avg=Avg("sleep_duration"))
+        .get("avg")
+    )
+    fatigue_score = (
+        FatigueLog.objects.filter(recorded_for__range=(start_date, end_date))
+        .aggregate(avg=Avg("total_score"))
+        .get("avg")
+    )
+
+    range_label = f"{start_date.strftime('%b %d')} – {end_date.strftime('%b %d')}"
+
+    return {
+        "title": title,
+        "range": range_label,
+        "adherence": adherence,
+        "training_minutes": round(training_seconds / 60, 1),
+        "average_sleep": _hours_from_duration(average_sleep),
+        "average_fatigue": round(fatigue_score or 0, 1),
+    }
+
+
+def _trainer_people():
+    today = timezone.localdate()
+    week_start = today - timedelta(days=6)
+    people = []
+
+    for account in User.objects.order_by("username"):
+        planned = DailyExercise.objects.filter(
+            user=account, scheduled_for__range=(week_start, today)
+        ).count()
+        completed = (
+            ExerciseLog.objects.filter(
+                user=account, completed_at__date__range=(week_start, today)
+            )
+            .values("daily_exercise_id")
+            .distinct()
+            .count()
+        )
+        adherence = round((completed / planned) * 100) if planned else 0
+
+        next_session = (
+            DailyExercise.objects.filter(
+                user=account, scheduled_for__gt=today
+            ).order_by("scheduled_for", "order")
+        ).first()
+        todays_plan = DailyExercise.objects.filter(
+            user=account, scheduled_for=today
+        ).count()
+        latest_fatigue = (
+            FatigueLog.objects.filter(user=account).order_by("-recorded_for")
+        ).first()
+        latest_recovery = (
+            RecoveryLog.objects.filter(user=account).order_by("-recorded_for")
+        ).first()
+
+        people.append(
+            {
+                "user": account,
+                "today_count": todays_plan,
+                "next_day": next_session.scheduled_for if next_session else None,
+                "fatigue": latest_fatigue.total_score if latest_fatigue else None,
+                "sleep_hours": _hours_from_duration(
+                    latest_recovery.sleep_duration if latest_recovery else None
+                ),
+                "adherence": adherence,
+            }
+        )
+
+    return people
+
+
 def _build_exercise_steps(todays_exercises):
     exercises = list(todays_exercises)
     if not exercises:
@@ -235,6 +380,12 @@ def _format_sleep_duration(duration):
     total_minutes = int(duration.total_seconds() // 60)
     hours, minutes = divmod(total_minutes, 60)
     return f"{hours}:{minutes:02d}"
+
+
+def _hours_from_duration(duration):
+    if not duration:
+        return None
+    return round(duration.total_seconds() / 3600, 1)
 
 
 FAS_OPTIONS = [

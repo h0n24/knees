@@ -4,7 +4,9 @@ import re
 from datetime import timedelta
 
 from django import forms
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from apps.backend.training.models import RecoveryLog
 
@@ -47,6 +49,28 @@ class RecoveryLogForm(forms.ModelForm):
             raise ValidationError("Minutes must be between 0 and 59.")
 
         return timedelta(hours=hours, minutes=minutes)
+
+
+class PlanEditorForm(forms.Form):
+    user = forms.ModelChoiceField(
+        label="Athlete",
+        queryset=User.objects.none(),
+        help_text="Choose whose plan you want to adjust.",
+    )
+    start_date = forms.DateField(
+        label="Week start",
+        initial=timezone.localdate,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    replace_existing = forms.BooleanField(
+        label="Replace existing entries",
+        required=False,
+        help_text="If checked, overwrite any exercises already scheduled for that week.",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["user"].queryset = User.objects.order_by("username")
 
 
 class FatigueAssessmentForm(forms.Form):

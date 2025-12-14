@@ -3,6 +3,11 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import Group
 from django.shortcuts import redirect, render
 
+from django.contrib.auth import login, logout
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import Group
+from django.shortcuts import redirect, render
+
 from apps.backend.accounts.forms import RegisterForm
 from apps.backend.training.services import create_weekly_plan_for_user
 

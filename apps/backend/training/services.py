@@ -115,14 +115,18 @@ def _min_prescription_value(exercise: Exercise, field: str) -> int | None:
 
 
 @transaction.atomic
-def create_weekly_plan_for_user(user: User) -> list[DailyExercise]:
+def create_weekly_plan_for_user(
+    user: User, *, start_date: date | None = None, replace_existing: bool = False
+) -> list[DailyExercise]:
     exercises = ensure_library_loaded()
     created: list[DailyExercise] = []
-    today = date.today()
+    start = start_date or date.today()
 
     for offset in range(7):
-        scheduled_day = today + timedelta(days=offset)
-        if DailyExercise.objects.filter(user=user, scheduled_for=scheduled_day).exists():
+        scheduled_day = start + timedelta(days=offset)
+        if replace_existing:
+            DailyExercise.objects.filter(user=user, scheduled_for=scheduled_day).delete()
+        elif DailyExercise.objects.filter(user=user, scheduled_for=scheduled_day).exists():
             continue
         daily_selection = _pick_daily_set(exercises)
         new_entries = [
