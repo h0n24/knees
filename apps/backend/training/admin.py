@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
@@ -98,7 +100,54 @@ def account_test_data_view(request):
     if request.method == "POST":
         action = request.POST.get("action")
         scope = f"user {target_user.username}" if target_user else "all users"
-        if action == "recovery":
+
+        if action in {"delete_exercises", "delete_recovery", "delete_fatigue", "delete_all"}:
+            day = request.POST.get("day")
+            try:
+                selected_day = date.fromisoformat(day)
+            except (TypeError, ValueError):
+                messages.error(request, "Select a valid day to reset data.")
+                return redirect(request.path)
+
+            daily_exercises_qs = DailyExercise.objects.filter(scheduled_for=selected_day)
+            exercise_logs_qs = ExerciseLog.objects.filter(daily_exercise__scheduled_for=selected_day)
+            recovery_logs_qs = RecoveryLog.objects.filter(recorded_for=selected_day)
+            fatigue_logs_qs = FatigueLog.objects.filter(recorded_for=selected_day)
+
+            if target_user:
+                daily_exercises_qs = daily_exercises_qs.filter(user=target_user)
+                exercise_logs_qs = exercise_logs_qs.filter(user=target_user)
+                recovery_logs_qs = recovery_logs_qs.filter(user=target_user)
+                fatigue_logs_qs = fatigue_logs_qs.filter(user=target_user)
+
+            deleted_daily_exercises = deleted_exercise_logs = deleted_recovery_logs = (
+                deleted_fatigue_logs
+            ) = 0
+
+            if action in {"delete_exercises", "delete_all"}:
+                deleted_exercise_logs, _ = exercise_logs_qs.delete()
+                deleted_daily_exercises, _ = daily_exercises_qs.delete()
+
+            if action in {"delete_recovery", "delete_all"}:
+                deleted_recovery_logs, _ = recovery_logs_qs.delete()
+
+            if action in {"delete_fatigue", "delete_all"}:
+                deleted_fatigue_logs, _ = fatigue_logs_qs.delete()
+
+            messages.success(
+                request,
+                "Removed {exercises} exercises, {exercise_logs} exercise logs, {recovery}"
+                " recovery logs, and {fatigue} fatigue logs for {scope} on {day}.".format(
+                    exercises=deleted_daily_exercises,
+                    exercise_logs=deleted_exercise_logs,
+                    recovery=deleted_recovery_logs,
+                    fatigue=deleted_fatigue_logs,
+                    scope=scope,
+                    day=selected_day,
+                ),
+            )
+
+        elif action == "recovery":
             created = generate_recovery_logs_for_all_users(user=target_user)
             messages.success(
                 request,
@@ -134,6 +183,7 @@ def account_test_data_view(request):
         title="Account test data generators",
         users=User.objects.all(),
         selected_user_id=selected_user_id,
+        day_options=[date.today() - timedelta(days=offset) for offset in range(0, 30)],
         actions=[
             {
                 "key": "recovery",
