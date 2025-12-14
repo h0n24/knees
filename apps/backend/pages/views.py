@@ -56,10 +56,9 @@ def _user_is_trainer(user: User) -> bool:
 def _record_recent_report(session, username: str) -> None:
     recent = session.get("trainer_recent_reports", [])
 
-    if username in recent:
-        recent.remove(username)
+    if username not in recent:
+        recent.insert(0, username)
 
-    recent.insert(0, username)
     session["trainer_recent_reports"] = recent[:4]
     session.modified = True
 
@@ -129,7 +128,7 @@ def trainer_user_page(request, username: str):
         "summary": _trainer_summary_for_user(athlete),
         "upcoming_plan": _upcoming_plan_for_user(athlete),
         "trainer_nav": _trainer_navigation(
-            request=request, selected="users", active_user=athlete
+            request=request, selected="user_detail", active_user=athlete
         ),
     }
 
