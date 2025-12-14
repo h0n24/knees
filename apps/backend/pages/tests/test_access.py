@@ -46,3 +46,15 @@ class PageAccessTests(TestCase):
         login_url = reverse("login")
         expected_url = f"{login_url}?next={reverse('health')}"
         self.assertRedirects(response, expected_url)
+
+    def test_anonymous_users_can_view_about_page(self):
+        response = self.client.get(reverse("about"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "About Knee Training Tracker")
+
+    def test_anonymous_users_can_view_privacy_page(self):
+        response = self.client.get(reverse("privacy"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Privacy policy")
