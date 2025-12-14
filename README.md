@@ -298,6 +298,8 @@ The project is intended for **local development** with Django and Next.js runnin
 
 Run locally:
 
+### Bash
+
 ```bash
 # Backend
 python -m venv .venv && source .venv/bin/activate
@@ -309,6 +311,16 @@ python manage.py runserver
 cd apps/frontend
 npm install
 npm run dev
+```
+
+### Alternative: Win cmd.exe
+
+```bat
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
 ```
 
 ---
