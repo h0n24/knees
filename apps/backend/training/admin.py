@@ -15,6 +15,7 @@ from apps.backend.training.models import (
 )
 from apps.backend.training.services import (
     generate_all_account_test_data,
+    generate_daily_exercises_for_day,
     generate_exercise_logs_for_all_users,
     generate_fatigue_logs_for_all_users,
     generate_recovery_logs_for_all_users,
@@ -145,6 +146,20 @@ def account_test_data_view(request):
                     scope=scope,
                     day=selected_day,
                 ),
+            )
+
+        elif action == "generate_daily_exercises":
+            day = request.POST.get("day")
+            try:
+                selected_day = date.fromisoformat(day)
+            except (TypeError, ValueError):
+                messages.error(request, "Select a valid day to generate exercises.")
+                return redirect(request.path)
+
+            created = generate_daily_exercises_for_day(selected_day, user=target_user)
+            messages.success(
+                request,
+                f"Generated {created} exercises for {scope} on {selected_day}.",
             )
 
         elif action == "recovery":
