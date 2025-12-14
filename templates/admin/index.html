@@ -2,14 +2,13 @@
 {% load i18n static %}
 
 {% block content %}
-<div id="content" class="flex">
-  <h1>{% translate 'Site administration' %}</h1>
 
-  <div class="module" style="margin-bottom: 2em;">
+
+  <div class="module" style="margin-bottom: 3rem;max-width: fit-content;">
     <h2>Account test data</h2>
-    <p>Open the generators to create sample recovery, fatigue, and exercise logs for all accounts.</p>
-    <p>
-      <a class="button default" href="{% url 'admin:account-test-data' %}">
+    <p style="margin-top: 1rem;">Open the generators to create sample recovery, fatigue, and exercise logs for all accounts.</p>
+    <p style="margin-top: 1rem;">
+      <a class="button default" href="{% url 'admin:account-test-data' %}" style="padding: 0.5rem;">
         Go to account test data generators
       </a>
     </p>
@@ -20,5 +19,5 @@
   {% else %}
     <p>{% translate "You don't have permission to view or edit anything." %}</p>
   {% endif %}
-</div>
+
 {% endblock %}

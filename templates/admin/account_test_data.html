@@ -1,105 +1,106 @@
 {% extends "admin/base_site.html" %}
 
 {% block content %}
-<div id="content" class="flex">
-  <h1>{{ title }}</h1>
+
+<div class="module">
+<h2>Demo data</h2>
   <p>Use these generators to seed demo data for every account without writing scripts.</p>
 
-  <div class="module">
-    <form method="post" novalidate>
-      {% csrf_token %}
-      <div class="form-row" style="margin-bottom: 1.5em;">
-        <label for="user_id"><strong>Target user</strong></label><br />
-        <select name="user_id" id="user_id">
-          <option value="" {% if not selected_user_id %}selected{% endif %}>All users</option>
-          {% for account in users %}
-          <option value="{{ account.id }}" {% if selected_user_id == account.id|stringformat:'s' %}selected{% endif %}>
-            {{ account.get_full_name|default:account.username }}
-          </option>
-          {% endfor %}
-        </select>
-        <p style="margin: 0.5em 0 0 0;">Leave as "All users" to seed every account, or pick a user to generate data only for them.</p>
-      </div>
-      {% for action in actions %}
-      <div class="form-row" style="margin-bottom: 1.5em;">
-        <h3 style="margin: 0 0 0.25em 0;">{{ action.label }}</h3>
-        <p style="margin: 0 0 0.5em 0;">{{ action.description }}</p>
-        <button type="submit" name="action" value="{{ action.key }}" class="button{% if action.primary %} default{% endif %}">
-          {{ action.label }}
-        </button>
-      </div>
-      {% endfor %}
-    </form>
-  </div>
 
-  <div class="module">
-    <h2>Reset account data</h2>
-    <p>Remove generated data for a specific day to keep demo accounts tidy.</p>
-    <form method="post" novalidate>
-      {% csrf_token %}
-      <div class="form-row" style="margin-bottom: 1.5em;">
-        <label for="reset_user_id"><strong>Target user</strong></label><br />
-        <select name="user_id" id="reset_user_id">
-          <option value="" {% if not selected_user_id %}selected{% endif %}>All users</option>
-          {% for account in users %}
-          <option value="{{ account.id }}" {% if selected_user_id == account.id|stringformat:'s' %}selected{% endif %}>
-            {{ account.get_full_name|default:account.username }}
-          </option>
-          {% endfor %}
-        </select>
-        <p style="margin: 0.5em 0 0 0;">Choose "All users" to clear data for every account, or pick a specific user.</p>
-      </div>
-
-      <div class="form-row" style="margin-bottom: 1.5em;">
-        <label for="reset_day"><strong>Day</strong></label><br />
-        <select name="day" id="reset_day">
-          {% for day in day_options %}
-          <option value="{{ day|date:'Y-m-d' }}">{{ day|date:'l, F j, Y' }}</option>
-          {% endfor %}
-        </select>
-        <p style="margin: 0.5em 0 0 0;">Select the day to remove logs and exercises for.</p>
-      </div>
-
-      <div class="form-row" style="margin-bottom: 1.5em;">
-        <h3 style="margin: 0 0 0.25em 0;">Generate a new set of 5 exercises</h3>
-        <p style="margin: 0 0 0.5em 0;">Creates a fresh set of daily exercises for the selected day, replacing any existing ones.</p>
-        <button type="submit" name="action" value="generate_daily_exercises" class="button default">
-          Generate exercises for the day
-        </button>
-      </div>
-
-      <div class="form-row" style="margin-bottom: 1.5em;">
-        <h3 style="margin: 0 0 0.25em 0;">Remove exercises</h3>
-        <p style="margin: 0 0 0.5em 0;">Deletes scheduled daily exercises and their exercise logs for the selected day.</p>
-        <button type="submit" name="action" value="delete_exercises" class="button">
-          Remove exercises
-        </button>
-      </div>
-
-      <div class="form-row" style="margin-bottom: 1.5em;">
-        <h3 style="margin: 0 0 0.25em 0;">Remove recovery logs</h3>
-        <p style="margin: 0 0 0.5em 0;">Deletes recovery logs recorded for the selected day.</p>
-        <button type="submit" name="action" value="delete_recovery" class="button">
-          Remove recovery logs
-        </button>
-      </div>
-
-      <div class="form-row" style="margin-bottom: 1.5em;">
-        <h3 style="margin: 0 0 0.25em 0;">Remove fatigue logs</h3>
-        <p style="margin: 0 0 0.5em 0;">Deletes fatigue logs recorded for the selected day.</p>
-        <button type="submit" name="action" value="delete_fatigue" class="button">
-          Remove fatigue logs
-        </button>
-      </div>
-
-      <div class="form-row" style="margin-bottom: 1.5em;">
-        <h3 style="margin: 0 0 0.25em 0;">Remove everything for the day</h3>
-        <p style="margin: 0 0 0.5em 0;">Deletes exercises, recovery logs, and fatigue logs for the selected day.</p>
-        <button type="submit" name="action" value="delete_all" class="button default">
-          Remove all data for the day
-        </button>
-      </div>
-    </form>
-  </div>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="form-row" style="margin-bottom: 1.5em;padding-left: 10px;">
+      <label for="user_id" style="margin-bottom: 0.5rem;display: inline-block;"><strong>Target user</strong></label><br />
+      <select name="user_id" id="user_id">
+        <option value="" {% if not selected_user_id %}selected{% endif %}>All users</option>
+        {% for account in users %}
+        <option value="{{ account.id }}" {% if selected_user_id == account.id|stringformat:'s' %}selected{% endif %}>
+          {{ account.get_full_name|default:account.username }}
+        </option>
+        {% endfor %}
+      </select>
+      <p style="margin: 0.5em 0 0 0;">Leave as "All users" to seed every account, or pick a user to generate data only for them.</p>
+    </div>
+    {% for action in actions %}
+    <div class="form-row" style="margin-bottom: 1.5em;">
+      <h3 style="margin: 0 0 0.25em 0;">{{ action.label }}</h3>
+      <p style="margin: 0 0 0.5em 0;">{{ action.description }}</p>
+      <button type="submit" name="action" value="{{ action.key }}" class="button{% if action.primary %} default{% endif %}" style="margin-left: 10px;padding: 0.5rem">
+        {{ action.label }}
+      </button>
+    </div>
+    {% endfor %}
+  </form>
 </div>
+
+<div class="module">
+  <h2>Reset account data</h2>
+  <p>Remove generated data for a specific day to keep demo accounts tidy.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="form-row" style="margin-bottom: 1.5em;padding-left: 10px;">
+      <label for="reset_user_id" style="margin-bottom: 0.5rem;display: inline-block;"><strong>Target user</strong></label><br />
+      <select name="user_id" id="reset_user_id">
+        <option value="" {% if not selected_user_id %}selected{% endif %}>All users</option>
+        {% for account in users %}
+        <option value="{{ account.id }}" {% if selected_user_id == account.id|stringformat:'s' %}selected{% endif %}>
+          {{ account.get_full_name|default:account.username }}
+        </option>
+        {% endfor %}
+      </select>
+      <p style="margin: 0.5em 0 0 0;">Choose "All users" to clear data for every account, or pick a specific user.</p>
+    </div>
+
+    <div class="form-row" style="margin-bottom: 1.5em;padding-left: 10px;">
+      <label for="reset_day" style="margin-bottom: 0.5rem;display: inline-block;"><strong>Day</strong></label><br />
+      <select name="day" id="reset_day">
+        {% for day in day_options %}
+        <option value="{{ day|date:'Y-m-d' }}">{{ day|date:'l, F j, Y' }}</option>
+        {% endfor %}
+      </select>
+      <p style="margin: 0.5em 0 0 0;">Select the day to remove logs and exercises for.</p>
+    </div>
+
+    <div class="form-row" style="margin-bottom: 1.5em;">
+      <h3 style="margin: 0 0 0.25em 0;">Generate a new set of 5 exercises</h3>
+      <p style="margin: 0 0 0.5em 0;">Creates a fresh set of daily exercises for the selected day, replacing any existing ones.</p>
+      <button type="submit" name="action" value="generate_daily_exercises" class="button default" style="margin-left: 10px;padding: 0.5rem">
+        Generate exercises for the day
+      </button>
+    </div>
+
+    <div class="form-row" style="margin-bottom: 1.5em;">
+      <h3 style="margin: 0 0 0.25em 0;">Remove exercises</h3>
+      <p style="margin: 0 0 0.5em 0;">Deletes scheduled daily exercises and their exercise logs for the selected day.</p>
+      <button type="submit" name="action" value="delete_exercises" class="button" style="margin-left: 10px;padding: 0.5rem">
+        Remove exercises
+      </button>
+    </div>
+
+    <div class="form-row" style="margin-bottom: 1.5em;">
+      <h3 style="margin: 0 0 0.25em 0;">Remove recovery logs</h3>
+      <p style="margin: 0 0 0.5em 0;">Deletes recovery logs recorded for the selected day.</p>
+      <button type="submit" name="action" value="delete_recovery" class="button" style="margin-left: 10px;padding: 0.5rem">
+        Remove recovery logs
+      </button>
+    </div>
+
+    <div class="form-row" style="margin-bottom: 1.5em;">
+      <h3 style="margin: 0 0 0.25em 0;">Remove fatigue logs</h3>
+      <p style="margin: 0 0 0.5em 0;">Deletes fatigue logs recorded for the selected day.</p>
+      <button type="submit" name="action" value="delete_fatigue" class="button" style="margin-left: 10px;padding: 0.5rem">
+        Remove fatigue logs
+      </button>
+    </div>
+
+    <div class="form-row" style="margin-bottom: 1.5em;">
+      <h3 style="margin: 0 0 0.25em 0;">Remove everything for the day</h3>
+      <p style="margin: 0 0 0.5em 0;">Deletes exercises, recovery logs, and fatigue logs for the selected day.</p>
+      <button type="submit" name="action" value="delete_all" class="button default" style="margin-left: 10px;padding: 0.5rem">
+        Remove all data for the day
+      </button>
+    </div>
+  </form>
+</div>
+
 {% endblock %}
