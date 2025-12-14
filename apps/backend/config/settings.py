@@ -55,9 +55,8 @@ TEMPLATES = [
 WSGI_APPLICATION = "apps.backend.config.wsgi.application"
 ASGI_APPLICATION = "apps.backend.config.asgi.application"
 
-DATABASES = {
-    "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
-}
+DB_PATH = BASE_DIR / "apps" / "backend" / "db.sqlite3"
+DATABASES = {"default": dj_database_url.config(default=f"sqlite:///{DB_PATH}")}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
