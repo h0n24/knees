@@ -6,7 +6,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from apps.backend.pages.forms import FatigueAssessmentForm, RecoveryLogForm
-from apps.backend.training.models import DailyExercise, ExerciseLog, RecoveryLog
+from apps.backend.training.models import DailyExercise, ExerciseLog, FatigueLog, RecoveryLog
 from apps.backend.training.services import ensure_training_tables_ready
 
 
@@ -233,6 +233,23 @@ def exercise_session_page(request):
                     for field in fas_form.fields
                 }
                 total_score = _calculate_fas_score(responses, fas_questions)
+                structured_responses = [
+                    {
+                        "question_id": question["id"],
+                        "question": question["text"],
+                        "reversed": question["reversed"],
+                        "value": responses.get(question["field_name"], 0),
+                    }
+                    for question in fas_questions
+                ]
+                FatigueLog.objects.update_or_create(
+                    user=request.user,
+                    recorded_for=recorded_for,
+                    defaults={
+                        "responses": structured_responses,
+                        "total_score": total_score,
+                    },
+                )
                 request.session["fas_responses"] = responses
                 request.session["fas_total_score"] = total_score
                 post_exercise_stage = min(post_exercise_stage + 1, 2)

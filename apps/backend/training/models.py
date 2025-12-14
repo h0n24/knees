@@ -129,3 +129,25 @@ class RecoveryLog(models.Model):
 
     def __str__(self) -> str:
         return f"Recovery log for {self.user.username} on {self.recorded_for}"
+
+
+class FatigueLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="fatigue_logs")
+    recorded_for = models.DateField(default=timezone.localdate)
+    responses = models.JSONField(default=list)
+    total_score = models.PositiveSmallIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-recorded_for", "-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "recorded_for"],
+                name="unique_fatigue_log_per_day",
+            )
+        ]
+        verbose_name = "Fatigue log"
+        verbose_name_plural = "Fatigue logs"
+
+    def __str__(self) -> str:
+        return f"Fatigue log for {self.user.username} on {self.recorded_for}"
