@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group
 from django.shortcuts import redirect, render
 
 from apps.backend.accounts.forms import RegisterForm
+from apps.backend.training.services import create_weekly_plan_for_user
 
 
 def login_page(request):
@@ -30,6 +31,7 @@ def register_page(request):
             user = form.save()
             basic_group, _ = Group.objects.get_or_create(name="basic user")
             user.groups.add(basic_group)
+            create_weekly_plan_for_user(user)
             return redirect("login")
     else:
         form = RegisterForm()
