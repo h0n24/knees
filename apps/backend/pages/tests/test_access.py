@@ -29,7 +29,7 @@ class PageAccessTests(TestCase):
         response = self.client.get(reverse("trainer"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Trainer portal")
+        self.assertContains(response, "Users")
 
     def test_trainer_user_can_access_health_page(self):
         user = self._create_user("trainer", "trainer user")

@@ -6,7 +6,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Sum
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 
 from apps.backend.accounts.forms import UserSettingsForm
@@ -52,6 +53,82 @@ def _user_is_trainer(user: User) -> bool:
     return user.is_staff or user.groups.filter(name="trainer user").exists()
 
 
+def _trainer_navigation(*, selected: str, active_user: User | None = None) -> dict:
+    default_user = User.objects.order_by("username").first()
+    reports_url = None
+
+    if active_user:
+        reports_url = reverse("trainer_user", args=[active_user.username])
+    elif default_user:
+        reports_url = reverse("trainer_user", args=[default_user.username])
+
+    return {
+        "selected": selected,
+        "reports_url": reports_url,
+    }
+
+
+@login_required
+def trainer_user_page(request, username: str):
+    if not _user_is_trainer(request.user):
+        return redirect("health")
+
+    ensure_training_tables_ready()
+    ensure_library_loaded()
+
+    athlete = get_object_or_404(User, username=username)
+    plan_form = PlanEditorForm(request.POST or None, initial={"user": athlete})
+    plan_form.fields["user"].queryset = User.objects.filter(id=athlete.id)
+    plan_form.fields["user"].widget = plan_form.fields["user"].hidden_widget()
+
+    plan_message = None
+    if request.method == "POST" and plan_form.is_valid():
+        start_date = plan_form.cleaned_data["start_date"]
+        replace_existing = plan_form.cleaned_data["replace_existing"]
+        created = create_weekly_plan_for_user(
+            athlete, start_date=start_date, replace_existing=replace_existing
+        )
+        plan_message = {
+            "user": athlete,
+            "created": len(created),
+            "start_date": start_date,
+            "replace_existing": replace_existing,
+        }
+
+    context = {
+        "title": f"{athlete.username} · Trainer",
+        "headline": athlete.username,
+        "plan_form": plan_form,
+        "plan_message": plan_message,
+        "reports": _trainer_reports(user=athlete),
+        "summary": _trainer_summary_for_user(athlete),
+        "upcoming_plan": _upcoming_plan_for_user(athlete),
+        "trainer_nav": _trainer_navigation(selected="reports", active_user=athlete),
+    }
+
+    return render(request, "pages/trainer_user_detail.html", context)
+
+
+@login_required
+def trainer_exercises_page(request):
+    if not _user_is_trainer(request.user):
+        return redirect("health")
+
+    ensure_training_tables_ready()
+    ensure_library_loaded()
+
+    exercises = Exercise.objects.all()
+
+    context = {
+        "title": "Exercises · Trainer",
+        "headline": "List of Exercises",
+        "exercises": exercises,
+        "trainer_nav": _trainer_navigation(selected="exercises"),
+    }
+
+    return render(request, "pages/trainer_exercises.html", context)
+
+
 @login_required
 def trainer_page(request):
     if not _user_is_trainer(request.user):
@@ -60,34 +137,14 @@ def trainer_page(request):
     ensure_training_tables_ready()
     ensure_library_loaded()
 
-    plan_form = PlanEditorForm(request.POST or None)
-    plan_message = None
-    if request.method == "POST" and plan_form.is_valid():
-        user = plan_form.cleaned_data["user"]
-        start_date = plan_form.cleaned_data["start_date"]
-        replace_existing = plan_form.cleaned_data["replace_existing"]
-        created = create_weekly_plan_for_user(
-            user, start_date=start_date, replace_existing=replace_existing
-        )
-        plan_message = {
-            "user": user,
-            "created": len(created),
-            "start_date": start_date,
-            "replace_existing": replace_existing,
-        }
-        plan_form = PlanEditorForm(initial=plan_form.cleaned_data)
-
     context = {
-        "title": "Trainer console",
-        "description": "View adherence, adjust plans, and keep tabs on fatigue trends.",
-        "reports": _trainer_reports(),
+        "title": "Trainer",
+        "headline": "Users",
         "people": _trainer_people(),
-        "exercise_library": Exercise.objects.all(),
-        "plan_form": plan_form,
-        "plan_message": plan_message,
+        "trainer_nav": _trainer_navigation(selected="users"),
     }
 
-    return render(request, "pages/trainer.html", context)
+    return render(request, "pages/trainer_users.html", context)
 
 
 @login_required
@@ -256,43 +313,40 @@ def health_settings_page(request):
     )
 
 
-def _trainer_reports():
+def _trainer_reports(user: User | None = None):
     today = timezone.localdate()
     return [
-        _report_card("Today", today, today),
-        _report_card("Last 7 days", today - timedelta(days=6), today),
-        _report_card("Last 30 days", today - timedelta(days=29), today),
+        _report_card("Today", today, today, user=user),
+        _report_card("Last 7 days", today - timedelta(days=6), today, user=user),
+        _report_card("Last 30 days", today - timedelta(days=29), today, user=user),
     ]
 
 
-def _report_card(title: str, start_date, end_date):
-    training_seconds = (
-        ExerciseLog.objects.filter(completed_at__date__range=(start_date, end_date))
-        .aggregate(total=Sum("duration_seconds"))
-        .get("total")
-        or 0
+def _report_card(title: str, start_date, end_date, user: User | None = None):
+    exercise_logs = ExerciseLog.objects.filter(
+        completed_at__date__range=(start_date, end_date)
     )
-    planned = DailyExercise.objects.filter(
+    planned_exercises = DailyExercise.objects.filter(
         scheduled_for__range=(start_date, end_date)
-    ).count()
+    )
+    recoveries = RecoveryLog.objects.filter(recorded_for__range=(start_date, end_date))
+    fatigues = FatigueLog.objects.filter(recorded_for__range=(start_date, end_date))
+
+    if user:
+        exercise_logs = exercise_logs.filter(user=user)
+        planned_exercises = planned_exercises.filter(user=user)
+        recoveries = recoveries.filter(user=user)
+        fatigues = fatigues.filter(user=user)
+
+    training_seconds = exercise_logs.aggregate(total=Sum("duration_seconds")).get("total") or 0
+    planned = planned_exercises.count()
     completed = (
-        ExerciseLog.objects.filter(completed_at__date__range=(start_date, end_date))
-        .values("daily_exercise_id")
-        .distinct()
-        .count()
+        exercise_logs.values("daily_exercise_id").distinct().count()
     )
     adherence = round((completed / planned) * 100) if planned else 0
 
-    average_sleep = (
-        RecoveryLog.objects.filter(recorded_for__range=(start_date, end_date))
-        .aggregate(avg=Avg("sleep_duration"))
-        .get("avg")
-    )
-    fatigue_score = (
-        FatigueLog.objects.filter(recorded_for__range=(start_date, end_date))
-        .aggregate(avg=Avg("total_score"))
-        .get("avg")
-    )
+    average_sleep = recoveries.aggregate(avg=Avg("sleep_duration")).get("avg")
+    fatigue_score = fatigues.aggregate(avg=Avg("total_score")).get("avg")
 
     range_label = f"{start_date.strftime('%b %d')} – {end_date.strftime('%b %d')}"
 
@@ -306,12 +360,16 @@ def _report_card(title: str, start_date, end_date):
     }
 
 
-def _trainer_people():
+def _trainer_people(user: User | None = None):
     today = timezone.localdate()
     week_start = today - timedelta(days=6)
+    accounts = User.objects.order_by("username")
+    if user:
+        accounts = accounts.filter(id=user.id)
+
     people = []
 
-    for account in User.objects.order_by("username"):
+    for account in accounts:
         planned = DailyExercise.objects.filter(
             user=account, scheduled_for__range=(week_start, today)
         ).count()
@@ -350,10 +408,40 @@ def _trainer_people():
                     latest_recovery.sleep_duration if latest_recovery else None
                 ),
                 "adherence": adherence,
+                "nutrition": latest_recovery.get_nutrition_display() if latest_recovery else None,
             }
         )
 
     return people
+
+
+def _trainer_summary_for_user(user: User):
+    summary = _trainer_people(user=user)
+    return summary[0] if summary else None
+
+
+def _upcoming_plan_for_user(user: User):
+    today = timezone.localdate()
+    end_date = today + timedelta(days=6)
+    plan = (
+        DailyExercise.objects.filter(user=user, scheduled_for__range=(today, end_date))
+        .select_related("exercise")
+        .order_by("scheduled_for", "order")
+    )
+
+    rows = []
+    for daily in plan:
+        rows.append(
+            {
+                "date": daily.scheduled_for,
+                "name": daily.exercise.name,
+                "sets": daily.sets,
+                "reps": daily.repetitions,
+                "difficulty": daily.exercise.difficulty_range,
+            }
+        )
+
+    return rows
 
 
 def _build_exercise_steps(todays_exercises):
@@ -666,16 +754,3 @@ def exercise_session_page(request):
     return render(request, "pages/exercise_session.html", context)
 
 
-@login_required
-def trainer_page(request):
-    if not request.user.groups.filter(name="trainer user").exists():
-        return redirect("health")
-
-    return render(
-        request,
-        "pages/trainer.html",
-        {
-            "title": "Trainer portal",
-            "description": "Oversight tools for monitoring adherence and adjusting plans.",
-        },
-    )

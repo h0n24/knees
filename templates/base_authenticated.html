@@ -20,7 +20,7 @@
           <a href="{{ progress_url }}" {% if request.path == progress_url %}aria-current="page"{% endif %}>Progress</a>
           <a href="{{ settings_url }}" {% if request.path == settings_url %}aria-current="page"{% endif %}>Settings</a>
           {% if request.user.is_staff or request.user|has_group:"trainer user" %}
-          <a href="{{ trainer_url }}" {% if request.path == trainer_url %}aria-current="page"{% endif %}>Trainer</a>
+          <a href="{{ trainer_url }}" {% if request.path|starts_with:trainer_url %}aria-current="page"{% endif %}>Trainer</a>
           {% endif %}
           <a href="/auth/logout/">Logout</a>
         </nav>
@@ -38,7 +38,7 @@
           <span>Progress</span>
         </a>
         {% if request.user.is_staff or request.user|has_group:"trainer user" %}
-        <a href="{{ trainer_url }}" {% if request.path == trainer_url %}aria-current="page"{% endif %}>
+        <a href="{{ trainer_url }}" {% if request.path|starts_with:trainer_url %}aria-current="page"{% endif %}>
           <span class="mobile-nav__icon">🧭</span>
           <span>Trainer</span>
         </a>
