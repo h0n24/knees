@@ -358,7 +358,9 @@ python manage.py runserver
 
 ---
 
-## 17. Presentation checklist
+# Presentation Plan
+
+## Presentation checklist
 
 For the 5-minute demo:
 
@@ -370,7 +372,7 @@ For the 5-minute demo:
 
 ---
 
-## 18. Course requirement mapping (quick)
+## Course requirement mapping (quick)
 
 - Registration/Login ✅
 - At least one data input form ✅ (Daily Check‑In)
