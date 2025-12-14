@@ -1,4 +1,4 @@
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import Group
 from django.shortcuts import redirect, render
@@ -55,6 +55,9 @@ def register_page(request):
 
 
 def logout_page(request):
+    if request.user.is_authenticated:
+        logout(request)
+
     return render(
         request,
         "accounts/logout.html",
