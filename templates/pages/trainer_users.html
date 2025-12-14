@@ -17,12 +17,16 @@
           <th>Fatigue</th>
           <th>Adherence</th>
           <th>Next session</th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
         {% for person in people %}
-        <tr>
+        <tr
+          class="clickable-row"
+          data-row-href="{% url 'trainer_user' person.user.username %}"
+          role="link"
+          tabindex="0"
+        >
           <td class="table-title">
             <div class="table-title__primary">{{ person.user.username }}</div>
             <div class="muted">{{ person.user.email|default:'Member' }}</div>
@@ -33,13 +37,32 @@
           <td>{% if person.fatigue %}{{ person.fatigue }} / 50{% else %}—{% endif %}</td>
           <td><span class="badge">{{ person.adherence }}%</span></td>
           <td>{% if person.next_day %}{{ person.next_day }}{% else %}—{% endif %}</td>
-          <td><a class="link" href="{% url 'trainer_user' person.user.username %}">Open</a></td>
         </tr>
         {% empty %}
-        <tr><td colspan="8">No users found yet.</td></tr>
+        <tr><td colspan="7">No users found yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".clickable-row").forEach((row) => {
+        const href = row.getAttribute("data-row-href");
+        if (!href) return;
+
+        const activate = () => {
+          window.location.href = href;
+        };
+
+        row.addEventListener("click", activate);
+        row.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            activate();
+          }
+        });
+      });
+    });
+  </script>
 </div>
 {% endblock %}

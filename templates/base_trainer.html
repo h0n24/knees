@@ -40,7 +40,10 @@
               <h1 class="trainer-headline">{% block trainer_headline %}{{ headline }}{% endblock %}</h1>
               {% block trainer_subheadline %}{% if subheadline %}<p class="muted">{{ subheadline }}</p>{% endif %}{% endblock %}
             </div>
-            {% block trainer_header_actions %}{% endblock %}
+            <div class="trainer-actions">
+              {% block trainer_header_actions %}{% endblock %}
+              <a class="button secondary" href="{% url 'logout' %}">Logout</a>
+            </div>
           </div>
           {% block trainer_content %}{% endblock %}
         </section>
