@@ -1,0 +1,883 @@
+{
+  "schema_version": "2.0",
+  "title": "Knee Exercise Library (No Equipment, Home)",
+  "difficulty_levels": {
+    "1": "Very Easy",
+    "2": "Easy",
+    "3": "Medium",
+    "4": "Hard",
+    "5": "Very Hard"
+  },
+  "exercises": [
+    {
+      "id": 1,
+      "name": "Heel cord / calf stretch (wall)",
+      "categories": ["stretch"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 3 },
+        "duration_seconds": { "min": 30, "max": 60 },
+        "per_side": true
+      },
+      "notes": "Back heel down, gentle forward lean."
+    },
+    {
+      "id": 2,
+      "name": "Standing quadriceps stretch",
+      "categories": ["stretch"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 3 },
+        "duration_seconds": { "min": 30, "max": 60 },
+        "per_side": true
+      },
+      "notes": "Hold chair/wall; knees close."
+    },
+    {
+      "id": 3,
+      "name": "Supine hamstring stretch",
+      "categories": ["stretch"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 3 },
+        "duration_seconds": { "min": 30, "max": 60 },
+        "per_side": true
+      },
+      "notes": "Keep knee soft; no pulling at knee joint."
+    },
+    {
+      "id": 4,
+      "name": "Seated hamstring stretch (leg on chair/bed)",
+      "categories": ["stretch"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 3 },
+        "duration_seconds": { "min": 20, "max": 40 },
+        "per_side": true
+      },
+      "notes": "Hinge at hips, back long."
+    },
+    {
+      "id": 5,
+      "name": "Kneeling hip flexor stretch",
+      "categories": ["stretch"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 3 },
+        "duration_seconds": { "min": 20, "max": 40 },
+        "per_side": true
+      },
+      "notes": "Glute squeeze, no low-back arch."
+    },
+    {
+      "id": 6,
+      "name": "Figure-4 glute stretch (supine)",
+      "categories": ["stretch"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 3 },
+        "duration_seconds": { "min": 20, "max": 40 },
+        "per_side": true
+      },
+      "notes": "Gentle pull behind thigh."
+    },
+    {
+      "id": 7,
+      "name": "Butterfly stretch (adductors)",
+      "categories": ["stretch"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 3 },
+        "duration_seconds": { "min": 20, "max": 40 },
+        "per_side": false
+      },
+      "notes": "Sit tall, no forcing knees."
+    },
+    {
+      "id": 8,
+      "name": "IT band / lateral thigh stretch (standing cross-over)",
+      "categories": ["stretch"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 2 },
+        "duration_seconds": { "min": 20, "max": 40 },
+        "per_side": true
+      },
+      "notes": "Side bend away from back leg."
+    },
+    {
+      "id": 9,
+      "name": "Knee-to-chest (single)",
+      "categories": ["mobility"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 3 },
+        "reps": { "min": 5, "max": 10 },
+        "hold_seconds": { "min": 5, "max": 10 },
+        "per_side": true
+      },
+      "notes": "Gentle hip + back mobility."
+    },
+    {
+      "id": 10,
+      "name": "Knee-to-chest (double)",
+      "categories": ["mobility"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 3 },
+        "reps": { "min": 5, "max": 10 },
+        "hold_seconds": { "min": 5, "max": 10 },
+        "per_side": false
+      },
+      "notes": "Relax shoulders."
+    },
+    {
+      "id": 11,
+      "name": "Heel slides",
+      "categories": ["mobility"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 15 },
+        "hold_seconds": { "min": 1, "max": 3 },
+        "per_side": true
+      },
+      "notes": "Smooth bend/straighten."
+    },
+    {
+      "id": 12,
+      "name": "Prone knee bend (gentle)",
+      "categories": ["mobility"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 3 },
+        "reps": { "min": 8, "max": 12 },
+        "per_side": true
+      },
+      "notes": "Bend knee slowly, small range."
+    },
+    {
+      "id": 13,
+      "name": "Quadruped rock-back",
+      "categories": ["mobility"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 12 },
+        "per_side": false
+      },
+      "notes": "Shift hips toward heels; pain-free."
+    },
+    {
+      "id": 14,
+      "name": "Ankle pumps",
+      "categories": ["mobility"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 3 },
+        "reps": { "min": 20, "max": 40 },
+        "per_side": false
+      },
+      "notes": "Helps circulation; easy warm-up."
+    },
+    {
+      "id": 15,
+      "name": "Leg swings (front/back)",
+      "categories": ["dynamic_mobility"],
+      "difficulty": {
+        "min": 1,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 2 },
+        "reps": { "min": 8, "max": 15 },
+        "per_side": true
+      },
+      "notes": "Controlled; warm-up."
+    },
+    {
+      "id": 16,
+      "name": "Quad set (knee press-down)",
+      "categories": ["activation"],
+      "difficulty": {
+        "min": 1,
+        "max": 1
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 15 },
+        "hold_seconds": { "min": 5, "max": 10 },
+        "per_side": false
+      },
+      "notes": "Tighten quad, press knee down."
+    },
+    {
+      "id": 17,
+      "name": "Short-arc quad (towel under knee)",
+      "categories": ["activation"],
+      "difficulty": {
+        "min": 1,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 15 },
+        "hold_seconds": { "min": 2, "max": 2 },
+        "per_side": false
+      },
+      "notes": "Lift foot by straightening knee."
+    },
+    {
+      "id": 18,
+      "name": "Seated knee extension hold",
+      "categories": ["isometric"],
+      "difficulty": {
+        "min": 2,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 12 },
+        "hold_seconds": { "min": 5, "max": 5 },
+        "per_side": false
+      },
+      "notes": "Extend leg, hold."
+    },
+    {
+      "id": 19,
+      "name": "Wall sit (shallow)",
+      "categories": ["isometric", "strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 5 },
+        "duration_seconds": { "min": 15, "max": 45 },
+        "per_side": false
+      },
+      "notes": "Start higher (less bend)."
+    },
+    {
+      "id": 20,
+      "name": "Wall sit (90°)",
+      "categories": ["isometric", "strength"],
+      "difficulty": {
+        "min": 3,
+        "max": 4
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 5 },
+        "duration_seconds": { "min": 20, "max": 60 },
+        "per_side": false
+      },
+      "notes": "Knees over mid-foot."
+    },
+    {
+      "id": 21,
+      "name": "Glute bridge hold",
+      "categories": ["isometric"],
+      "difficulty": {
+        "min": 2,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "duration_seconds": { "min": 15, "max": 45 },
+        "per_side": false
+      },
+      "notes": "Squeeze glutes, ribs down."
+    },
+    {
+      "id": 22,
+      "name": "Calf raise hold (top position)",
+      "categories": ["isometric"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "duration_seconds": { "min": 10, "max": 20 },
+        "per_side": false
+      },
+      "notes": "Rise, hold, lower."
+    },
+    {
+      "id": 23,
+      "name": "Terminal knee extension (no band) 'lockout squeeze'",
+      "categories": ["activation"],
+      "difficulty": {
+        "min": 1,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 15 },
+        "hold_seconds": { "min": 2, "max": 5 },
+        "per_side": false
+      },
+      "notes": "Stand tall, straighten knee, squeeze quad."
+    },
+    {
+      "id": 24,
+      "name": "Isometric adductor squeeze (pillow between knees)",
+      "categories": ["activation"],
+      "difficulty": {
+        "min": 1,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 15 },
+        "hold_seconds": { "min": 5, "max": 5 },
+        "per_side": false
+      },
+      "notes": "Gentle but firm squeeze."
+    },
+    {
+      "id": 25,
+      "name": "Isometric hamstring dig (heels into floor)",
+      "categories": ["activation"],
+      "difficulty": {
+        "min": 2,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 12 },
+        "hold_seconds": { "min": 5, "max": 5 },
+        "per_side": false
+      },
+      "notes": "Supine, heels dig without lifting hips."
+    },
+    {
+      "id": 26,
+      "name": "Straight-leg raise (supine)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 15 },
+        "hold_seconds": { "min": 2, "max": 5 },
+        "per_side": true
+      },
+      "notes": "Knee straight, slow."
+    },
+    {
+      "id": 27,
+      "name": "Straight-leg raise (seated)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 15 },
+        "hold_seconds": { "min": 2, "max": 5 },
+        "per_side": true
+      },
+      "notes": "Chair supported."
+    },
+    {
+      "id": 28,
+      "name": "Straight-leg raise (prone / hip extension)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 15 },
+        "per_side": true
+      },
+      "notes": "Lift leg from hip, not low back."
+    },
+    {
+      "id": 29,
+      "name": "Glute bridge",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 15 },
+        "per_side": false
+      },
+      "notes": "Push through heels."
+    },
+    {
+      "id": 30,
+      "name": "Single-leg bridge",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 4,
+        "max": 4
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 12 },
+        "per_side": true
+      },
+      "notes": "Keep hips level."
+    },
+    {
+      "id": 31,
+      "name": "Clamshell (no band)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 10, "max": 20 },
+        "per_side": true
+      },
+      "notes": "Hips stacked; small clean motion."
+    },
+    {
+      "id": 32,
+      "name": "Side-lying hip abduction",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 20 },
+        "per_side": true
+      },
+      "notes": "Toes forward."
+    },
+    {
+      "id": 33,
+      "name": "Side-lying hip adduction",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 20 },
+        "per_side": true
+      },
+      "notes": "Inner thigh focus."
+    },
+    {
+      "id": 34,
+      "name": "Fire hydrant",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 15 },
+        "per_side": true
+      },
+      "notes": "Avoid pelvis rotation."
+    },
+    {
+      "id": 35,
+      "name": "Donkey kick",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 8, "max": 15 },
+        "per_side": true
+      },
+      "notes": "Controlled hip extension."
+    },
+    {
+      "id": 36,
+      "name": "Standing hip abduction",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 10, "max": 20 },
+        "per_side": true
+      },
+      "notes": "Tall posture."
+    },
+    {
+      "id": 37,
+      "name": "Standing hip extension",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 10, "max": 20 },
+        "per_side": true
+      },
+      "notes": "Small range, glute squeeze."
+    },
+    {
+      "id": 38,
+      "name": "Calf raises (double-leg)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 2
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 5 },
+        "reps": { "min": 8, "max": 20 },
+        "per_side": false
+      },
+      "notes": "Full range, slow lower."
+    },
+    {
+      "id": 39,
+      "name": "Calf raises (single-leg)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 4,
+        "max": 4
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 5 },
+        "reps": { "min": 6, "max": 15 },
+        "per_side": true
+      },
+      "notes": "Light support allowed."
+    },
+    {
+      "id": 40,
+      "name": "Tibialis raises (toe lifts at wall)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 10, "max": 25 },
+        "per_side": false
+      },
+      "notes": "Heels down, toes up."
+    },
+    {
+      "id": 41,
+      "name": "Sit-to-stand (chair rise)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 15 },
+        "per_side": false
+      },
+      "notes": "Control down."
+    },
+    {
+      "id": 42,
+      "name": "Box squat to chair (touch & go)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 15 },
+        "per_side": false
+      },
+      "notes": "Tap chair, stand."
+    },
+    {
+      "id": 43,
+      "name": "Partial squat (half squat)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 15 },
+        "per_side": false
+      },
+      "notes": "Stop before pain."
+    },
+    {
+      "id": 44,
+      "name": "Tempo partial squat (3s down)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 3,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 12 },
+        "tempo": {
+          "eccentric_seconds": 3
+        },
+        "per_side": false
+      },
+      "notes": "Slow eccentric."
+    },
+    {
+      "id": 45,
+      "name": "Wall slide squat (back on wall)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 12 },
+        "per_side": false
+      },
+      "notes": "Slide down/up."
+    },
+    {
+      "id": 46,
+      "name": "Forward lunge (short stride, shallow)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 3,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 12 },
+        "per_side": true
+      },
+      "notes": "Vertical torso, small depth."
+    },
+    {
+      "id": 47,
+      "name": "Reverse lunge",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 3,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 12 },
+        "per_side": true
+      },
+      "notes": "Often knee-friendlier."
+    },
+    {
+      "id": 48,
+      "name": "Split squat (static lunge)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 3,
+        "max": 4
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 12 },
+        "per_side": true
+      },
+      "notes": "Stay in split stance."
+    },
+    {
+      "id": 49,
+      "name": "Lateral lunge (shallow)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 3,
+        "max": 4
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 12 },
+        "per_side": true
+      },
+      "notes": "Hips back, knee tracks."
+    },
+    {
+      "id": 50,
+      "name": "Step-up (low step)",
+      "categories": ["strength"],
+      "difficulty": {
+        "min": 3,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 15 },
+        "per_side": true
+      },
+      "notes": "Use stairs; drive through heel."
+    },
+    {
+      "id": 51,
+      "name": "Step-down (low step)",
+      "categories": ["control"],
+      "difficulty": {
+        "min": 3,
+        "max": 4
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 12 },
+        "per_side": true
+      },
+      "notes": "Slow lowering, knee aligned."
+    },
+    {
+      "id": 52,
+      "name": "Single-leg balance (eyes open)",
+      "categories": ["balance"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 5 },
+        "duration_seconds": { "min": 10, "max": 45 },
+        "per_side": true
+      },
+      "notes": "Slight knee bend."
+    },
+    {
+      "id": 53,
+      "name": "Single-leg balance (head turns / reach)",
+      "categories": ["balance"],
+      "difficulty": {
+        "min": 3,
+        "max": 4
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 5 },
+        "duration_seconds": { "min": 10, "max": 30 },
+        "per_side": true
+      },
+      "notes": "Add small tasks."
+    },
+    {
+      "id": 54,
+      "name": "Single-leg balance (eyes closed)",
+      "categories": ["balance"],
+      "difficulty": {
+        "min": 4,
+        "max": 5
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 5 },
+        "duration_seconds": { "min": 5, "max": 20 },
+        "per_side": true
+      },
+      "notes": "Only if safe."
+    },
+    {
+      "id": 55,
+      "name": "Mini squat hold (athletic stance)",
+      "categories": ["stability"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 5 },
+        "duration_seconds": { "min": 15, "max": 45 },
+        "per_side": false
+      },
+      "notes": "Knees soft, hips back."
+    },
+    {
+      "id": 56,
+      "name": "Side-step walk (no band)",
+      "categories": ["stability"],
+      "difficulty": {
+        "min": 2,
+        "max": 3
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 10, "max": 20 },
+        "unit": "steps_each_direction",
+        "per_side": false
+      },
+      "notes": "Stay low."
+    },
+    {
+      "id": 57,
+      "name": "Single-leg hip hinge (RDL pattern)",
+      "categories": ["stability", "strength"],
+      "difficulty": {
+        "min": 4,
+        "max": 4
+      },
+      "prescription": {
+        "sets": { "min": 2, "max": 4 },
+        "reps": { "min": 6, "max": 12 },
+        "per_side": true
+      },
+      "notes": "Long spine, slow."
+    }
+  ]
+}
