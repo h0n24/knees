@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -95,3 +96,36 @@ class ExerciseLog(models.Model):
         return (
             f"{self.daily_exercise.exercise.name} set {self.set_number} for {self.user.username}"
         )
+
+
+class RecoveryLog(models.Model):
+    class NutritionQuality(models.TextChoices):
+        BELOW_AVERAGE = "below_average", "Below average"
+        AVERAGE = "average", "Average"
+        AMAZING = "amazing", "Amazing"
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recovery_logs")
+    recorded_for = models.DateField(default=timezone.localdate)
+    sleep_duration = models.DurationField()
+    sleep_quality = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
+    nutrition = models.CharField(
+        max_length=20, choices=NutritionQuality.choices, default=NutritionQuality.AVERAGE
+    )
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-recorded_for", "-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "recorded_for"],
+                name="unique_recovery_log_per_day",
+            )
+        ]
+        verbose_name = "Recovery log"
+        verbose_name_plural = "Recovery logs"
+
+    def __str__(self) -> str:
+        return f"Recovery log for {self.user.username} on {self.recorded_for}"

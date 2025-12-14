@@ -1,0 +1,49 @@
+from __future__ import annotations
+
+import re
+from datetime import timedelta
+
+from django import forms
+from django.core.exceptions import ValidationError
+
+from apps.backend.training.models import RecoveryLog
+
+
+class RecoveryLogForm(forms.ModelForm):
+    sleep_duration = forms.CharField(label="Sleep Time")
+
+    class Meta:
+        model = RecoveryLog
+        fields = ["sleep_duration", "sleep_quality", "nutrition", "comment"]
+        widgets = {
+            "sleep_quality": forms.NumberInput(attrs={"min": 0, "max": 100, "placeholder": "80"}),
+            "nutrition": forms.Select(),
+            "comment": forms.Textarea(
+                attrs={"rows": 3, "placeholder": "Custom comment for the trainer"}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["sleep_duration"].widget.attrs.update({"placeholder": "7:20"})
+        self.fields["sleep_quality"].label = "Sleep Quality"
+        self.fields["nutrition"].label = "Nutrition"
+        self.fields["comment"].label = "Custom Comment"
+
+    def clean_sleep_duration(self):
+        value = self.cleaned_data.get("sleep_duration")
+        if value is None:
+            raise ValidationError("Please enter your sleep time in hours and minutes.")
+
+        value = value.strip()
+        match = re.fullmatch(r"(\d{1,2}):(\d{2})", value)
+        if not match:
+            raise ValidationError("Use the format h:mm (for example 7:20).")
+
+        hours = int(match.group(1))
+        minutes = int(match.group(2))
+
+        if minutes >= 60:
+            raise ValidationError("Minutes must be between 0 and 59.")
+
+        return timedelta(hours=hours, minutes=minutes)

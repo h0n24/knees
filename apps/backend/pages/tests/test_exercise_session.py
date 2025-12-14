@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from apps.backend.pages import views
-from apps.backend.training.models import DailyExercise, Exercise, ExerciseLog
+from apps.backend.training.models import DailyExercise, Exercise, ExerciseLog, RecoveryLog
 
 
 class ExerciseSessionTests(TestCase):
@@ -68,3 +68,54 @@ class ExerciseSessionTests(TestCase):
         log = ExerciseLog.objects.get(user=self.user, daily_exercise=daily)
         self.assertEqual(log.set_number, 1)
         self.assertGreaterEqual(log.duration_seconds, 1)
+
+    def test_recovery_log_submission_records_data(self):
+        self._create_daily_exercise("Exercise 1", 0, 1)
+
+        session = self.client.session
+        session["current_step_started_at"] = timezone.now().timestamp() - 5
+        session.save()
+
+        self.client.post(reverse("exercise_session"))
+
+        response = self.client.post(
+            reverse("exercise_session"),
+            {
+                "sleep_duration": "7:20",
+                "sleep_quality": 80,
+                "nutrition": RecoveryLog.NutritionQuality.AMAZING,
+                "comment": "Felt great",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+        log = RecoveryLog.objects.get(user=self.user, recorded_for=timezone.localdate())
+        self.assertEqual(log.sleep_quality, 80)
+        self.assertEqual(log.nutrition, RecoveryLog.NutritionQuality.AMAZING)
+        self.assertEqual(log.comment, "Felt great")
+        self.assertEqual(int(log.sleep_duration.total_seconds()), (7 * 60 + 20) * 60)
+
+    def test_invalid_sleep_time_shows_error(self):
+        self._create_daily_exercise("Exercise 1", 0, 1)
+
+        session = self.client.session
+        session["current_step_started_at"] = timezone.now().timestamp() - 5
+        session.save()
+
+        self.client.post(reverse("exercise_session"))
+
+        response = self.client.post(
+            reverse("exercise_session"),
+            {
+                "sleep_duration": "720",  # missing colon
+                "sleep_quality": 80,
+                "nutrition": RecoveryLog.NutritionQuality.AVERAGE,
+                "comment": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Use the format h:mm")
+        self.assertFalse(RecoveryLog.objects.exists())
+        self.assertEqual(self.client.session.get("post_exercise_stage"), 0)

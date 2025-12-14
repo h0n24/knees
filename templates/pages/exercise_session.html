@@ -46,15 +46,44 @@
             </div>
         {% elif post_exercise_stage == 0 %}
             <div class="session__body">
-                <div class="session__text-card">
+                <form method="post" class="session__text-card session__form">
+                    {% csrf_token %}
                     <p class="eyebrow">Recovery</p>
                     <h2>Sleep &amp; nutrition check-in</h2>
                     <p class="muted">Take a moment to record how you rested and what you ate today.</p>
-                    <form method="post" class="session__actions">
-                        {% csrf_token %}
+
+                    {% if recovery_form.non_field_errors %}
+                        <div class="form__errors">{{ recovery_form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <label for="id_sleep_duration">Sleep Time</label>
+                    {{ recovery_form.sleep_duration }}
+                    {% if recovery_form.sleep_duration.errors %}
+                        <div class="form__errors">{{ recovery_form.sleep_duration.errors }}</div>
+                    {% endif %}
+
+                    <label for="id_sleep_quality">Sleep Quality</label>
+                    {{ recovery_form.sleep_quality }}
+                    {% if recovery_form.sleep_quality.errors %}
+                        <div class="form__errors">{{ recovery_form.sleep_quality.errors }}</div>
+                    {% endif %}
+
+                    <label for="id_nutrition">Nutrition</label>
+                    {{ recovery_form.nutrition }}
+                    {% if recovery_form.nutrition.errors %}
+                        <div class="form__errors">{{ recovery_form.nutrition.errors }}</div>
+                    {% endif %}
+
+                    <label for="id_comment">Custom Comment for the trainer</label>
+                    {{ recovery_form.comment }}
+                    {% if recovery_form.comment.errors %}
+                        <div class="form__errors">{{ recovery_form.comment.errors }}</div>
+                    {% endif %}
+
+                    <div class="session__actions">
                         <button type="submit" class="button primary">Next</button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         {% elif post_exercise_stage == 1 %}
             <div class="session__body">
