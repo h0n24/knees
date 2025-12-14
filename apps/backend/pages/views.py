@@ -3,7 +3,6 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from apps.backend.training.models import DailyExercise
-from apps.backend.training.services import create_weekly_plan_for_user
 
 
 def landing_page(request):
@@ -19,18 +18,12 @@ def landing_page(request):
 
 @login_required
 def health_page(request):
-    todays_exercises_qs = DailyExercise.objects.filter(
-        user=request.user, scheduled_for=timezone.localdate()
-    )
-
-    if not todays_exercises_qs.exists():
-        create_weekly_plan_for_user(request.user)
-        todays_exercises_qs = DailyExercise.objects.filter(
+    todays_exercises = (
+        DailyExercise.objects.filter(
             user=request.user, scheduled_for=timezone.localdate()
         )
-
-    todays_exercises = todays_exercises_qs.select_related("exercise").order_by(
-        "order", "id"
+        .select_related("exercise")
+        .order_by("order", "id")
     )
 
     return render(

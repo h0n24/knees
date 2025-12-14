@@ -33,15 +33,3 @@ class TrainingPlanTests(TestCase):
         todays_plan = DailyExercise.for_today(self.user)
         for item in todays_plan:
             self.assertContains(response, item.exercise.name)
-
-    def test_health_page_bootstraps_plan_if_missing(self):
-        client = Client()
-        client.force_login(self.user)
-
-        self.assertFalse(DailyExercise.objects.filter(user=self.user).exists())
-
-        response = client.get(reverse("health"))
-        self.assertContains(response, "Today's plan")
-
-        todays_plan = DailyExercise.for_today(self.user)
-        self.assertGreaterEqual(todays_plan.count(), 1)

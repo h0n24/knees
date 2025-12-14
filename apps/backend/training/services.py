@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import json
 import random
-from datetime import timedelta
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Iterable, List
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.utils import timezone
 
 from apps.backend.training.models import DailyExercise, Exercise
 
@@ -79,7 +78,7 @@ def _pick_daily_set(exercises: Iterable[Exercise]) -> list[Exercise]:
 def create_weekly_plan_for_user(user: User) -> list[DailyExercise]:
     exercises = ensure_library_loaded()
     created: list[DailyExercise] = []
-    today = timezone.localdate()
+    today = date.today()
 
     for offset in range(7):
         scheduled_day = today + timedelta(days=offset)
