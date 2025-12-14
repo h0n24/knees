@@ -8,6 +8,18 @@
   <div class="module">
     <form method="post" novalidate>
       {% csrf_token %}
+      <div class="form-row" style="margin-bottom: 1.5em;">
+        <label for="user_id"><strong>Target user</strong></label><br />
+        <select name="user_id" id="user_id">
+          <option value="" {% if not selected_user_id %}selected{% endif %}>All users</option>
+          {% for account in users %}
+          <option value="{{ account.id }}" {% if selected_user_id == account.id|stringformat:'s' %}selected{% endif %}>
+            {{ account.get_full_name|default:account.username }}
+          </option>
+          {% endfor %}
+        </select>
+        <p style="margin: 0.5em 0 0 0;">Leave as "All users" to seed every account, or pick a user to generate data only for them.</p>
+      </div>
       {% for action in actions %}
       <div class="form-row" style="margin-bottom: 1.5em;">
         <h3 style="margin: 0 0 0.25em 0;">{{ action.label }}</h3>
