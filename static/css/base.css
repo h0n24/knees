@@ -18,38 +18,153 @@ body {
     line-height: 1.6;
 }
 
-header {
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
-    padding: 1rem 1.5rem;
+.app-shell {
+    background: #f3f6fb;
+    min-height: 100vh;
 }
 
-nav {
+.app-header {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+}
+
+.app-header__inner {
+    max-width: 960px;
+    margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 960px;
-    margin: 0 auto;
-}
-
-nav ul {
-    display: flex;
-    list-style: none;
     gap: 1rem;
-    padding: 0;
-    margin: 0;
 }
 
-nav a {
-    color: var(--text);
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+}
+
+.primary-nav {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.primary-nav a {
+    color: #cbd5e1;
     text-decoration: none;
-    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    transition: background 150ms ease, color 150ms ease;
 }
 
-main {
+.primary-nav a:hover,
+.primary-nav a[aria-current="page"] {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.app-main {
     max-width: 960px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+    margin: 1.5rem auto 4rem;
+    padding: 0 1rem 2rem;
+}
+
+.grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.grid.two-columns {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 20px 30px rgba(15, 23, 42, 0.06);
+}
+
+.panel__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.hero__text h1 {
+    margin: 0 0 0.35rem;
+}
+
+.hero__text p {
+    margin: 0;
+    color: #475569;
+}
+
+.task-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+}
+
+.task-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #e0f2fe;
+    color: #0ea5e9;
+    font-weight: 800;
+}
+
+.task-status.is-complete .task-icon {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-title {
+    margin: 0;
+    font-weight: 800;
+}
+
+.task-label {
+    margin: 0.15rem 0 0;
+    color: #475569;
+    font-size: 0.95rem;
+}
+
+.cta {
+    margin-top: 1.5rem;
 }
 
 .exercise-list ol {
@@ -107,6 +222,13 @@ main {
     border-color: var(--border);
 }
 
+.button.wide {
+    width: 100%;
+    text-align: center;
+    font-size: 1.05rem;
+    padding: 1rem 1.25rem;
+}
+
 .page-actions {
     margin-top: 1.5rem;
 }
@@ -116,4 +238,59 @@ footer {
     padding: 1rem 1.5rem;
     text-align: center;
     color: #475569;
+}
+
+.mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0f172a;
+    color: #e2e8f0;
+    display: none;
+    padding: 0.35rem 0.75rem;
+    box-shadow: 0 -6px 20px rgba(15, 23, 42, 0.12);
+}
+
+.mobile-nav__inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+
+.mobile-nav a {
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 0.35rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-weight: 700;
+    display: grid;
+    gap: 0.15rem;
+}
+
+.mobile-nav a[aria-current="page"],
+.mobile-nav a:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.mobile-nav__icon {
+    font-size: 1.15rem;
+}
+
+@media (max-width: 640px) {
+    .primary-nav {
+        display: none;
+    }
+
+    .app-main {
+        margin-bottom: 6rem;
+    }
+
+    .mobile-nav {
+        display: block;
+    }
 }
