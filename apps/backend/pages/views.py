@@ -349,6 +349,16 @@ def exercise_session_page(request):
         and fatigue_log
     )
 
+    completed_post_exercise_stage = 0
+    if recovery_log:
+        completed_post_exercise_stage = 1
+        if fatigue_log:
+            completed_post_exercise_stage = 2
+
+    if post_exercise_stage > completed_post_exercise_stage:
+        post_exercise_stage = completed_post_exercise_stage
+        request.session["post_exercise_stage"] = post_exercise_stage
+
     editing_checkins = session_finished and (
         request.GET.get("edit_checkins") == "1"
         or request.session.get("editing_checkins")
