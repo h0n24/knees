@@ -8,7 +8,9 @@ from typing import Iterable, List
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db import transaction
+from django.core.management import call_command
+from django.db import connection, transaction
+from django.db.utils import OperationalError, ProgrammingError
 
 from apps.backend.training.models import DailyExercise, Exercise
 
@@ -21,8 +23,31 @@ def _library_path() -> Path:
     return Path(settings.BASE_DIR) / "exercises.json"
 
 
+def _ensure_training_tables_ready() -> None:
+    """Apply migrations if the training tables have not been created yet.
+
+    When the project is first run it's easy to forget the ``migrate`` step,
+    which leads to ``OperationalError: no such table: training_exercise`` when
+    we try to seed the exercise library. To keep the registration flow stable
+    in development, we opportunistically run migrations if the training tables
+    are missing.
+    """
+
+    table_name = Exercise._meta.db_table
+    try:
+        if table_name in connection.introspection.table_names():
+            return
+    except (OperationalError, ProgrammingError):
+        # SQLite may raise if the database file hasn't been created yet.
+        pass
+
+    call_command("migrate", interactive=False, run_syncdb=True, verbosity=0)
+
+
 def ensure_library_loaded() -> List[Exercise]:
     """Load exercises from the bundled JSON file into the database if missing."""
+
+    _ensure_training_tables_ready()
 
     path = _library_path()
     with path.open() as handle:
