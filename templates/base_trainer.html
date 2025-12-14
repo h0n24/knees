@@ -12,10 +12,6 @@
         <aside class="trainer-sidebar" aria-label="Trainer navigation">
           <div class="trainer-brand">
             <div class="trainer-brand__logo">Knees</div>
-            <div class="trainer-brand__copy">
-              <p class="eyebrow">Training Tracker</p>
-              <p class="muted">Trainer workspace</p>
-            </div>
           </div>
           <nav class="trainer-nav">
             <a href="{% url 'trainer' %}" class="trainer-nav__item{% if trainer_nav.selected == 'users' %} is-active{% endif %}">
@@ -38,17 +34,10 @@
           <div class="trainer-sidebar__spacer" aria-hidden="true"></div>
           <a class="trainer-nav__item trainer-nav__item--logout" href="{% url 'logout' %}">Logout</a>
         </aside>
-        <section class="trainer-content">
-          <div class="trainer-page-header">
-            <div>
-              <h1 class="trainer-headline">{% block trainer_headline %}{{ headline }}{% endblock %}</h1>
-              {% block trainer_subheadline %}{% if subheadline %}<p class="muted">{{ subheadline }}</p>{% endif %}{% endblock %}
-            </div>
-            <div class="trainer-actions">
-              {% block trainer_header_actions %}{% endblock %}
-            </div>
-          </div>
+        <section class="trainer-page-header">
+          <div class="">
           {% block trainer_content %}{% endblock %}
+          </div>
         </section>
       </div>
     </main>
