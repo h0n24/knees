@@ -6,32 +6,6 @@ This repository is intentionally written as a **course-grade reference project**
 
 ---
 
-## 0. Milestone 1 — Project skeleton
-
-This commit establishes the dual-stack skeleton referenced in the structure plan:
-
-- **Backend (Django 5)**: `apps/backend` with project settings under `apps/backend/config`, ASGI entrypoint, and placeholder apps for accounts, training, check-ins, reports, and pages.
-- **Frontend (Next.js App Router)**: `apps/frontend` with grouped route folders for marketing, auth, user, and trainer experiences, plus a simple landing page layout.
-
-The project is intended for **local development** with Django and Next.js running side by side; there is no serverless or Vercel dependency.
-
-Run locally:
-
-```bash
-# Backend
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-
-# Frontend (in a second terminal)
-cd apps/frontend
-npm install
-npm run dev
-```
-
----
-
 ## 1. Why this app exists
 
 Many knee issues improve with consistent, progressive training plus adequate recovery. This app provides a **minimal daily routine tracker** that also collects a few **lightweight recovery signals**.
@@ -292,28 +266,9 @@ This is intended to be “state of the art but understandable”:
 
 ---
 
-## 14. Suggested project structure
+## 14. Project structure
 
-```
-.
-├── manage.py
-├── pyproject.toml / requirements.txt
-├── config/                 # project settings
-├── apps/
-│   ├── accounts/
-│   ├── training/
-│   ├── checkins/
-│   ├── reports/
-│   └── pages/
-├── templates/
-│   ├── base.html
-│   ├── components/
-│   └── ...
-├── static/
-│   ├── css/
-│   └── js/
-└── README.md
-```
+Defined in Structure_Plan.md in the docs.
 
 ---
 
@@ -326,7 +281,39 @@ This is intended to be “state of the art but understandable”:
 
 ---
 
-## 16. Milestones
+## 19. License
+
+Educational project.
+
+# Project Milestones
+
+## Milestone 1 — Project skeleton
+
+This commit establishes the dual-stack skeleton referenced in the structure plan:
+
+- **Backend (Django 5)**: `apps/backend` with project settings under `apps/backend/config`, ASGI entrypoint, and placeholder apps for accounts, training, check-ins, reports, and pages.
+- **Frontend (Next.js App Router)**: `apps/frontend` with grouped route folders for marketing, auth, user, and trainer experiences, plus a simple landing page layout.
+
+The project is intended for **local development** with Django and Next.js running side by side; there is no serverless or Vercel dependency.
+
+Run locally:
+
+```bash
+# Backend
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+
+# Frontend (in a second terminal)
+cd apps/frontend
+npm install
+npm run dev
+```
+
+---
+
+## All milestones
 
 1. Project skeleton
 
@@ -388,7 +375,3 @@ Optional (extra points):
 - Interactive JS tables (DataTables) ⬜
 
 ---
-
-## 19. License
-
-Educational project.
