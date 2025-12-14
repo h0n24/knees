@@ -29,7 +29,7 @@ User = get_user_model()
 class ExerciseAdmin(admin.ModelAdmin):
     list_display = ("name", "difficulty_range", "external_id")
     list_filter = ("difficulty_min", "categories")
-    search_fields = ("name", "notes")
+    search_fields = ("name", "notes", "info")
 
 
 @admin.register(DailyExercise)

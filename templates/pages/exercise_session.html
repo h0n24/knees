@@ -1,4 +1,5 @@
 {% extends "base_authenticated.html" %}
+{% load static %}
 
 {% block title %}Exercise session | Knees{% endblock %}
 
@@ -25,15 +26,22 @@
         {% if current_step %}
             <div class="session__body">
                 <div class="session__media">
-                    <div class="media-placeholder">
-                        <div class="play-icon">▶</div>
-                    </div>
+                    <figure class="exercise-media">
+                        <img
+                            src="{% static 'exercises' %}/{{ current_step.daily_exercise.exercise.external_id }}.png"
+                            alt="{{ current_step.daily_exercise.exercise.name }} exercise demonstration"
+                            loading="lazy"
+                        />
+                    </figure>
                 </div>
                 <div class="session__details">
                     <p class="eyebrow">Set {{ current_step.set_number }} of {{ current_step.daily_exercise.sets|default:1 }}</p>
                     <h2>{{ current_step.daily_exercise.exercise.name }}</h2>
                     <p class="reps">{{ current_step.daily_exercise.repetitions|default:"Repetitions not specified" }}</p>
                     <p class="muted">Difficulty {{ current_step.daily_exercise.exercise.difficulty_range }}</p>
+                    {% if current_step.daily_exercise.exercise.info %}
+                        <p class="muted exercise-info">{{ current_step.daily_exercise.exercise.info }}</p>
+                    {% endif %}
 
                     <form method="post" class="session__actions">
                         {% csrf_token %}
