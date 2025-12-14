@@ -87,8 +87,13 @@ class FatigueLogAdmin(admin.ModelAdmin):
     autocomplete_fields = ("user",)
 
 
+SESSION_SELECTED_USER_ID_KEY = "account_test_data_selected_user_id"
+
+
 def account_test_data_view(request):
-    selected_user_id = request.POST.get("user_id")
+    selected_user_id = request.POST.get("user_id") or request.session.get(
+        SESSION_SELECTED_USER_ID_KEY
+    )
     target_user = None
 
     if selected_user_id:
@@ -96,9 +101,15 @@ def account_test_data_view(request):
             target_user = User.objects.get(pk=selected_user_id)
         except User.DoesNotExist:
             messages.error(request, "Selected user was not found; no data generated.")
+            request.session.pop(SESSION_SELECTED_USER_ID_KEY, None)
             return redirect(request.path)
 
     if request.method == "POST":
+        if target_user:
+            request.session[SESSION_SELECTED_USER_ID_KEY] = str(target_user.pk)
+        else:
+            request.session.pop(SESSION_SELECTED_USER_ID_KEY, None)
+
         action = request.POST.get("action")
         scope = f"user {target_user.username}" if target_user else "all users"
 
