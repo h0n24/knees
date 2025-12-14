@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "api/django.py": {
+      "runtime": "python3.11"
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/django.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/apps/frontend/.next/server/app/$1"
+    }
+  ]
+}
