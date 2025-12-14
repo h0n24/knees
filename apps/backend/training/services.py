@@ -71,6 +71,7 @@ def ensure_library_loaded() -> List[Exercise]:
                 "categories": raw.get("categories", []),
                 "prescription": raw.get("prescription", {}),
                 "notes": raw.get("notes", ""),
+                "info": raw.get("info", ""),
             },
         )
         exercises.append(exercise)

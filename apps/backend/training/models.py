@@ -16,6 +16,7 @@ class Exercise(models.Model):
     categories = models.JSONField(default=list)
     prescription = models.JSONField(default=dict)
     notes = models.TextField(blank=True)
+    info = models.TextField(blank=True, default="")
 
     class Meta:
         ordering = ["name"]
