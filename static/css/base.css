@@ -422,9 +422,9 @@ footer {
 
 .slider__bubble {
   position: absolute;
-  left: 0;
+  left: 50%;
   bottom: calc(100% + 10px);
-  transform: translateX(-50%);
+  transform: translate(-50%, -4px) scale(0.98);
   background: #0f172a;
   color: white;
   padding: 0.4rem 0.65rem 0.5rem;
@@ -436,6 +436,15 @@ footer {
   flex-direction: column;
   gap: 0.1rem;
   pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+}
+
+.slider-field.is-active .slider__bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -6px);
 }
 
 .slider__value {
