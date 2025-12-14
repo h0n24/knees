@@ -36,6 +36,8 @@ class DailyExercise(models.Model):
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE, related_name="scheduled_instances")
     scheduled_for = models.DateField()
     order = models.PositiveSmallIntegerField(default=0)
+    sets = models.PositiveSmallIntegerField(null=True, blank=True)
+    repetitions = models.PositiveSmallIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

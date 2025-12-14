@@ -33,3 +33,16 @@ class TrainingPlanTests(TestCase):
         todays_plan = DailyExercise.for_today(self.user)
         for item in todays_plan:
             self.assertContains(response, item.exercise.name)
+
+    def test_daily_exercises_store_minimum_prescription(self):
+        create_weekly_plan_for_user(self.user)
+
+        todays_plan = DailyExercise.for_today(self.user)
+
+        for item in todays_plan:
+            prescription = item.exercise.prescription or {}
+            expected_sets = (prescription.get("sets") or {}).get("min")
+            expected_reps = (prescription.get("reps") or {}).get("min")
+
+            self.assertEqual(item.sets, expected_sets)
+            self.assertEqual(item.repetitions, expected_reps)
