@@ -1,4 +1,4 @@
-"""ASGI config for Vercel deployment."""
+"""ASGI config for local Django deployment."""
 import os
 from django.core.asgi import get_asgi_application
 

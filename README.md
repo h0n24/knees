@@ -12,7 +12,8 @@ This commit establishes the dual-stack skeleton referenced in the structure plan
 
 - **Backend (Django 5)**: `apps/backend` with project settings under `apps/backend/config`, ASGI entrypoint, and placeholder apps for accounts, training, check-ins, reports, and pages.
 - **Frontend (Next.js App Router)**: `apps/frontend` with grouped route folders for marketing, auth, user, and trainer experiences, plus a simple landing page layout.
-- **Serverless wiring**: `api/django.py` (ASGI for Vercel) and `infra/vercel.json` with routes that send `/api/*` to Django and everything else to Next.js.
+
+The project is intended for **local development** with Django and Next.js running side by side; there is no serverless or Vercel dependency.
 
 Run locally:
 

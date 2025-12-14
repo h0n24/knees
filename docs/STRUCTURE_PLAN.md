@@ -1,6 +1,6 @@
-# Project Structure Plan (Vercel-Friendly)
+# Project Structure Plan (Local-First)
 
-This plan models a folder structure that satisfies the functional scope in `README.md` and the creative direction in `CREATIVE-BRIEF.md`, while fitting within free Vercel hosting (serverless-friendly, minimal cold-start risk).
+This plan models a folder structure that satisfies the functional scope in `README.md` and the creative direction in `CREATIVE-BRIEF.md`, optimized for straightforward local development (Django + Next.js running together on your machine).
 
 ```
 .
@@ -23,33 +23,26 @@ This plan models a folder structure that satisfies the functional scope in `READ
 │       ├── lib/                     # API client, auth helpers
 │       ├── styles/                  # tokens + global styles
 │       └── public/                  # static assets
-├── api/
-│   ├── django.py                    # Vercel Python serverless entry (ASGI via config.asgi:application)
-│   └── healthcheck.py               # lightweight uptime probe
 ├── docs/
 │   ├── STRUCTURE_PLAN.md            # this file
 │   └── resources/
 │       ├── requirements/            # requirements snapshots, briefs
 │       └── wireframes/              # design PDFs
-├── infra/
-│   ├── vercel.json                  # routes build output to Next.js + Django ASGI
-│   └── scripts/                     # deploy/build helpers (collectstatic, migrations)
 ├── tests/
 │   ├── backend/                     # Django unit/integration tests
 │   └── frontend/                    # Playwright/React tests
-├── static/                          # collected static files (Vercel storage bucket/CDN)
+├── static/                          # collected static files for Django
 ├── templates/                       # Django templates for server-rendered fallbacks
 ├── exercises.json                   # seed data for starter plans
 └── README.md                        # project overview
 ```
 
-## Vercel-Specific Notes
+## Local Development Notes
 
-- Keep **serverless functions small and fast**: the Django ASGI entry in `api/django.py` should import only what is needed and rely on environment variables for settings. Avoid long-lived background work.
-- Use **Vercel Postgres / Neon** (or another hosted DB) via environment variables; do not rely on local SQLite in production.
-- Prefer **Next.js static generation or ISR** for marketing/auth shells. Authenticated pages can use server actions or API fetches to the Django endpoints deployed as serverless functions.
-- Store large assets (e.g., media) in object storage (S3-compatible) referenced by URLs rather than bundling into the repo.
-- Include a **healthcheck** endpoint so Vercel uptime monitors the Python function without exercising full business logic.
+- Use the provided `manage.py` commands for migrations and running the Django server (`python manage.py migrate` and `python manage.py runserver`).
+- The default database is SQLite for quick local spins; swap to Postgres/MySQL later by updating Django settings.
+- Run the Next.js frontend locally with `npm run dev` from `apps/frontend` and point API calls to the Django server.
+- Keep environment variables in a local `.env` file (ignored from version control) for secrets and DB URLs.
 
 ## Navigation Mapping (per requirements)
 
