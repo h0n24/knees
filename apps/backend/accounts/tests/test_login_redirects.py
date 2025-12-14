@@ -31,3 +31,19 @@ class LoginRedirectTests(TestCase):
         )
 
         self.assertRedirects(response, reverse("trainer"))
+
+    def test_basic_user_already_authenticated_redirects_to_health(self):
+        self._create_user("basic", "basic user")
+        self.client.login(username="basic", password="pass12345")
+
+        response = self.client.get(reverse("login"))
+
+        self.assertRedirects(response, reverse("health"))
+
+    def test_trainer_user_already_authenticated_redirects_to_trainer(self):
+        self._create_user("trainer", "trainer user")
+        self.client.login(username="trainer", password="pass12345")
+
+        response = self.client.get(reverse("login"))
+
+        self.assertRedirects(response, reverse("trainer"))
