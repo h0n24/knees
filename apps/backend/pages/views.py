@@ -16,6 +16,28 @@ def landing_page(request):
     )
 
 
+def about_page(request):
+    return render(
+        request,
+        "pages/about.html",
+        {
+            "title": "About Knee Training Tracker",
+            "description": "Learn how Knee Training Tracker supports your recovery goals with guided exercises and progress tracking.",
+        },
+    )
+
+
+def privacy_page(request):
+    return render(
+        request,
+        "pages/privacy.html",
+        {
+            "title": "Privacy policy",
+            "description": "We only collect the information needed to keep your training plan on track.",
+        },
+    )
+
+
 @login_required
 def health_page(request):
     todays_exercises = (
