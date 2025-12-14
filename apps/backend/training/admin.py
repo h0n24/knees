@@ -12,7 +12,7 @@ class ExerciseAdmin(admin.ModelAdmin):
 
 @admin.register(DailyExercise)
 class DailyExerciseAdmin(admin.ModelAdmin):
-    list_display = ("user", "exercise", "scheduled_for", "order")
+    list_display = ("user", "exercise", "scheduled_for", "order", "sets", "repetitions")
     list_filter = ("scheduled_for", "user")
     search_fields = ("exercise__name", "user__username")
     ordering = ("-scheduled_for", "user", "order")

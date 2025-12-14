@@ -99,6 +99,14 @@ def _pick_daily_set(exercises: Iterable[Exercise]) -> list[Exercise]:
     return chosen[:EXERCISE_COUNT_PER_DAY]
 
 
+def _min_prescription_value(exercise: Exercise, field: str) -> int | None:
+    prescription = exercise.prescription or {}
+    values = prescription.get(field)
+    if isinstance(values, dict):
+        return values.get("min")
+    return None
+
+
 @transaction.atomic
 def create_weekly_plan_for_user(user: User) -> list[DailyExercise]:
     exercises = ensure_library_loaded()
@@ -116,6 +124,8 @@ def create_weekly_plan_for_user(user: User) -> list[DailyExercise]:
                 exercise=exercise,
                 scheduled_for=scheduled_day,
                 order=index,
+                sets=_min_prescription_value(exercise, "sets"),
+                repetitions=_min_prescription_value(exercise, "reps"),
             )
             for index, exercise in enumerate(daily_selection)
         ]
