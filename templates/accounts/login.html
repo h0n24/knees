@@ -4,12 +4,16 @@
 <section>
     <h1>{{ title }}</h1>
     <p>{{ cta }}</p>
-    <form>
-        <label>Email
-            <input type="email" placeholder="you@example.com" />
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label for="{{ form.username.id_for_label }}">Username
+            {{ form.username }}
+            {{ form.username.errors }}
         </label>
-        <label>Password
-            <input type="password" placeholder="••••••" />
+        <label for="{{ form.password.id_for_label }}">Password
+            {{ form.password }}
+            {{ form.password.errors }}
         </label>
         <button type="submit">Login</button>
     </form>

@@ -4,15 +4,24 @@
 <section>
     <h1>{{ title }}</h1>
     <p>{{ cta }}</p>
-    <form>
-        <label>Email
-            <input type="email" placeholder="you@example.com" />
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label for="{{ form.username.id_for_label }}">Username
+            {{ form.username }}
+            {{ form.username.errors }}
         </label>
-        <label>Password
-            <input type="password" placeholder="Create a strong password" />
+        <label for="{{ form.email.id_for_label }}">Email
+            {{ form.email }}
+            {{ form.email.errors }}
         </label>
-        <label>Confirm Password
-            <input type="password" placeholder="Repeat your password" />
+        <label for="{{ form.password1.id_for_label }}">Password
+            {{ form.password1 }}
+            {{ form.password1.errors }}
+        </label>
+        <label for="{{ form.password2.id_for_label }}">Confirm Password
+            {{ form.password2 }}
+            {{ form.password2.errors }}
         </label>
         <button type="submit">Create account</button>
     </form>
