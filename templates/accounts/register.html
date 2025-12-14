@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section>
+    <h1>{{ title }}</h1>
+    <p>{{ cta }}</p>
+    <form>
+        <label>Email
+            <input type="email" placeholder="you@example.com" />
+        </label>
+        <label>Password
+            <input type="password" placeholder="Create a strong password" />
+        </label>
+        <label>Confirm Password
+            <input type="password" placeholder="Repeat your password" />
+        </label>
+        <button type="submit">Create account</button>
+    </form>
+    <p>Already have an account? <a href="/auth/login/">Login instead</a>.</p>
+</section>
+{% endblock %}

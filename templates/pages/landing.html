@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section>
+    <h1>{{ title }}</h1>
+    <p>{{ description }}</p>
+    <div class="actions">
+        <a class="button" href="/auth/login/">Login</a>
+        <a class="button secondary" href="/auth/register/">Register</a>
+    </div>
+</section>
+{% endblock %}
