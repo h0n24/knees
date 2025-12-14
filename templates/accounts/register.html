@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section>
+    <h1>{{ title }}</h1>
+    <p>{{ cta }}</p>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <ul class="errors">
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <label>Username
+            {{ form.username }}
+            {% for error in form.username.errors %}
+                <span class="errors">{{ error }}</span>
+            {% endfor %}
+        </label>
+        <label>Email
+            {{ form.email }}
+            {% for error in form.email.errors %}
+                <span class="errors">{{ error }}</span>
+            {% endfor %}
+        </label>
+        <label>Password
+            {{ form.password1 }}
+            {% for error in form.password1.errors %}
+                <span class="errors">{{ error }}</span>
+            {% endfor %}
+        </label>
+        <label>Confirm Password
+            {{ form.password2 }}
+            {% for error in form.password2.errors %}
+                <span class="errors">{{ error }}</span>
+            {% endfor %}
+        </label>
+        <button type="submit">Create account</button>
+    </form>
+    <p>Already have an account? <a href="/auth/login/">Login instead</a>.</p>
+</section>
+{% endblock %}
