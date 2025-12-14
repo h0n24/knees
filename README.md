@@ -298,22 +298,18 @@ The project is intended for **local development** with Django and Next.js runnin
 
 Run locally:
 
-### Bash
+### First terminal: backend server
+
+#### Bash
 
 ```bash
-# Backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
-
-# Frontend (in a second terminal)
-cd apps/frontend
-npm install
-npm run dev
 ```
 
-### Alternative: Win cmd.exe
+#### Alternative: Win cmd.exe
 
 ```bat
 python -m venv .venv
@@ -321,6 +317,14 @@ python -m venv .venv
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
+```
+
+### Second terminal: frontend server
+
+```bash
+cd apps/frontend
+npm install
+npm run dev
 ```
 
 ---
@@ -370,8 +374,6 @@ For the 5-minute demo:
 - Show trainer report page
 - Mention stack, goals, and target audience
 
----
-
 ## Course requirement mapping (quick)
 
 - Registration/Login ✅
@@ -387,5 +389,3 @@ Optional (extra points):
 - Professional templates (Bootstrap) ⬜
 - Deployment + SSL ⬜
 - Interactive JS tables (DataTables) ⬜
-
----
