@@ -1,3 +1,4 @@
 *.pyc
 apps/db.sqlite3
 .venv/
+db.sqlite3
