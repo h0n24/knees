@@ -1,6 +1,6 @@
 # Project Structure Plan (Local-First)
 
-This plan models a folder structure that satisfies the functional scope in `README.md` and the creative direction in `CREATIVE-BRIEF.md`, optimized for straightforward local development (Django + Next.js running together on your machine).
+This plan models a folder structure that satisfies the functional scope in `README.md` and the creative direction in `CREATIVE-BRIEF.md`, optimized for straightforward local development with a single Django app serving HTML, CSS, and vanilla JavaScript.
 
 ```
 .
@@ -12,17 +12,6 @@ This plan models a folder structure that satisfies the functional scope in `READ
 │   │   ├── checkins/                # daily recovery inputs
 │   │   ├── reports/                 # aggregation + dashboards
 │   │   └── pages/                   # about/privacy pages
-│   └── frontend/                    # Next.js (App Router) UI
-│       ├── app/                     # routes for landing, auth, dashboards
-│       │   ├── (marketing)/         # landing page sections
-│       │   ├── (auth)/              # signup/login/forgot password
-│       │   ├── (user)/              # Today, Check-in, History
-│       │   ├── (trainer)/           # Dashboard, Users, Reports, Plans
-│       │   └── api/                 # server actions or fetch wrappers
-│       ├── components/              # shared UI per creative brief
-│       ├── lib/                     # API client, auth helpers
-│       ├── styles/                  # tokens + global styles
-│       └── public/                  # static assets
 ├── docs/
 │   ├── STRUCTURE_PLAN.md            # this file
 │   └── resources/
@@ -30,7 +19,7 @@ This plan models a folder structure that satisfies the functional scope in `READ
 │       └── wireframes/              # design PDFs
 ├── tests/
 │   ├── backend/                     # Django unit/integration tests
-│   └── frontend/                    # Playwright/React tests
+│   └── frontend/                    # Browser-driven UI tests for templates
 ├── static/                          # collected static files for Django
 ├── templates/                       # Django templates for server-rendered fallbacks
 ├── exercises.json                   # seed data for starter plans
@@ -41,7 +30,7 @@ This plan models a folder structure that satisfies the functional scope in `READ
 
 - Use the provided `manage.py` commands for migrations and running the Django server (`python manage.py migrate` and `python manage.py runserver`).
 - The default database is SQLite for quick local spins; swap to Postgres/MySQL later by updating Django settings.
-- Run the Next.js frontend locally with `npm run dev` from `apps/frontend` and point API calls to the Django server.
+- Run the Django server locally with `python manage.py runserver` to serve both pages and APIs.
 - Keep environment variables in a local `.env` file (ignored from version control) for secrets and DB URLs.
 
 ## Navigation Mapping (per requirements)

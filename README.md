@@ -289,12 +289,12 @@ Educational project.
 
 ## Milestone 1 — Project skeleton
 
-This commit establishes the dual-stack skeleton referenced in the structure plan:
+This commit establishes the Django-first skeleton referenced in the structure plan:
 
 - **Backend (Django 5)**: `apps/backend` with project settings under `apps/backend/config`, ASGI entrypoint, and placeholder apps for accounts, training, check-ins, reports, and pages.
-- **Frontend (Next.js App Router)**: `apps/frontend` with grouped route folders for marketing, auth, user, and trainer experiences, plus a simple landing page layout.
+- **Server-rendered UI**: Templates and static assets live under `templates/` and `static/`, keeping the frontend to HTML/CSS/vanilla JS delivered by Django.
 
-The project is intended for **local development** with Django and Next.js running side by side; there is no serverless or Vercel dependency.
+The project is intended for **local development** with a single Django server; there is no serverless or Vercel dependency.
 
 Run locally:
 
@@ -318,16 +318,6 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 ```
-
-### Second terminal: frontend server
-
-```bash
-cd apps/frontend
-npm install
-npm run dev
-```
-
-Alternatively `npm ci` instead of `npm install` uses package-lock.json.
 
 ---
 
