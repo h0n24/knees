@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from apps.backend.training.models import DailyExercise
+from apps.backend.training.services import ensure_training_tables_ready
 
 
 def landing_page(request):
@@ -40,6 +41,8 @@ def privacy_page(request):
 
 @login_required
 def health_page(request):
+    ensure_training_tables_ready()
+
     todays_exercises = (
         DailyExercise.objects.filter(
             user=request.user, scheduled_for=timezone.localdate()
