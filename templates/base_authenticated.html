@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Knees{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/base.css" />
+  </head>
+  <body class="app-shell">
+    <header class="app-header">
+      <div class="app-header__inner">
+        <div class="brand">Knees</div>
+        <nav class="primary-nav" aria-label="Primary">
+          <a href="/health/" aria-current="page">Home</a>
+          <a href="#progress">Progress</a>
+          <a href="#settings">Settings</a>
+        </nav>
+      </div>
+    </header>
+    <main class="app-main">{% block content %}{% endblock %}</main>
+    <nav class="mobile-nav" aria-label="Primary">
+      <div class="mobile-nav__inner">
+        <a href="/health/" aria-current="page">
+          <span class="mobile-nav__icon">🏠</span>
+          <span>Home</span>
+        </a>
+        <a href="#progress">
+          <span class="mobile-nav__icon">📈</span>
+          <span>Progress</span>
+        </a>
+        <a href="#settings">
+          <span class="mobile-nav__icon">⚙️</span>
+          <span>Settings</span>
+        </a>
+      </div>
+    </nav>
+  </body>
+</html>

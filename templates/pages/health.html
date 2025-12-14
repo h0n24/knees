@@ -1,33 +1,81 @@
-{% extends "base.html" %}
+{% extends "base_authenticated.html" %}
+
+{% block title %}Health | Knees{% endblock %}
 
 {% block content %}
-<section>
-    <h1>{{ title }}</h1>
-    <p>Signed in as <strong>{{ request.user.username }}</strong></p>
-    <p>{{ headline }}</p>
-    <p>Use this page to log your own sessions and keep your training schedule moving.</p>
-    {% if todays_exercises %}
-    <div class="exercise-list">
-        <h2>Today's plan</h2>
-        <ol>
-            {% for item in todays_exercises %}
-            <li>
-                <div class="card">
-                    <div class="card__header">
-                        <strong>{{ item.exercise.name }}</strong>
-                        <span class="pill">Difficulty {{ item.exercise.difficulty_range }}</span>
-                    </div>
-                    <p>{{ item.exercise.notes }}</p>
-                </div>
-            </li>
-            {% endfor %}
-        </ol>
+<section class="hero">
+    <div class="hero__text">
+        <h1>{{ title }}</h1>
+        <p>Signed in as <strong>{{ request.user.username }}</strong></p>
+        <p>{{ headline }}</p>
     </div>
-    {% else %}
-    <p>No exercises scheduled for today yet. Come back after your first login.</p>
-    {% endif %}
-    <div class="page-actions">
-        <a class="button" href="/auth/logout/">Log out</a>
+</section>
+
+<section class="grid two-columns">
+    <div class="panel">
+        <div class="panel__heading">
+            <h2>Today&apos;s checks</h2>
+            <span class="pill">4 tasks</span>
+        </div>
+        <div class="task-list">
+            <div class="task-item task-status is-complete">
+                <div class="task-icon">✓</div>
+                <div class="task-content">
+                    <p class="task-title">Exercises</p>
+                    <p class="task-label">{{ todays_exercises|length }} exercises today</p>
+                </div>
+            </div>
+            <div class="task-item task-status is-complete">
+                <div class="task-icon">✓</div>
+                <div class="task-content">
+                    <p class="task-title">Sleep</p>
+                    <p class="task-label">Optional label</p>
+                </div>
+            </div>
+            <div class="task-item task-status">
+                <div class="task-icon">○</div>
+                <div class="task-content">
+                    <p class="task-title">Nutrition</p>
+                    <p class="task-label">Optional label</p>
+                </div>
+            </div>
+            <div class="task-item task-status">
+                <div class="task-icon">○</div>
+                <div class="task-content">
+                    <p class="task-title">Fatigue</p>
+                    <p class="task-label">Optional label</p>
+                </div>
+            </div>
+        </div>
+        <div class="cta">
+            <a class="button wide" href="#start-session">Start today session</a>
+        </div>
+    </div>
+
+    <div class="panel" id="start-session">
+        <div class="panel__heading">
+            <h2>Today&apos;s plan</h2>
+            <span class="pill">Your schedule</span>
+        </div>
+        {% if todays_exercises %}
+        <div class="exercise-list">
+            <ol>
+                {% for item in todays_exercises %}
+                <li>
+                    <div class="card">
+                        <div class="card__header">
+                            <strong>{{ item.exercise.name }}</strong>
+                            <span class="pill">Difficulty {{ item.exercise.difficulty_range }}</span>
+                        </div>
+                        <p>{{ item.exercise.notes }}</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ol>
+        </div>
+        {% else %}
+        <p>No exercises scheduled for today yet. Come back after your first login.</p>
+        {% endif %}
     </div>
 </section>
 {% endblock %}
