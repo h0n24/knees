@@ -298,7 +298,7 @@ The project is intended for **local development** with a single Django server; t
 
 Run locally:
 
-### First terminal: backend server
+### Backend server
 
 #### Bash
 
@@ -317,6 +317,12 @@ python -m venv .venv
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
+```
+
+#### Creating an admin user
+
+```bash
+python manage.py createsuperuser
 ```
 
 ---
