@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "apps.backend.accounts",
     "apps.backend.pages",
+    "apps.backend.training",
 ]
 
 MIDDLEWARE = [
