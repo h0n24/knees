@@ -70,3 +70,28 @@ class DailyExercise(models.Model):
 
     def scheduled_day_display(self) -> str:
         return self.scheduled_for.strftime(settings.DATE_FORMAT if hasattr(settings, "DATE_FORMAT") else "%Y-%m-%d")
+
+
+class ExerciseLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="exercise_logs")
+    daily_exercise = models.ForeignKey(
+        DailyExercise, on_delete=models.CASCADE, related_name="logs"
+    )
+    set_number = models.PositiveSmallIntegerField()
+    duration_seconds = models.PositiveIntegerField()
+    started_at = models.DateTimeField()
+    completed_at = models.DateTimeField()
+
+    class Meta:
+        ordering = ["completed_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "daily_exercise", "set_number"],
+                name="unique_exercise_log_per_set",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return (
+            f"{self.daily_exercise.exercise.name} set {self.set_number} for {self.user.username}"
+        )
