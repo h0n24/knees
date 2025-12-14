@@ -1,16 +1,131 @@
-{% extends "base.html" %}
+{% extends "base_authenticated.html" %}
+
+{% block title %}Trainer console{% endblock %}
 
 {% block content %}
-<section>
+<div class="hero">
+  <div class="hero__text">
     <h1>{{ title }}</h1>
     <p>{{ description }}</p>
-    <ul>
-        <li>Monitor adherence and recovery trends.</li>
-        <li>Review daily, weekly, and monthly reports.</li>
-        <li>Adjust plans based on auto-progression suggestions.</li>
-    </ul>
-    <div class="page-actions">
-        <a class="button" href="/auth/logout/">Log out</a>
+  </div>
+  <div class="hero__actions">
+    <span class="pill">Trainer tools</span>
+  </div>
+</div>
+
+<div class="grid two-columns">
+  <section class="panel">
+    <div class="panel__heading">
+      <h2>Reports</h2>
+      <p class="hero__subdued">Adherence and recovery snapshots</p>
     </div>
+    <div class="grid two-columns">
+      {% for report in reports %}
+      <div class="card report-card">
+        <div class="card__header">
+          <div>
+            <h3>{{ report.title }}</h3>
+            <p class="hero__subdued">{{ report.range }}</p>
+          </div>
+          <span class="pill">{{ report.adherence }}% adherence</span>
+        </div>
+        <dl class="stat-list">
+          <div class="stat-row">
+            <dt>Training load</dt>
+            <dd>{{ report.training_minutes }} min</dd>
+          </div>
+          <div class="stat-row">
+            <dt>Avg sleep</dt>
+            <dd>{{ report.average_sleep|default:"—" }} hrs</dd>
+          </div>
+          <div class="stat-row">
+            <dt>Avg fatigue</dt>
+            <dd>{{ report.average_fatigue }}</dd>
+          </div>
+        </dl>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel__heading">
+      <h2>Plan editor</h2>
+      <p class="hero__subdued">Regenerate the coming week for any athlete.</p>
+    </div>
+
+    {% if plan_message %}
+    <div class="notice is-success">
+      Updated {{ plan_message.user.username }} starting {{ plan_message.start_date }} with
+      {{ plan_message.created }} scheduled exercises{% if plan_message.replace_existing %}
+      (replaced existing entries){% endif %}.
+    </div>
+    {% endif %}
+
+    <form method="post" class="form-grid">
+      {% csrf_token %}
+      <label>{{ plan_form.user.label }}{{ plan_form.user }}<small class="muted">{{ plan_form.user.help_text }}</small></label>
+      <label>{{ plan_form.start_date.label }}{{ plan_form.start_date }}<small class="muted">Start any day to roll a 7-day plan.</small></label>
+      <label class="full-width checkbox-row">{{ plan_form.replace_existing }} {{ plan_form.replace_existing.label }}</label>
+      {% if plan_form.errors %}
+        <div class="form-errors">{{ plan_form.errors }}</div>
+      {% endif %}
+      <button type="submit" class="button">Generate week</button>
+    </form>
+  </section>
+</div>
+
+<section class="panel">
+  <div class="panel__heading">
+    <h2>People</h2>
+    <p class="hero__subdued">At-a-glance view of who is on track.</p>
+  </div>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Today</th>
+          <th>Next session</th>
+          <th>Fatigue</th>
+          <th>Avg sleep</th>
+          <th>Adherence</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for person in people %}
+        <tr>
+          <td>{{ person.user.username }}</td>
+          <td>{{ person.today_count }} planned</td>
+          <td>{% if person.next_day %}{{ person.next_day }}{% else %}—{% endif %}</td>
+          <td>{% if person.fatigue %}{{ person.fatigue }} / 50{% else %}—{% endif %}</td>
+          <td>{% if person.sleep_hours %}{{ person.sleep_hours }} hrs{% else %}—{% endif %}</td>
+          <td><span class="badge">{{ person.adherence }}%</span></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No users found yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel__heading">
+    <h2>Exercise library</h2>
+    <p class="hero__subdued">Quick reference for what can be assigned.</p>
+  </div>
+  <div class="grid two-columns">
+    {% for exercise in exercise_library %}
+    <div class="card">
+      <div class="card__header">
+        <h3>{{ exercise.name }}</h3>
+        <span class="pill">Level {{ exercise.difficulty_range }}</span>
+      </div>
+      <p class="hero__subdued">{{ exercise.notes|default:"No notes" }}</p>
+      <p class="muted">Categories: {{ exercise.categories|join:", " }}</p>
+    </div>
+    {% endfor %}
+  </div>
 </section>
 {% endblock %}
