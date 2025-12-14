@@ -155,14 +155,22 @@ def _sample_responses() -> list[dict]:
     return responses
 
 
-def generate_recovery_logs_for_all_users(retrospective_days: int = 30) -> int:
+def _target_users(user: User | None):
+    if user is None:
+        return User.objects.all()
+    return User.objects.filter(pk=user.pk)
+
+
+def generate_recovery_logs_for_all_users(
+    retrospective_days: int = 30, user: User | None = None
+) -> int:
     start_day = timezone.localdate() - timedelta(days=retrospective_days - 1)
     created = 0
-    for user in User.objects.all():
+    for account in _target_users(user):
         for offset in range(retrospective_days):
             recorded_for = start_day + timedelta(days=offset)
             _, was_created = RecoveryLog.objects.get_or_create(
-                user=user,
+                user=account,
                 recorded_for=recorded_for,
                 defaults={
                     "sleep_duration": timedelta(
@@ -180,16 +188,18 @@ def generate_recovery_logs_for_all_users(retrospective_days: int = 30) -> int:
     return created
 
 
-def generate_fatigue_logs_for_all_users(retrospective_days: int = 30) -> int:
+def generate_fatigue_logs_for_all_users(
+    retrospective_days: int = 30, user: User | None = None
+) -> int:
     start_day = timezone.localdate() - timedelta(days=retrospective_days - 1)
     created = 0
-    for user in User.objects.all():
+    for account in _target_users(user):
         for offset in range(retrospective_days):
             recorded_for = start_day + timedelta(days=offset)
             responses = _sample_responses()
             total_score = sum(item["answer"] for item in responses)
             _, was_created = FatigueLog.objects.get_or_create(
-                user=user,
+                user=account,
                 recorded_for=recorded_for,
                 defaults={"responses": responses, "total_score": total_score},
             )
@@ -209,16 +219,18 @@ def _exercise_times_for_day(target_day: date, sets: int) -> list[tuple[datetime,
     return times
 
 
-def generate_exercise_logs_for_all_users(days_ago: int = 30) -> dict[str, int]:
+def generate_exercise_logs_for_all_users(
+    days_ago: int = 30, user: User | None = None
+) -> dict[str, int]:
     ensure_library_loaded()
     created_daily = 0
     created_logs = 0
     target_day = timezone.localdate() - timedelta(days=days_ago)
-    for user in User.objects.all():
+    for account in _target_users(user):
         daily_selection = _pick_daily_set(Exercise.objects.all())
         for order, exercise in enumerate(daily_selection):
             daily, daily_created = DailyExercise.objects.get_or_create(
-                user=user,
+                user=account,
                 scheduled_for=target_day,
                 order=order,
                 defaults={
@@ -233,7 +245,7 @@ def generate_exercise_logs_for_all_users(days_ago: int = 30) -> dict[str, int]:
                 _exercise_times_for_day(target_day, set_count), start=1
             ):
                 _, log_created = ExerciseLog.objects.get_or_create(
-                    user=user,
+                    user=account,
                     daily_exercise=daily,
                     set_number=set_number,
                     defaults={
@@ -246,10 +258,10 @@ def generate_exercise_logs_for_all_users(days_ago: int = 30) -> dict[str, int]:
     return {"daily": created_daily, "logs": created_logs}
 
 
-def generate_all_account_test_data() -> dict[str, int]:
-    recovery = generate_recovery_logs_for_all_users()
-    fatigue = generate_fatigue_logs_for_all_users()
-    exercise = generate_exercise_logs_for_all_users()
+def generate_all_account_test_data(user: User | None = None) -> dict[str, int]:
+    recovery = generate_recovery_logs_for_all_users(user=user)
+    fatigue = generate_fatigue_logs_for_all_users(user=user)
+    exercise = generate_exercise_logs_for_all_users(user=user)
     return {
         "recovery": recovery,
         "fatigue": fatigue,

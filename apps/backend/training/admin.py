@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import path
@@ -16,6 +17,9 @@ from apps.backend.training.services import (
     generate_fatigue_logs_for_all_users,
     generate_recovery_logs_for_all_users,
 )
+
+
+User = get_user_model()
 
 
 @admin.register(Exercise)
@@ -81,34 +85,45 @@ class FatigueLogAdmin(admin.ModelAdmin):
 
 
 def account_test_data_view(request):
+    selected_user_id = request.POST.get("user_id")
+    target_user = None
+
+    if selected_user_id:
+        try:
+            target_user = User.objects.get(pk=selected_user_id)
+        except User.DoesNotExist:
+            messages.error(request, "Selected user was not found; no data generated.")
+            return redirect(request.path)
+
     if request.method == "POST":
         action = request.POST.get("action")
+        scope = f"user {target_user.username}" if target_user else "all users"
         if action == "recovery":
-            created = generate_recovery_logs_for_all_users()
+            created = generate_recovery_logs_for_all_users(user=target_user)
             messages.success(
                 request,
-                f"Generated {created} recovery logs for all users over the past 30 days.",
+                f"Generated {created} recovery logs for {scope} over the past 30 days.",
             )
         elif action == "fatigue":
-            created = generate_fatigue_logs_for_all_users()
+            created = generate_fatigue_logs_for_all_users(user=target_user)
             messages.success(
                 request,
-                f"Generated {created} fatigue logs for all users over the past 30 days.",
+                f"Generated {created} fatigue logs for {scope} over the past 30 days.",
             )
         elif action == "exercise":
-            result = generate_exercise_logs_for_all_users()
+            result = generate_exercise_logs_for_all_users(user=target_user)
             messages.success(
                 request,
-                "Generated {daily} scheduled exercises and {logs} exercise logs for all "
-                "users 30 days ago.".format(**result),
+                "Generated {daily} scheduled exercises and {logs} exercise logs for "
+                "{scope} 30 days ago.".format(scope=scope, **result),
             )
         elif action == "all":
-            result = generate_all_account_test_data()
+            result = generate_all_account_test_data(user=target_user)
             messages.success(
                 request,
                 "Generated {recovery} recovery logs, {fatigue} fatigue logs, {daily} "
-                "scheduled exercises, and {exercise_logs} exercise logs across all "
-                "users.".format(**result),
+                "scheduled exercises, and {exercise_logs} exercise logs across "
+                "{scope}.".format(scope=scope, **result),
             )
         else:
             messages.error(request, "Unknown action; no test data was generated.")
@@ -117,6 +132,8 @@ def account_test_data_view(request):
     context = dict(
         admin.site.each_context(request),
         title="Account test data generators",
+        users=User.objects.all(),
+        selected_user_id=selected_user_id,
         actions=[
             {
                 "key": "recovery",
