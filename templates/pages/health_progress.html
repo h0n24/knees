@@ -1,0 +1,156 @@
+{% extends "base_authenticated.html" %}
+
+{% block title %}Progress | Knees{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero__text">
+        <h1>{{ title }}</h1>
+        <p>{{ headline }}</p>
+        <p class="hero__subdued">Showing the last 30 days.</p>
+    </div>
+</section>
+
+<section class="grid two-columns chart-grid">
+    <div class="panel">
+        <div class="panel__heading">
+            <h2>Training time</h2>
+            <span class="pill">Minutes per day</span>
+        </div>
+        <p class="panel__lede">A smooth line to help you see momentum and spot dips quickly.</p>
+        <div class="chart-shell">
+            <canvas id="training-chart" role="img" aria-label="Training minutes over the last 30 days"></canvas>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel__heading">
+            <h2>Sleep schedule</h2>
+            <span class="pill">Hours each night</span>
+        </div>
+        <p class="panel__lede">Simple bars so you can compare nights at a glance.</p>
+        <div class="chart-shell">
+            <canvas id="sleep-chart" role="img" aria-label="Sleep hours over the last 30 days"></canvas>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel__heading">
+            <h2>Fatigue</h2>
+            <span class="pill">Daily check-in</span>
+        </div>
+        <p class="panel__lede">A calm line to track how your energy is trending.</p>
+        <div class="chart-shell">
+            <canvas id="fatigue-chart" role="img" aria-label="Fatigue scores over the last 30 days"></canvas>
+        </div>
+    </div>
+</section>
+
+{{ progress_data|json_script:"progress-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha256-FCQGeJh5uCy02+u1OfoB8Ro2gGXxIj29saLlAbjINZg=" crossorigin="anonymous"></script>
+<script>
+    const progressData = JSON.parse(document.getElementById('progress-data').textContent);
+
+    const chartDefaults = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                ticks: { maxTicksLimit: 8, color: '#475569' },
+                grid: { display: false }
+            },
+            y: {
+                ticks: { color: '#475569' },
+                grid: { color: 'rgba(148, 163, 184, 0.25)' }
+            }
+        },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#0f172a',
+                titleColor: '#e2e8f0',
+                bodyColor: '#cbd5e1',
+            }
+        }
+    };
+
+    const trainingCtx = document.getElementById('training-chart').getContext('2d');
+    new Chart(trainingCtx, {
+        type: 'line',
+        data: {
+            labels: progressData.labels,
+            datasets: [{
+                label: 'Training minutes',
+                data: progressData.trainingMinutes,
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                fill: true,
+                tension: 0.35,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            ...chartDefaults,
+            scales: {
+                ...chartDefaults.scales,
+                y: {
+                    ...chartDefaults.scales.y,
+                    title: { display: true, text: 'Minutes' }
+                }
+            }
+        }
+    });
+
+    const sleepCtx = document.getElementById('sleep-chart').getContext('2d');
+    new Chart(sleepCtx, {
+        type: 'bar',
+        data: {
+            labels: progressData.labels,
+            datasets: [{
+                label: 'Sleep hours',
+                data: progressData.sleepHours,
+                backgroundColor: '#22c55e',
+                borderRadius: 8,
+            }]
+        },
+        options: {
+            ...chartDefaults,
+            scales: {
+                ...chartDefaults.scales,
+                y: {
+                    ...chartDefaults.scales.y,
+                    title: { display: true, text: 'Hours' },
+                    suggestedMax: 10
+                }
+            }
+        }
+    });
+
+    const fatigueCtx = document.getElementById('fatigue-chart').getContext('2d');
+    new Chart(fatigueCtx, {
+        type: 'line',
+        data: {
+            labels: progressData.labels,
+            datasets: [{
+                label: 'Fatigue score',
+                data: progressData.fatigueScores,
+                borderColor: '#a855f7',
+                pointRadius: 0,
+                tension: 0.35,
+                borderDash: [6, 6]
+            }]
+        },
+        options: {
+            ...chartDefaults,
+            scales: {
+                ...chartDefaults.scales,
+                y: {
+                    ...chartDefaults.scales.y,
+                    title: { display: true, text: 'Score' },
+                    suggestedMin: 0
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

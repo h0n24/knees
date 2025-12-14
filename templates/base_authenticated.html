@@ -11,9 +11,12 @@
       <div class="app-header__inner">
         <div class="brand">Knees</div>
         <nav class="primary-nav" aria-label="Primary">
-          <a href="/health/" aria-current="page">Home</a>
-          <a href="#progress">Progress</a>
-          <a href="/health/settings/">Settings</a>
+          {% url 'health' as health_url %}
+          {% url 'health_progress' as progress_url %}
+          {% url 'health_settings' as settings_url %}
+          <a href="{{ health_url }}" {% if request.path == health_url %}aria-current="page"{% endif %}>Home</a>
+          <a href="{{ progress_url }}" {% if request.path == progress_url %}aria-current="page"{% endif %}>Progress</a>
+          <a href="{{ settings_url }}" {% if request.path == settings_url %}aria-current="page"{% endif %}>Settings</a>
           <a href="/auth/logout/">Logout</a>
         </nav>
       </div>
@@ -21,15 +24,15 @@
     <main class="app-main">{% block content %}{% endblock %}</main>
     <nav class="mobile-nav" aria-label="Primary">
       <div class="mobile-nav__inner">
-        <a href="/health/" aria-current="page">
+        <a href="{{ health_url }}" {% if request.path == health_url %}aria-current="page"{% endif %}>
           <span class="mobile-nav__icon">🏠</span>
           <span>Home</span>
         </a>
-        <a href="#progress">
+        <a href="{{ progress_url }}" {% if request.path == progress_url %}aria-current="page"{% endif %}>
           <span class="mobile-nav__icon">📈</span>
           <span>Progress</span>
         </a>
-        <a href="/health/settings/">
+        <a href="{{ settings_url }}" {% if request.path == settings_url %}aria-current="page"{% endif %}>
           <span class="mobile-nav__icon">⚙️</span>
           <span>Settings</span>
         </a>

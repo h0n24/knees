@@ -5,6 +5,7 @@ from apps.backend.pages import views
 urlpatterns = [
     path("", views.landing_page, name="landing"),
     path("health/", views.health_page, name="health"),
+    path("health/progress/", views.health_progress_page, name="health_progress"),
     path("health/settings/", views.health_settings_page, name="health_settings"),
     path("health/exercise/", views.exercise_session_page, name="exercise_session"),
     path("trainer/", views.trainer_page, name="trainer"),

@@ -1,5 +1,5 @@
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -64,6 +64,59 @@ def health_page(request):
             "title": "Health Check",
             "headline": "Keep your own training on track.",
             "todays_exercises": todays_exercises,
+        },
+        status=200,
+    )
+
+
+@login_required
+def health_progress_page(request):
+    ensure_training_tables_ready()
+
+    end_date = timezone.localdate()
+    start_date = end_date - timedelta(days=29)
+    date_range = [start_date + timedelta(days=offset) for offset in range(30)]
+
+    training_logs = ExerciseLog.objects.filter(
+        user=request.user,
+        completed_at__date__range=(start_date, end_date),
+    ).values_list("completed_at", "duration_seconds")
+
+    training_totals: dict = {}
+    for completed_at, duration_seconds in training_logs:
+        day = timezone.localtime(completed_at).date()
+        training_totals[day] = training_totals.get(day, 0) + duration_seconds
+
+    recovery_logs = RecoveryLog.objects.filter(
+        user=request.user, recorded_for__range=(start_date, end_date)
+    ).values_list("recorded_for", "sleep_duration")
+    sleep_totals = {
+        recorded_for: sleep_duration.total_seconds()
+        for recorded_for, sleep_duration in recovery_logs
+    }
+
+    fatigue_logs = FatigueLog.objects.filter(
+        user=request.user, recorded_for__range=(start_date, end_date)
+    ).values_list("recorded_for", "total_score")
+    fatigue_totals = {recorded_for: total_score for recorded_for, total_score in fatigue_logs}
+
+    labels = [day.strftime("%b %d") for day in date_range]
+    training_minutes = [round(training_totals.get(day, 0) / 60, 1) for day in date_range]
+    sleep_hours = [round(sleep_totals.get(day, 0) / 3600, 1) for day in date_range]
+    fatigue_scores = [fatigue_totals.get(day) for day in date_range]
+
+    return render(
+        request,
+        "pages/health_progress.html",
+        {
+            "title": "Progress",
+            "headline": "See your last 30 days at a glance.",
+            "progress_data": {
+                "labels": labels,
+                "trainingMinutes": training_minutes,
+                "sleepHours": sleep_hours,
+                "fatigueScores": fatigue_scores,
+            },
         },
         status=200,
     )

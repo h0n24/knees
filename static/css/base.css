@@ -117,6 +117,10 @@ body {
   color: #475569;
 }
 
+.hero__subdued {
+  color: #64748b;
+}
+
 .task-list {
   display: grid;
   gap: 0.75rem;
@@ -198,6 +202,26 @@ body {
   border-radius: 999px;
   font-weight: 700;
   font-size: 0.875rem;
+}
+
+.panel__lede {
+  margin: 0 0 0.5rem;
+  color: #475569;
+}
+
+.chart-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.chart-shell {
+  margin-top: 0.75rem;
+  height: 240px;
+}
+
+@media (min-width: 768px) {
+  .chart-shell {
+    height: 280px;
+  }
 }
 
 .notice {
