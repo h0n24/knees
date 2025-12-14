@@ -6,7 +6,8 @@ from pathlib import Path
 
 import dj_database_url
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+# Project root (repository root) so shared assets like templates resolve correctly
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "insecure-skeleton-key")
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
