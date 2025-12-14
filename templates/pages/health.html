@@ -2,8 +2,9 @@
 
 {% block content %}
 <section>
-    <h1>Health Check</h1>
-    <p>Status: <strong>{{ status }}</strong></p>
-    <p>{{ message }}</p>
+    <h1>{{ title }}</h1>
+    <p>Signed in as <strong>{{ request.user.username }}</strong></p>
+    <p>{{ headline }}</p>
+    <p>Use this page to log your own sessions and keep your training schedule moving.</p>
 </section>
 {% endblock %}
