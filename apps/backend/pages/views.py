@@ -53,18 +53,42 @@ def _user_is_trainer(user: User) -> bool:
     return user.is_staff or user.groups.filter(name="trainer user").exists()
 
 
-def _trainer_navigation(*, selected: str, active_user: User | None = None) -> dict:
-    default_user = User.objects.order_by("username").first()
-    reports_url = None
+def _record_recent_report(session, username: str) -> None:
+    recent = session.get("trainer_recent_reports", [])
 
-    if active_user:
-        reports_url = reverse("trainer_user", args=[active_user.username])
-    elif default_user:
-        reports_url = reverse("trainer_user", args=[default_user.username])
+    if username in recent:
+        recent.remove(username)
+
+    recent.insert(0, username)
+    session["trainer_recent_reports"] = recent[:4]
+    session.modified = True
+
+
+def _trainer_navigation(*, request, selected: str, active_user: User | None = None) -> dict:
+    recent_usernames = request.session.get("trainer_recent_reports", [])
+    users = {
+        user.username: user
+        for user in User.objects.filter(username__in=recent_usernames)
+    }
+
+    recent_reports = []
+    for username in recent_usernames:
+        user = users.get(username)
+        if not user:
+            continue
+
+        recent_reports.append(
+            {
+                "username": user.username,
+                "name": user.get_full_name() or user.username,
+                "url": reverse("trainer_user", args=[user.username]),
+                "is_active": bool(active_user and user.username == active_user.username),
+            }
+        )
 
     return {
         "selected": selected,
-        "reports_url": reports_url,
+        "recent_reports": recent_reports,
     }
 
 
@@ -77,6 +101,7 @@ def trainer_user_page(request, username: str):
     ensure_library_loaded()
 
     athlete = get_object_or_404(User, username=username)
+    _record_recent_report(request.session, athlete.username)
     plan_form = PlanEditorForm(request.POST or None, initial={"user": athlete})
     plan_form.fields["user"].queryset = User.objects.filter(id=athlete.id)
     plan_form.fields["user"].widget = plan_form.fields["user"].hidden_widget()
@@ -103,7 +128,9 @@ def trainer_user_page(request, username: str):
         "reports": _trainer_reports(user=athlete),
         "summary": _trainer_summary_for_user(athlete),
         "upcoming_plan": _upcoming_plan_for_user(athlete),
-        "trainer_nav": _trainer_navigation(selected="reports", active_user=athlete),
+        "trainer_nav": _trainer_navigation(
+            request=request, selected="users", active_user=athlete
+        ),
     }
 
     return render(request, "pages/trainer_user_detail.html", context)
@@ -123,7 +150,7 @@ def trainer_exercises_page(request):
         "title": "Exercises · Trainer",
         "headline": "List of Exercises",
         "exercises": exercises,
-        "trainer_nav": _trainer_navigation(selected="exercises"),
+        "trainer_nav": _trainer_navigation(request=request, selected="exercises"),
     }
 
     return render(request, "pages/trainer_exercises.html", context)
@@ -141,7 +168,7 @@ def trainer_page(request):
         "title": "Trainer",
         "headline": "Users",
         "people": _trainer_people(),
-        "trainer_nav": _trainer_navigation(selected="users"),
+        "trainer_nav": _trainer_navigation(request=request, selected="users"),
     }
 
     return render(request, "pages/trainer_users.html", context)

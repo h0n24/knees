@@ -21,17 +21,22 @@
             <a href="{% url 'trainer' %}" class="trainer-nav__item{% if trainer_nav.selected == 'users' %} is-active{% endif %}">
               <span>Users</span>
             </a>
-            {% if trainer_nav.reports_url %}
-            <a href="{{ trainer_nav.reports_url }}" class="trainer-nav__item{% if trainer_nav.selected == 'reports' %} is-active{% endif %}">
-              <span>Reports</span>
-            </a>
-            {% else %}
-            <span class="trainer-nav__item is-disabled">Reports</span>
-            {% endif %}
             <a href="{% url 'trainer_exercises' %}" class="trainer-nav__item{% if trainer_nav.selected == 'exercises' %} is-active{% endif %}">
               <span>List of Exercises</span>
             </a>
+            {% if trainer_nav.recent_reports %}
+            <p class="trainer-nav__label">Recent reports</p>
+            <div class="trainer-nav__recent">
+              {% for report in trainer_nav.recent_reports %}
+              <a href="{{ report.url }}" class="trainer-nav__item{% if report.is_active %} is-active{% endif %}">
+                <span>{{ report.name }}</span>
+              </a>
+              {% endfor %}
+            </div>
+            {% endif %}
           </nav>
+          <div class="trainer-sidebar__spacer" aria-hidden="true"></div>
+          <a class="trainer-nav__item trainer-nav__item--logout" href="{% url 'logout' %}">Logout</a>
         </aside>
         <section class="trainer-content">
           <div class="trainer-page-header">
@@ -42,7 +47,6 @@
             </div>
             <div class="trainer-actions">
               {% block trainer_header_actions %}{% endblock %}
-              <a class="button secondary" href="{% url 'logout' %}">Logout</a>
             </div>
           </div>
           {% block trainer_content %}{% endblock %}
