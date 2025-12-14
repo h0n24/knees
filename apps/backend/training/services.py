@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import random
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from typing import Iterable, List
 
@@ -11,8 +11,15 @@ from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.db import connection, transaction
 from django.db.utils import OperationalError, ProgrammingError
+from django.utils import timezone
 
-from apps.backend.training.models import DailyExercise, Exercise
+from apps.backend.training.models import (
+    DailyExercise,
+    Exercise,
+    ExerciseLog,
+    FatigueLog,
+    RecoveryLog,
+)
 
 
 EXERCISE_COUNT_PER_DAY = 5
@@ -132,3 +139,120 @@ def create_weekly_plan_for_user(user: User) -> list[DailyExercise]:
         created.extend(DailyExercise.objects.bulk_create(new_entries))
 
     return created
+
+
+def _sample_responses() -> list[dict]:
+    questions = [
+        "How do your knees feel today?",
+        "Any soreness while walking?",
+        "How was recovery after your last session?",
+        "Are you ready for your next workout?",
+    ]
+    responses: list[dict] = []
+    for question in questions:
+        answer = random.randint(0, 4)
+        responses.append({"question": question, "answer": answer})
+    return responses
+
+
+def generate_recovery_logs_for_all_users(retrospective_days: int = 30) -> int:
+    start_day = timezone.localdate() - timedelta(days=retrospective_days - 1)
+    created = 0
+    for user in User.objects.all():
+        for offset in range(retrospective_days):
+            recorded_for = start_day + timedelta(days=offset)
+            _, was_created = RecoveryLog.objects.get_or_create(
+                user=user,
+                recorded_for=recorded_for,
+                defaults={
+                    "sleep_duration": timedelta(
+                        hours=random.randint(6, 9),
+                        minutes=random.choice([0, 15, 30, 45]),
+                    ),
+                    "sleep_quality": random.randint(60, 100),
+                    "nutrition": random.choice(
+                        [choice[0] for choice in RecoveryLog.NutritionQuality.choices]
+                    ),
+                    "comment": "Automated demo recovery log.",
+                },
+            )
+            created += 1 if was_created else 0
+    return created
+
+
+def generate_fatigue_logs_for_all_users(retrospective_days: int = 30) -> int:
+    start_day = timezone.localdate() - timedelta(days=retrospective_days - 1)
+    created = 0
+    for user in User.objects.all():
+        for offset in range(retrospective_days):
+            recorded_for = start_day + timedelta(days=offset)
+            responses = _sample_responses()
+            total_score = sum(item["answer"] for item in responses)
+            _, was_created = FatigueLog.objects.get_or_create(
+                user=user,
+                recorded_for=recorded_for,
+                defaults={"responses": responses, "total_score": total_score},
+            )
+            created += 1 if was_created else 0
+    return created
+
+
+def _exercise_times_for_day(target_day: date, sets: int) -> list[tuple[datetime, datetime]]:
+    start_of_day = datetime.combine(
+        target_day, time(hour=8), tzinfo=timezone.get_current_timezone()
+    )
+    times: list[tuple[datetime, datetime]] = []
+    for index in range(sets):
+        started = start_of_day + timedelta(minutes=30 * index)
+        completed = started + timedelta(minutes=random.randint(5, 12))
+        times.append((started, completed))
+    return times
+
+
+def generate_exercise_logs_for_all_users(days_ago: int = 30) -> dict[str, int]:
+    ensure_library_loaded()
+    created_daily = 0
+    created_logs = 0
+    target_day = timezone.localdate() - timedelta(days=days_ago)
+    for user in User.objects.all():
+        daily_selection = _pick_daily_set(Exercise.objects.all())
+        for order, exercise in enumerate(daily_selection):
+            daily, daily_created = DailyExercise.objects.get_or_create(
+                user=user,
+                scheduled_for=target_day,
+                order=order,
+                defaults={
+                    "exercise": exercise,
+                    "sets": _min_prescription_value(exercise, "sets"),
+                    "repetitions": _min_prescription_value(exercise, "reps"),
+                },
+            )
+            created_daily += 1 if daily_created else 0
+            set_count = daily.sets or random.randint(2, 3)
+            for set_number, (started, completed) in enumerate(
+                _exercise_times_for_day(target_day, set_count), start=1
+            ):
+                _, log_created = ExerciseLog.objects.get_or_create(
+                    user=user,
+                    daily_exercise=daily,
+                    set_number=set_number,
+                    defaults={
+                        "duration_seconds": int((completed - started).total_seconds()),
+                        "started_at": started,
+                        "completed_at": completed,
+                    },
+                )
+                created_logs += 1 if log_created else 0
+    return {"daily": created_daily, "logs": created_logs}
+
+
+def generate_all_account_test_data() -> dict[str, int]:
+    recovery = generate_recovery_logs_for_all_users()
+    fatigue = generate_fatigue_logs_for_all_users()
+    exercise = generate_exercise_logs_for_all_users()
+    return {
+        "recovery": recovery,
+        "fatigue": fatigue,
+        "daily": exercise["daily"],
+        "exercise_logs": exercise["logs"],
+    }

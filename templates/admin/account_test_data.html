@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content" class="flex">
+  <h1>{{ title }}</h1>
+  <p>Use these generators to seed demo data for every account without writing scripts.</p>
+
+  <div class="module">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for action in actions %}
+      <div class="form-row" style="margin-bottom: 1.5em;">
+        <h3 style="margin: 0 0 0.25em 0;">{{ action.label }}</h3>
+        <p style="margin: 0 0 0.5em 0;">{{ action.description }}</p>
+        <button type="submit" name="action" value="{{ action.key }}" class="button{% if action.primary %} default{% endif %}">
+          {{ action.label }}
+        </button>
+      </div>
+      {% endfor %}
+    </form>
+  </div>
+</div>
+{% endblock %}

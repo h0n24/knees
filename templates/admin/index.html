@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div id="content" class="flex">
+  <h1>{% translate 'Site administration' %}</h1>
+
+  <div class="module" style="margin-bottom: 2em;">
+    <h2>Account test data</h2>
+    <p>Open the generators to create sample recovery, fatigue, and exercise logs for all accounts.</p>
+    <p>
+      <a class="button default" href="{% url 'admin:account-test-data' %}">
+        Go to account test data generators
+      </a>
+    </p>
+  </div>
+
+  {% if app_list %}
+    {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+  {% else %}
+    <p>{% translate "You don't have permission to view or edit anything." %}</p>
+  {% endif %}
+</div>
+{% endblock %}
