@@ -1,5 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.utils import timezone
+
+from apps.backend.training.models import DailyExercise
 
 
 def landing_page(request):
@@ -15,12 +18,21 @@ def landing_page(request):
 
 @login_required
 def health_page(request):
+    todays_exercises = (
+        DailyExercise.objects.filter(
+            user=request.user, scheduled_for=timezone.localdate()
+        )
+        .select_related("exercise")
+        .order_by("order", "id")
+    )
+
     return render(
         request,
         "pages/health.html",
         {
             "title": "Health Check",
             "headline": "Keep your own training on track.",
+            "todays_exercises": todays_exercises,
         },
         status=200,
     )

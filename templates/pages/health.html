@@ -6,6 +6,26 @@
     <p>Signed in as <strong>{{ request.user.username }}</strong></p>
     <p>{{ headline }}</p>
     <p>Use this page to log your own sessions and keep your training schedule moving.</p>
+    {% if todays_exercises %}
+    <div class="exercise-list">
+        <h2>Today's plan</h2>
+        <ol>
+            {% for item in todays_exercises %}
+            <li>
+                <div class="card">
+                    <div class="card__header">
+                        <strong>{{ item.exercise.name }}</strong>
+                        <span class="pill">Difficulty {{ item.exercise.difficulty_range }}</span>
+                    </div>
+                    <p>{{ item.exercise.notes }}</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+    {% else %}
+    <p>No exercises scheduled for today yet. Come back after your first login.</p>
+    {% endif %}
     <div class="page-actions">
         <a class="button" href="/auth/logout/">Log out</a>
     </div>
