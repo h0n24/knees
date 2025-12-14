@@ -18,34 +18,17 @@
             <span class="pill">4 tasks</span>
         </div>
         <div class="task-list">
-            <div class="task-item task-status is-complete">
-                <div class="task-icon">✓</div>
+            {% for task in tasks %}
+            <div class="task-item task-status{% if task.complete %} is-complete{% endif %}">
+                <div class="task-icon">{% if task.complete %}✓{% else %}○{% endif %}</div>
                 <div class="task-content">
-                    <p class="task-title">Exercises</p>
-                    <p class="task-label">{{ todays_exercises|length }} exercises today</p>
+                    <p class="task-title">{{ task.title }}</p>
+                    {% if task.label %}
+                    <p class="task-label">{{ task.label }}</p>
+                    {% endif %}
                 </div>
             </div>
-            <div class="task-item task-status is-complete">
-                <div class="task-icon">✓</div>
-                <div class="task-content">
-                    <p class="task-title">Sleep</p>
-                    <p class="task-label">Optional label</p>
-                </div>
-            </div>
-            <div class="task-item task-status">
-                <div class="task-icon">○</div>
-                <div class="task-content">
-                    <p class="task-title">Nutrition</p>
-                    <p class="task-label">Optional label</p>
-                </div>
-            </div>
-            <div class="task-item task-status">
-                <div class="task-icon">○</div>
-                <div class="task-content">
-                    <p class="task-title">Fatigue</p>
-                    <p class="task-label">Optional label</p>
-                </div>
-            </div>
+            {% endfor %}
         </div>
         <div class="cta">
             <a class="button wide" href="{% url 'exercise_session' %}">Start today session</a>

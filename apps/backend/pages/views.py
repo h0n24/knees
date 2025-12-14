@@ -57,6 +57,55 @@ def health_page(request):
         .order_by("order", "id")
     )
 
+    exercise_steps = _build_exercise_steps(todays_exercises)
+    completed_exercise_logs = ExerciseLog.objects.filter(
+        user=request.user, daily_exercise__in=[step["daily_exercise"] for step in exercise_steps]
+    ).count()
+    exercises_complete = bool(exercise_steps) and completed_exercise_logs >= len(exercise_steps)
+
+    recovery_log = RecoveryLog.objects.filter(
+        user=request.user, recorded_for=timezone.localdate()
+    ).first()
+    fatigue_log = FatigueLog.objects.filter(
+        user=request.user, recorded_for=timezone.localdate()
+    ).first()
+
+    sleep_label = _format_sleep_duration(recovery_log.sleep_duration) if recovery_log else None
+    nutrition_label = recovery_log.get_nutrition_display() if recovery_log else None
+
+    fatigue_label = None
+    if fatigue_log:
+        scaled_score = fatigue_log.total_score * 2
+        if scaled_score <= 21:
+            fatigue_label = "Normal/Healthy"
+        elif scaled_score <= 34:
+            fatigue_label = "Mid-to-moderate fatigue"
+        else:
+            fatigue_label = "Severe or extreme fatigue"
+
+    tasks = [
+        {
+            "title": "Exercises",
+            "complete": exercises_complete,
+            "label": f"{len(exercise_steps)} sets completed" if exercises_complete else None,
+        },
+        {
+            "title": "Sleep",
+            "complete": bool(recovery_log),
+            "label": sleep_label if recovery_log else None,
+        },
+        {
+            "title": "Nutrition",
+            "complete": bool(recovery_log),
+            "label": nutrition_label if recovery_log else None,
+        },
+        {
+            "title": "Fatigue",
+            "complete": bool(fatigue_log),
+            "label": fatigue_label,
+        },
+    ]
+
     return render(
         request,
         "pages/health.html",
@@ -64,6 +113,7 @@ def health_page(request):
             "title": "Health Check",
             "headline": "Keep your own training on track.",
             "todays_exercises": todays_exercises,
+            "tasks": tasks,
         },
         status=200,
     )
