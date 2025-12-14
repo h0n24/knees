@@ -327,6 +327,8 @@ npm install
 npm run dev
 ```
 
+Alternatively `npm ci` instead of `npm install` uses package-lock.json.
+
 ---
 
 ## All milestones
