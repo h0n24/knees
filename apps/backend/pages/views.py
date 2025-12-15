@@ -127,6 +127,7 @@ def trainer_user_page(request, username: str):
         "reports": _trainer_reports(user=athlete),
         "summary": _trainer_summary_for_user(athlete),
         "upcoming_plan": _upcoming_plan_for_user(athlete),
+        "report_payload": _trainer_report_payload(athlete),
         "trainer_nav": _trainer_navigation(
             request=request, selected="user_detail", active_user=athlete
         ),
@@ -464,10 +465,126 @@ def _upcoming_plan_for_user(user: User):
                 "sets": daily.sets,
                 "reps": daily.repetitions,
                 "difficulty": daily.exercise.difficulty_range,
+                "iso_date": daily.scheduled_for.isoformat(),
             }
         )
 
     return rows
+
+
+def _trainer_report_payload(user: User):
+    timeline, metrics = _recovery_timeline_for_user(user)
+    return {
+        "meta": {
+            "athlete": user.username,
+            "todayISO": timezone.localdate().isoformat(),
+            "weekEntries": metrics["week_entries"],
+        },
+        "reports": _trainer_reports(user=user),
+        "recovery": {
+            "entries": timeline,
+            "metrics": metrics,
+        },
+        "plan": _upcoming_plan_for_user(user),
+    }
+
+
+def _recovery_timeline_for_user(user: User):
+    today = timezone.localdate()
+    start_date = today - timedelta(days=44)
+
+    recoveries = {
+        entry.recorded_for: entry
+        for entry in RecoveryLog.objects.filter(
+            user=user, recorded_for__range=(start_date, today)
+        )
+    }
+    fatigues = {
+        entry.recorded_for: entry
+        for entry in FatigueLog.objects.filter(
+            user=user, recorded_for__range=(start_date, today)
+        )
+    }
+
+    timeline = []
+    recent_sleep_hours = []
+
+    for offset in range((today - start_date).days + 1):
+        current_date = start_date + timedelta(days=offset)
+        recovery = recoveries.get(current_date)
+        fatigue = fatigues.get(current_date)
+
+        sleep_hours = _hours_from_duration(recovery.sleep_duration) if recovery else None
+        fatigue_score = fatigue.total_score if fatigue else None
+        nutrition_label = recovery.get_nutrition_display() if recovery else None
+        balance = _balance_score(sleep_hours, fatigue_score, nutrition_label)
+
+        if sleep_hours is not None:
+            recent_sleep_hours.append(sleep_hours)
+
+        timeline.append(
+            {
+                "date": current_date.strftime("%b %d"),
+                "iso": current_date.isoformat(),
+                "balance": balance,
+                "sleep_hours": sleep_hours,
+                "fatigue": fatigue_score,
+                "nutrition": nutrition_label,
+            }
+        )
+
+    recent_sleep_avg = round(sum(recent_sleep_hours[-7:]) / len(recent_sleep_hours[-7:]), 1) if recent_sleep_hours else None
+    latest_entry = timeline[-1] if timeline else {}
+    projected = _project_balance(timeline)
+
+    metrics = {
+        "today_balance": latest_entry.get("balance"),
+        "week_entries": len([item for item in timeline[-7:] if item["balance"] is not None]),
+        "avg_sleep_7": recent_sleep_avg,
+        "projected": projected,
+    }
+
+    return timeline, metrics
+
+
+def _balance_score(sleep_hours, fatigue_score, nutrition_label):
+    has_data = any(value is not None for value in (sleep_hours, fatigue_score, nutrition_label))
+    if not has_data:
+        return None
+
+    balance = 0.0
+    if sleep_hours is not None:
+        balance += sleep_hours - 8
+
+    if nutrition_label:
+        balance += _nutrition_score(nutrition_label)
+
+    if fatigue_score is not None:
+        balance -= fatigue_score / 20
+
+    return round(balance, 2)
+
+
+def _project_balance(timeline: list[dict]):
+    balances = [item["balance"] for item in timeline if item.get("balance") is not None]
+    if not balances:
+        return None
+
+    # Use the average of the last five balances to smooth the projection
+    tail = balances[-5:]
+    avg = sum(tail) / len(tail)
+    return round(avg, 2)
+
+
+def _nutrition_score(label: str) -> float:
+    match label.lower():
+        case "great":
+            return 0.8
+        case "ok":
+            return 0.3
+        case "poor":
+            return -0.6
+    return 0.0
 
 
 def _build_exercise_steps(todays_exercises):

@@ -1,13 +1,36 @@
 {% extends "base_trainer.html" %}
 
 {% block trainer_content %}
+<style>
+  .chart-tooltip { transform: translate(-50%, -115%); white-space: nowrap; }
+</style>
 <div class="space-y-6">
   <div class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
-    <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
-      <div class="flex flex-wrap items-center gap-2">
+    <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
+      <div class="flex flex-wrap items-center">
         <h1 class="text-xl font-semibold leading-tight">Report for athlete: {{ headline }}</h1>
       </div>
       <div class="flex flex-wrap items-center gap-2">
+        <label class="sr-only" for="rangeSelect">Range</label>
+        <select
+          id="rangeSelect"
+          class="h-9 rounded-2xl bg-white px-3 text-sm font-medium text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+        >
+          <option selected>Last 45 days</option>
+          <option>Last 30 days</option>
+          <option>Last 7 days</option>
+        </select>
+
+        <button
+          type="button"
+          class="inline-flex h-9 items-center gap-2 rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h14M7 8h6M8 12h4M9 16h2" />
+          </svg>
+          Export CSV
+        </button>
+
         <a
           href="#generate-week"
           class="inline-flex h-9 items-center justify-center rounded-2xl bg-indigo-600 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
@@ -21,38 +44,205 @@
   <section class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
     <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
       <div>
-        <h2 class="text-base font-semibold leading-6">Reports</h2>
-        <p class="mt-1 text-sm text-zinc-500">Recent adherence and recovery snapshots</p>
+        <h2 class="text-base font-semibold leading-6">Recovery balance</h2>
+        <p class="mt-1 text-sm text-zinc-500">Daily balance: sleep + nutrition − fatigue. Red zone means recovery debt.</p>
       </div>
     </div>
-    <div class="grid gap-4 px-5 pb-6 sm:px-6 sm:pb-6 md:grid-cols-2">
-      {% for report in reports %}
-      <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">{{ report.title }}</p>
-            <h3 class="text-lg font-semibold leading-6 text-zinc-900">{{ report.range }}</h3>
-          </div>
-          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset bg-zinc-100 text-zinc-700 ring-zinc-600/20">{{ report.adherence }}% adherence</span>
+
+    <div class="px-5 pb-5 sm:px-6 sm:pb-6">
+      <div class="relative">
+        <div id="todayPill" class="pointer-events-none absolute -top-3 z-20 hidden" style="left: 50%;">
+          <div class="rounded-xl bg-zinc-700 px-3 py-1 text-xs font-semibold text-white shadow-sm">Today</div>
         </div>
-        <dl class="mt-4 space-y-2 text-sm text-zinc-700">
-          <div class="flex items-center justify-between">
-            <dt class="text-zinc-500">Training load</dt>
-            <dd class="font-medium text-zinc-900">{{ report.training_minutes }} min</dd>
+
+        <div id="chartTooltip" class="chart-tooltip pointer-events-none absolute z-30 hidden rounded-2xl bg-white px-3 py-2 text-xs shadow-sm ring-1 ring-zinc-900/10">
+          <div class="text-zinc-500">Projected balance</div>
+          <div id="chartTooltipValue" class="mt-0.5 font-semibold text-zinc-900">—</div>
+        </div>
+
+        <div class="h-64 w-full">
+          <canvas id="balanceChart" aria-label="Recovery balance chart" role="img"></canvas>
+        </div>
+      </div>
+
+      <div class="mt-5 overflow-hidden rounded-2xl bg-white ring-1 ring-zinc-200">
+        <dl class="grid grid-cols-2 divide-x divide-y divide-zinc-200 sm:grid-cols-4 sm:divide-y-0">
+          <div class="p-4 sm:p-5">
+            <dt class="text-sm font-medium text-zinc-500">Today’s balance</dt>
+            <dd id="metricTodayBalance" class="mt-1 text-sm font-semibold text-zinc-900">—</dd>
           </div>
-          <div class="flex items-center justify-between">
-            <dt class="text-zinc-500">Avg sleep</dt>
-            <dd class="font-medium text-zinc-900">{% if report.average_sleep %}{{ report.average_sleep }} hrs{% else %}—{% endif %}</dd>
+          <div class="p-4 sm:p-5">
+            <dt class="text-sm font-medium text-zinc-500">Week entries</dt>
+            <dd id="metricWeekEntries" class="mt-1 text-sm font-semibold text-zinc-900">—</dd>
           </div>
-          <div class="flex items-center justify-between">
-            <dt class="text-zinc-500">Avg fatigue</dt>
-            <dd class="font-medium text-zinc-900">{{ report.average_fatigue }}</dd>
+          <div class="p-4 sm:p-5">
+            <dt class="text-sm font-medium text-zinc-500">Avg sleep (7d)</dt>
+            <dd id="metricAvgSleep" class="mt-1 text-sm font-semibold text-zinc-900">—</dd>
+          </div>
+          <div class="p-4 sm:p-5">
+            <dt class="text-sm font-medium text-zinc-500">Projected (15d)</dt>
+            <dd id="metricProjected" class="mt-1 text-sm font-semibold text-rose-600">—</dd>
           </div>
         </dl>
       </div>
-      {% empty %}
-      <div class="px-5 pb-6 text-sm text-zinc-600 sm:px-6 sm:pb-6">No reports available.</div>
-      {% endfor %}
+
+      <div class="mt-5 border-b border-zinc-200">
+        <nav class="-mb-px flex gap-6" aria-label="Recovery tabs">
+          <button type="button" class="recovery-tab whitespace-nowrap border-b-2 border-indigo-600 px-1 pb-3 text-sm font-semibold text-indigo-600" data-recovery-tab="checkins">
+            Check-ins
+          </button>
+          <button type="button" class="recovery-tab whitespace-nowrap border-b-2 border-transparent px-1 pb-3 text-sm font-semibold text-zinc-500 hover:text-zinc-700" data-recovery-tab="sessions">
+            Sessions
+          </button>
+        </nav>
+      </div>
+
+      <div class="overflow-x-auto" data-recovery-panel="checkins">
+        <table class="min-w-full divide-y divide-zinc-200">
+          <thead class="bg-zinc-50">
+            <tr>
+              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Date</th>
+              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Note</th>
+              <th scope="col" class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Balance</th>
+            </tr>
+          </thead>
+          <tbody id="checkinsBody" class="divide-y divide-zinc-200 bg-white"></tbody>
+        </table>
+      </div>
+
+      <div class="hidden overflow-x-auto" data-recovery-panel="sessions">
+        <table class="min-w-full divide-y divide-zinc-200">
+          <thead class="bg-zinc-50">
+            <tr>
+              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Date</th>
+              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Session</th>
+              <th scope="col" class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Planned</th>
+            </tr>
+          </thead>
+          <tbody id="sessionsBody" class="divide-y divide-zinc-200 bg-white"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
+    <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
+      <div>
+        <h2 class="text-base font-semibold leading-6">Snapshots</h2>
+        <p class="mt-1 text-sm text-zinc-500">Today vs 7-day and 30-day summary.</p>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-zinc-200">
+        <thead class="bg-zinc-50">
+          <tr>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Period</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Range</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Training load</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Avg sleep</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Avg fatigue</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Adherence</th>
+          </tr>
+        </thead>
+        <tbody id="snapshotsBody" class="divide-y divide-zinc-200 bg-white"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
+    <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
+      <div>
+        <h2 class="text-base font-semibold leading-6">Current week plan</h2>
+        <p class="mt-1 text-sm text-zinc-500">Filter and paginate upcoming exercises.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="relative">
+          <input
+            id="planSearch"
+            type="search"
+            placeholder="Filter exercises…"
+            class="h-9 w-64 rounded-2xl bg-white pl-10 pr-3 text-sm ring-1 ring-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+          />
+          <svg class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12.5 12.5l4 4m-2-7a6 6 0 11-12 0 6 6 0 0112 0z" />
+          </svg>
+        </div>
+
+        <button type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+          <span class="sr-only">Export</span>
+          <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 3v9m0 0l3-3m-3 3L7 9M4 14h12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="border-b border-zinc-200 px-5 sm:px-6">
+      <nav class="-mb-px flex gap-6" aria-label="Plan tabs">
+        <button type="button" class="plan-tab whitespace-nowrap border-b-2 border-indigo-600 px-1 pb-3 text-sm font-semibold text-indigo-600" data-plan-tab="date">
+          By date
+        </button>
+        <button type="button" class="plan-tab whitespace-nowrap border-b-2 border-transparent px-1 pb-3 text-sm font-semibold text-zinc-500 hover:text-zinc-700" data-plan-tab="exercise">
+          By exercise
+        </button>
+      </nav>
+    </div>
+
+    <div data-plan-panel="date" class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-zinc-200">
+        <thead class="bg-zinc-50">
+          <tr>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Date</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Exercise</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Sets</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Reps</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Difficulty</th>
+          </tr>
+        </thead>
+        <tbody id="planTableBody" class="divide-y divide-zinc-200 bg-white"></tbody>
+      </table>
+
+      <div class="flex items-center justify-between gap-4 border-t border-zinc-200 px-5 py-4 text-sm sm:px-6">
+        <div class="text-zinc-500" id="planDateRange">Showing —</div>
+        <div class="flex items-center gap-2">
+          <button id="planDatePrev" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+            Prev
+          </button>
+          <div class="text-zinc-500" id="planDateInfo">Page —</div>
+          <button id="planDateNext" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div data-plan-panel="exercise" class="hidden overflow-x-auto">
+      <table class="min-w-full divide-y divide-zinc-200">
+        <thead class="bg-zinc-50">
+          <tr>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Exercise</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Times planned</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Total sets</th>
+            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Total reps</th>
+          </tr>
+        </thead>
+        <tbody id="planAggBody" class="divide-y divide-zinc-200 bg-white"></tbody>
+      </table>
+
+      <div class="flex items-center justify-between gap-4 border-t border-zinc-200 px-5 py-4 text-sm sm:px-6">
+        <div class="text-zinc-500" id="planAggRange">Showing —</div>
+        <div class="flex items-center gap-2">
+          <button id="planAggPrev" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+            Prev
+          </button>
+          <div class="text-zinc-500" id="planAggInfo">Page —</div>
+          <button id="planAggNext" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -62,6 +252,7 @@
         <h2 class="text-base font-semibold leading-6">Generate new week</h2>
         <p class="mt-1 text-sm text-zinc-500">Build a fresh 7-day plan for this athlete.</p>
       </div>
+
     </div>
 
     <div class="px-5 pb-6 sm:px-6 sm:pb-6">
@@ -71,7 +262,7 @@
       </div>
       {% endif %}
 
-      <form method="post" class="space-y-4">
+      <form method="post" class="space-y-4 max-w-2xl">
         {% csrf_token %}
         {{ plan_form.user }}
         <div class="space-y-2">
@@ -79,9 +270,12 @@
           <div class="text-sm text-zinc-900">{{ plan_form.start_date }}</div>
           <p class="text-xs text-zinc-500">Start any day to roll a 7-day plan.</p>
         </div>
-        <label class="flex items-center gap-2 text-sm font-medium text-zinc-700">
+        <label class="flex items-start gap-3 rounded-2xl bg-zinc-50 p-4 ring-1 ring-zinc-200">
           {{ plan_form.replace_existing }}
-          <span>{{ plan_form.replace_existing.label }}</span>
+          <span class="text-sm text-zinc-700">
+            <span class="font-semibold">Replace existing entries</span>
+            <span class="block text-sm text-zinc-500">Overwrite the current week plan.</span>
+          </span>
         </label>
         {% if plan_form.errors %}
         <div class="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700 ring-1 ring-rose-200">{{ plan_form.errors }}</div>
@@ -92,65 +286,370 @@
       </form>
     </div>
   </section>
-
-  <section class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
-    <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
-      <div>
-        <h2 class="text-base font-semibold leading-6">Training snapshot</h2>
-        <p class="mt-1 text-sm text-zinc-500">Latest recovery and plan details</p>
-      </div>
-    </div>
-
-    <div class="px-5 pb-6 sm:px-6 sm:pb-6">
-      {% if summary %}
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Sleep</p>
-          <h3 class="mt-1 text-2xl font-semibold text-zinc-900">{% if summary.sleep_hours %}{{ summary.sleep_hours }} hrs{% else %}—{% endif %}</h3>
-          <p class="text-sm text-zinc-500">Last recorded</p>
-        </div>
-        <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Nutrition</p>
-          <h3 class="mt-1 text-2xl font-semibold text-zinc-900">{% if summary.nutrition %}{{ summary.nutrition }}{% else %}—{% endif %}</h3>
-          <p class="text-sm text-zinc-500">Most recent</p>
-        </div>
-        <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Fatigue</p>
-          <h3 class="mt-1 text-2xl font-semibold text-zinc-900">{% if summary.fatigue %}{{ summary.fatigue }} / 50{% else %}—{% endif %}</h3>
-          <p class="text-sm text-zinc-500">Latest check-in</p>
-        </div>
-      </div>
-      {% endif %}
-
-      <div class="mt-6 overflow-x-auto">
-        <table class="min-w-full divide-y divide-zinc-200">
-          <thead class="bg-zinc-50">
-            <tr>
-              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Date</th>
-              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Exercise</th>
-              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Sets</th>
-              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Reps</th>
-              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Difficulty</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-200 bg-white">
-            {% for row in upcoming_plan %}
-            <tr>
-              <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">{{ row.date }}</td>
-              <td class="whitespace-nowrap px-5 py-4 text-sm font-medium text-zinc-900 sm:px-6">{{ row.name }}</td>
-              <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">{% if row.sets %}{{ row.sets }}{% else %}—{% endif %}</td>
-              <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">{% if row.reps %}{{ row.reps }}{% else %}—{% endif %}</td>
-              <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">{{ row.difficulty }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="5" class="px-5 py-4 text-sm text-zinc-600 sm:px-6">No upcoming exercises scheduled.</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
 </div>
+
+{{ report_payload|json_script:"report-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+  (function () {
+    const dataEl = document.getElementById('report-data');
+    if (!dataEl) return;
+
+    const payload = JSON.parse(dataEl.textContent);
+    const reportRows = payload.reports || [];
+    const snapshotsBody = document.getElementById('snapshotsBody');
+    if (snapshotsBody) {
+      snapshotsBody.innerHTML = reportRows.map((row) => `
+        <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+          <td class="whitespace-nowrap px-5 py-4 text-sm font-medium text-zinc-900 sm:px-6">${row.title}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${row.range}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${row.training_minutes} min</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${row.average_sleep ?? '—'} hrs</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${row.average_fatigue}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm font-semibold text-zinc-900 sm:px-6">${row.adherence}%</td>
+        </tr>
+      `).join('');
+    }
+
+    const checkinsBody = document.getElementById('checkinsBody');
+    const sessionsBody = document.getElementById('sessionsBody');
+    const entries = payload.recovery?.entries || [];
+    const plan = payload.plan || [];
+
+    if (checkinsBody) {
+      const rows = entries
+        .filter((entry) => entry.balance !== null)
+        .sort((a, b) => new Date(b.iso) - new Date(a.iso))
+        .slice(0, 20)
+        .map((entry) => {
+          const noteParts = [
+            `Sleep: ${entry.sleep_hours ?? '—'}h`,
+            `Nutrition: ${entry.nutrition ?? '—'}`,
+            `Fatigue: ${entry.fatigue ?? '—'}`,
+          ];
+          const balanceClass = typeof entry.balance === 'number' && entry.balance < 0 ? 'text-rose-600' : 'text-emerald-600';
+          return `
+            <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+              <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${entry.date}</td>
+              <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">${noteParts.join(' · ')}</td>
+              <td class="whitespace-nowrap px-5 py-4 text-right text-sm font-medium sm:px-6 ${balanceClass}">${entry.balance}</td>
+            </tr>
+          `;
+        });
+      checkinsBody.innerHTML = rows.join('') || '<tr><td colspan="3" class="px-5 py-4 text-sm text-zinc-600 sm:px-6">No recovery check-ins yet.</td></tr>';
+    }
+
+    if (sessionsBody) {
+      const rows = plan
+        .slice()
+        .sort((a, b) => new Date(a.iso_date) - new Date(b.iso_date))
+        .map((row) => `
+          <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+            <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${row.date}</td>
+            <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">${row.name}</td>
+            <td class="whitespace-nowrap px-5 py-4 text-right text-sm text-zinc-700 sm:px-6">${row.sets ?? '—'} sets</td>
+          </tr>
+        `);
+      sessionsBody.innerHTML = rows.join('') || '<tr><td colspan="3" class="px-5 py-4 text-sm text-zinc-600 sm:px-6">No sessions planned.</td></tr>';
+    }
+
+    const recoveryTabs = document.querySelectorAll('.recovery-tab');
+    recoveryTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        recoveryTabs.forEach((other) => {
+          other.classList.remove('border-indigo-600', 'text-indigo-600');
+          other.classList.add('border-transparent', 'text-zinc-500');
+        });
+
+        tab.classList.add('border-indigo-600', 'text-indigo-600');
+        tab.classList.remove('border-transparent', 'text-zinc-500');
+
+        const active = tab.dataset.recoveryTab;
+        document.querySelectorAll('[data-recovery-panel]').forEach((panel) => {
+          panel.classList.toggle('hidden', panel.dataset.recoveryPanel !== active);
+        });
+      });
+    });
+
+    const metricToday = document.getElementById('metricTodayBalance');
+    const metricWeek = document.getElementById('metricWeekEntries');
+    const metricSleep = document.getElementById('metricAvgSleep');
+    const metricProjected = document.getElementById('metricProjected');
+
+    const metrics = payload.recovery?.metrics || {};
+    if (metricToday) metricToday.textContent = metrics.today_balance ?? '—';
+    if (metricWeek) metricWeek.textContent = metrics.week_entries ?? '0';
+    if (metricSleep) metricSleep.textContent = metrics.avg_sleep_7 ? `${metrics.avg_sleep_7} hrs` : '—';
+    if (metricProjected) metricProjected.textContent = metrics.projected ?? '—';
+
+    // Plan tables
+    const planTableBody = document.getElementById('planTableBody');
+    const planAggBody = document.getElementById('planAggBody');
+    const search = document.getElementById('planSearch');
+
+    const dateInfo = document.getElementById('planDateInfo');
+    const datePrev = document.getElementById('planDatePrev');
+    const dateNext = document.getElementById('planDateNext');
+    const dateRange = document.getElementById('planDateRange');
+
+    const aggInfo = document.getElementById('planAggInfo');
+    const aggPrev = document.getElementById('planAggPrev');
+    const aggNext = document.getElementById('planAggNext');
+    const aggRange = document.getElementById('planAggRange');
+
+    const planTabs = document.querySelectorAll('.plan-tab');
+    planTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        planTabs.forEach((other) => {
+          other.classList.remove('border-indigo-600', 'text-indigo-600');
+          other.classList.add('border-transparent', 'text-zinc-500');
+        });
+
+        tab.classList.add('border-indigo-600', 'text-indigo-600');
+        tab.classList.remove('border-transparent', 'text-zinc-500');
+
+        const active = tab.dataset.planTab;
+        document.querySelectorAll('[data-plan-panel]').forEach((panel) => {
+          panel.classList.toggle('hidden', panel.dataset.planPanel !== active);
+        });
+      });
+    });
+
+    let q = '';
+    let datePage = 1;
+    let aggPage = 1;
+    const PAGE_SIZE = 10;
+
+    function setRangeText(el, start, end, total) {
+      if (!el) return;
+      if (!total) {
+        el.textContent = 'Showing 0 items';
+        return;
+      }
+      el.textContent = `Showing ${start + 1}-${end} of ${total}`;
+    }
+
+    function filterRows(rows) {
+      if (!q) return rows;
+      return rows.filter((row) => {
+        return [row.name, row.date, row.difficulty].some((field) =>
+          String(field).toLowerCase().includes(q)
+        );
+      });
+    }
+
+    function renderDate() {
+      if (!planTableBody) return;
+
+      const rows = filterRows(plan);
+      const total = rows.length;
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      datePage = Math.min(Math.max(1, datePage), totalPages);
+
+      const start = (datePage - 1) * PAGE_SIZE;
+      const slice = rows.slice(start, start + PAGE_SIZE);
+
+      planTableBody.innerHTML = slice.map((r) => `
+        <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.date}</td>
+          <td class="min-w-[18rem] px-5 py-4 text-sm sm:px-6">${r.name}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.sets ?? '—'}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.reps ?? '—'}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.difficulty}</td>
+        </tr>
+      `).join('');
+
+      if (dateInfo) dateInfo.textContent = `Page ${datePage} of ${totalPages}`;
+      setRangeText(dateRange, start, Math.min(start + PAGE_SIZE, total), total);
+
+      if (datePrev) datePrev.disabled = datePage <= 1;
+      if (dateNext) dateNext.disabled = datePage >= totalPages;
+
+      [datePrev, dateNext].forEach((btn) => {
+        if (!btn) return;
+        btn.classList.toggle('opacity-50', btn.disabled);
+        btn.classList.toggle('pointer-events-none', btn.disabled);
+      });
+    }
+
+    function buildAgg(rows) {
+      const map = new Map();
+      rows.forEach((r) => {
+        const key = r.name;
+        if (!map.has(key)) map.set(key, { exercise: key, times: 0, sets: 0, reps: 0 });
+        const item = map.get(key);
+        item.times += 1;
+
+        const sets = parseFloat(String(r.sets ?? '').replace(',', '.'));
+        if (!Number.isNaN(sets)) item.sets += sets;
+
+        const reps = parseFloat(String(r.reps ?? '').replace(',', '.'));
+        if (!Number.isNaN(reps)) item.reps += reps;
+      });
+
+      return Array.from(map.values()).sort((a, b) => b.times - a.times);
+    }
+
+    function renderAgg() {
+      if (!planAggBody) return;
+
+      const rows = filterRows(plan);
+      const agg = buildAgg(rows);
+      const total = agg.length;
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      aggPage = Math.min(Math.max(1, aggPage), totalPages);
+
+      const start = (aggPage - 1) * PAGE_SIZE;
+      const slice = agg.slice(start, start + PAGE_SIZE);
+
+      planAggBody.innerHTML = slice.map((r) => `
+        <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+          <td class="min-w-[18rem] px-5 py-4 text-sm sm:px-6">${r.exercise}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.times}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.sets ? r.sets.toFixed(0) : '—'}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.reps ? r.reps.toFixed(0) : '—'}</td>
+        </tr>
+      `).join('');
+
+      if (aggInfo) aggInfo.textContent = `Page ${aggPage} of ${totalPages}`;
+      setRangeText(aggRange, start, Math.min(start + PAGE_SIZE, total), total);
+
+      if (aggPrev) aggPrev.disabled = aggPage <= 1;
+      if (aggNext) aggNext.disabled = aggPage >= totalPages;
+
+      [aggPrev, aggNext].forEach((btn) => {
+        if (!btn) return;
+        btn.classList.toggle('opacity-50', btn.disabled);
+        btn.classList.toggle('pointer-events-none', btn.disabled);
+      });
+    }
+
+    if (search) {
+      search.addEventListener('input', () => {
+        q = search.value.trim().toLowerCase();
+        datePage = 1;
+        aggPage = 1;
+        renderDate();
+        renderAgg();
+      });
+    }
+
+    if (datePrev) datePrev.addEventListener('click', () => { datePage -= 1; renderDate(); });
+    if (dateNext) dateNext.addEventListener('click', () => { datePage += 1; renderDate(); });
+
+    if (aggPrev) aggPrev.addEventListener('click', () => { aggPage -= 1; renderAgg(); });
+    if (aggNext) aggNext.addEventListener('click', () => { aggPage += 1; renderAgg(); });
+
+    renderDate();
+    renderAgg();
+
+    // Chart.js: Recovery balance
+    const canvas = document.getElementById('balanceChart');
+    if (!canvas) return;
+
+    const labels = entries.map((entry) => entry.date);
+    const series = entries.map((entry) => entry.balance);
+
+    const positive = series.map((v) => (typeof v === 'number' && v >= 0 ? v : null));
+    const negative = series.map((v) => (typeof v === 'number' && v < 0 ? v : null));
+    const projectedLine = series.map(() => null);
+    if (metrics.projected !== null && typeof metrics.projected !== 'undefined') {
+      projectedLine[projectedLine.length - 1] = metrics.projected;
+    }
+
+    const tooltipEl = document.getElementById('chartTooltip');
+    const tooltipVal = document.getElementById('chartTooltipValue');
+    const todayPill = document.getElementById('todayPill');
+
+    const todayIndex = labels.findIndex((label) => label === new Date(payload.meta.todayISO).toLocaleDateString('en-US', { month: 'short', day: '2-digit' }));
+
+    const negativeZone = {
+      id: 'negativeZone',
+      beforeDraw(chart) {
+        const { ctx, chartArea, scales } = chart;
+        ctx.save();
+        ctx.fillStyle = 'rgba(248, 113, 113, 0.06)';
+        ctx.fillRect(chartArea.left, scales.y.getPixelForValue(0), chartArea.right - chartArea.left, chartArea.bottom - scales.y.getPixelForValue(0));
+        ctx.restore();
+      },
+    };
+
+    const externalTooltipHandler = (context) => {
+      const { chart, tooltip } = context;
+      if (!tooltipEl || !tooltipVal) return;
+
+      if (tooltip.opacity === 0) {
+        tooltipEl.classList.add('hidden');
+        return;
+      }
+
+      const value = tooltip.dataPoints?.[0]?.raw;
+      tooltipVal.textContent = value ?? '—';
+
+      const { offsetLeft: positionX, offsetTop: positionY } = chart.canvas;
+      tooltipEl.style.left = `${positionX + tooltip.caretX}px`;
+      tooltipEl.style.top = `${positionY + tooltip.caretY}px`;
+      tooltipEl.classList.remove('hidden');
+    };
+
+    new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            type: 'line',
+            label: 'Projected',
+            data: projectedLine,
+            borderColor: 'rgba(239, 68, 68, 0.9)',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.35,
+          },
+          {
+            label: 'Positive',
+            data: positive,
+            backgroundColor: 'rgba(22, 163, 74, 0.6)',
+            borderRadius: 6,
+          },
+          {
+            label: 'Negative',
+            data: negative,
+            backgroundColor: 'rgba(239, 68, 68, 0.6)',
+            borderRadius: 6,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false, external: externalTooltipHandler },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 },
+          },
+          y: {
+            grid: { color: 'rgba(113, 113, 122, 0.1)' },
+            suggestedMin: Math.min(-3, Math.min(...(series.filter((n) => typeof n === 'number')) || [0]) - 0.5),
+            suggestedMax: Math.max(3, Math.max(...(series.filter((n) => typeof n === 'number')) || [0]) + 0.5),
+            border: { display: false },
+          },
+        },
+      },
+      plugins: [negativeZone],
+    });
+
+    if (todayPill && todayIndex >= 0) {
+      const percentage = (todayIndex / labels.length) * 100;
+      todayPill.style.left = `${percentage}%`;
+      todayPill.classList.remove('hidden');
+    }
+  })();
+</script>
 {% endblock %}
