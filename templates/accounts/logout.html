@@ -1,10 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section>
-    <h1>{{ title }}</h1>
-    <p>{{ message }}</p>
-    <a class="button" href="/auth/login/">Login again</a>
-    <a class="button secondary" href="/">Return home</a>
+<section class="relative overflow-hidden">
+  <div class="pointer-events-none absolute inset-0">
+    <div class="absolute left-1/2 top-[-18rem] h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-500/20 via-sky-400/15 to-emerald-400/20 blur-3xl"></div>
+    <svg class="absolute inset-0 h-full w-full stroke-slate-200/70 [mask-image:radial-gradient(60%_60%_at_50%_30%,#000_60%,transparent_100%)]" aria-hidden="true">
+      <defs>
+        <pattern id="logout-grid" width="72" height="72" patternUnits="userSpaceOnUse" x="0" y="0">
+          <path d="M72 0H0V72" fill="none"></path>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" stroke-width="0" fill="url(#logout-grid)"></rect>
+    </svg>
+  </div>
+
+  <div class="relative mx-auto flex min-h-screen max-w-4xl items-center justify-center px-6 py-16 sm:py-20">
+    <div class="w-full max-w-2xl rounded-2xl bg-white/90 px-8 py-10 text-center shadow-xl ring-1 ring-slate-900/5 backdrop-blur sm:px-10 sm:py-12">
+      <header class="space-y-2">
+        <p class="text-sm font-semibold uppercase tracking-wider text-indigo-600">{{ title|default:"Signed Out" }}</p>
+        <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">See you next time</h1>
+        <p class="text-sm text-slate-700">{{ message|default:"You have been successfully signed out." }}</p>
+      </header>
+
+      <div class="mt-10 grid gap-4 sm:grid-cols-2">
+        <a href="/auth/login/" class="group inline-flex items-center justify-center rounded-full bg-indigo-600 px-4 py-4 text-sm font-semibold text-white shadow-md transition hover:bg-indigo-500 hover:text-slate-100 active:bg-indigo-800 active:text-indigo-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          Sign back in
+        </a>
+        <a href="/" class="group inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-4 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-indigo-200 hover:text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          Return home
+        </a>
+      </div>
+    </div>
+  </div>
 </section>
 {% endblock %}
