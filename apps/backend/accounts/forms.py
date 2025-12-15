@@ -37,6 +37,15 @@ class UserSettingsForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.user = user or self.instance
 
+        input_classes = (
+            "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm "
+            "text-slate-900 shadow-sm focus:border-indigo-600 focus:outline-none "
+            "focus:ring-2 focus:ring-indigo-600/30"
+        )
+
+        for field_name in ("username", "first_name", "last_name", "password1", "password2"):
+            self.fields[field_name].widget.attrs.update({"class": input_classes})
+
     def clean(self):
         cleaned_data = super().clean()
         password1 = cleaned_data.get("password1")
