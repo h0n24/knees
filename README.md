@@ -45,7 +45,7 @@ python manage.py createsuperuser  # optional, but needed for trainer/staff area
 python manage.py runserver
 ```
 
-> On Windows, activate with `.\.venv\Scriptsctivate` instead of `source .venv/bin/activate`.
+> On Windows, activate with `.\.venv\Scripts\activate` instead of `source .venv/bin/activate`.
 
 ---
 
