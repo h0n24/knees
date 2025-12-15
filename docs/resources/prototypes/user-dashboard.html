@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Knees · User</title>
+
+  <!-- Inter (Salient uses Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind via CDN (single-file friendly) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"] },
+          boxShadow: {
+            'soft': '0 10px 30px rgba(2, 6, 23, 0.08)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Small extras Tailwind doesn't cover well for a fixed bottom nav */
+    :root { color-scheme: light; }
+    .safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
+  </style>
+</head>
+
+<body class="h-full bg-white font-sans text-slate-900">
+  <!-- Background decorations (Salient-like) -->
+  <div class="relative isolate min-h-full">
+    <div class="pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80" aria-hidden="true">
+      <div class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-indigo-500 to-cyan-400 opacity-25 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+           style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%);">
+      </div>
+    </div>
+    <div class="pointer-events-none absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]" aria-hidden="true">
+      <div class="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-fuchsia-500 to-indigo-500 opacity-20 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+           style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%);">
+      </div>
+    </div>
+
+    <!-- Top header (desktop) -->
+    <header class="sticky top-0 z-40 border-b border-slate-200/60 bg-white/70 backdrop-blur">
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-3">
+              <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12"/>
+                </svg>
+              </div>
+          <div class="leading-tight">
+            <div class="text-sm font-semibold tracking-tight">Knees</div>
+            <div class="text-xs text-slate-500">Signed in as <span class="font-medium text-slate-700">testik2</span></div>
+          </div>
+        </div>
+
+        <nav class="hidden items-center gap-1 md:flex" aria-label="Primary">
+          <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Home</a>
+          <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Progress</a>
+          <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Settings</a>
+          <span class="mx-2 h-6 w-px bg-slate-200"></span>
+          <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Logout</a>
+        </nav>
+
+        <div class="md:hidden">
+          <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Logout</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="mx-auto max-w-7xl px-4 pb-28 pt-8 sm:px-6 lg:px-8">
+      <!-- Hero -->
+      <section class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft">
+        <div class="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-white"></div>
+        <div class="relative p-6 sm:p-10">
+          <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div class="max-w-2xl">
+              <!-- <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
+                <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                Ready for today
+              </div> -->
+
+              <h1 class="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+                Your knee-friendly routine, <span class="text-slate-600">made simple.</span>
+              </h1>
+              <p class="mt-3 text-sm leading-6 text-slate-600 sm:text-base">
+                Keep your own training on track. Follow today’s plan.
+              </p>
+            </div>
+
+            <div class="flex flex-col gap-3 sm:flex-row">
+              <a href="#" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-soft hover:bg-indigo-500">
+                Start today session
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <!-- Left: Today -->
+        <section class="lg:col-span-8">
+          <div class="rounded-3xl border border-slate-200 bg-white shadow-soft">
+            <div class="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-5">
+              <div>
+                <h2 class="text-base font-semibold tracking-tight text-slate-900">Today’s plan</h2>
+                <p class="mt-1 text-sm text-slate-600">Your schedule (from your saved routine)</p>
+              </div>
+              <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                5 exercises
+              </span>
+            </div>
+
+            <div class="p-6">
+              <ol class="space-y-4">
+                <!-- Exercise cards (from the provided MHTML) -->
+                <li class="rounded-2xl bg-white p-4 hover:bg-slate-50">
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">Butterfly Stretch <span class="font-normal text-slate-500">(Seated Groin Stretch)</span></div>
+                      <div class="mt-1 text-sm text-slate-600">Seated groin/adductor stretch; gentle forward lean.</div>
+                    </div>
+                    <span class="inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-semibold text-slate-700">Difficulty 1</span>
+                  </div>
+                </li>
+
+                <li class="rounded-2xl bg-white p-4 hover:bg-slate-50">
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">Lateral Lunge <span class="font-normal text-slate-500">(Side Lunge)</span></div>
+                      <div class="mt-1 text-sm text-slate-600">Side lunge; hips back; keep knee tracking.</div>
+                    </div>
+                    <span class="inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-semibold text-slate-700">Difficulty 3</span>
+                  </div>
+                </li>
+
+                <li class="rounded-2xl bg-white p-4 hover:bg-slate-50">
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">Fire Hydrants <span class="font-normal text-slate-500">(Quadruped Hip Abduction)</span></div>
+                      <div class="mt-1 text-sm text-slate-600">Quadruped hip abduction; pelvis stable.</div>
+                    </div>
+                    <span class="inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-semibold text-slate-700">Difficulty 2</span>
+                  </div>
+                </li>
+
+                <li class="rounded-2xl bg-white p-4 hover:bg-slate-50">
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">Sit-to-Stand <span class="font-normal text-slate-500">(Chair Rise)</span></div>
+                      <div class="mt-1 text-sm text-slate-600">Stand up without hands if possible; slow controlled sit.</div>
+                    </div>
+                    <span class="inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-semibold text-slate-700">Difficulty 2</span>
+                  </div>
+                </li>
+
+                <li class="rounded-2xl bg-white p-4 hover:bg-slate-50">
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">Heel and Calf Stretch</div>
+                      <div class="mt-1 text-sm text-slate-600">Wall-supported calf/heel cord stretch.</div>
+                    </div>
+                    <span class="inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-semibold text-slate-700">Difficulty 1</span>
+                  </div>
+                </li>
+              </ol>
+
+              <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="text-sm text-slate-600 pl-3">
+                  Tip: keep movement <span class="font-medium text-slate-700">pain-free</span> and slow. Keep the pain ≤ <span class="font-semibold text-slate-900">3/10</span>. Stop if pain spikes. 
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Right: Health check -->
+        <aside class="lg:col-span-4">
+          <div class="rounded-3xl border border-slate-200 bg-white shadow-soft">
+            <div class="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-5">
+              <div>
+                <h2 class="text-base font-semibold tracking-tight text-slate-900">Health check</h2>
+                <p class="mt-1 text-sm text-slate-600">Quick status for today</p>
+              </div>
+              <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">4 items</span>
+            </div>
+
+            <div class="p-3">
+              <ul class="space-y-2">
+                <!-- Task items (from the provided MHTML) -->
+                <li class="flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 hover:bg-slate-50">
+                  <div class="flex items-center gap-3">
+                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100">✓</span>
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">Exercises</div>
+                      <div class="text-xs text-slate-500">Planned · Not started</div>
+                    </div>
+                  </div>
+                  <button class="rounded-full bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500">Start</button>
+                </li>
+
+                <li class="flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 hover:bg-slate-50">
+                  <div class="flex items-center gap-3">
+                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100">·</span>
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">Sleep</div>
+                      <div class="text-xs text-slate-500">Quick log · 10 seconds</div>
+                    </div>
+                  </div>
+                  <!-- <button class="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">Log</button> -->
+                </li>
+
+                <li class="flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 hover:bg-slate-50">
+                  <div class="flex items-center gap-3">
+                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100">·</span>
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">Nutrition</div>
+                      <div class="text-xs text-slate-500">How was it?</div>
+                    </div>
+                  </div>
+                  <!-- <button class="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">Pick</button> -->
+                </li>
+
+                <li class="flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 hover:bg-slate-50">
+                  <div class="flex items-center gap-3">
+                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100">·</span>
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">Fatigue</div>
+                      <div class="text-xs text-slate-500">Energy today</div>
+                    </div>
+                  </div>
+                  <!-- <button class="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">Pick</button> -->
+                </li>
+              </ul>
+
+              <!-- <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div class="flex items-center justify-between">
+                  <div class="text-sm font-semibold text-slate-900">Recovery note</div>
+                  <span class="text-xs font-semibold text-slate-500">Optional</span>
+                </div>
+                <p class="mt-2 text-sm text-slate-600">
+                  If you feel pain above your normal baseline, reduce range of motion and keep today gentle.
+                </p>
+                <button class="mt-3 inline-flex w-full items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-soft hover:bg-slate-50">
+                  Add note
+                </button>
+              </div> -->
+            </div>
+          </div>
+
+          <!-- Tiny help card -->
+          <div class="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
+              <div class="flex items-center justify-between">
+                <div class="text-sm font-semibold text-slate-900">Streak</div>
+                <!-- <span class="text-xs font-semibold text-slate-500">Last 7 days</span> -->
+              </div>
+              <div class="mt-3 flex items-baseline gap-2">
+                <div class="text-3xl font-semibold tracking-tight">3</div>
+                <div class="text-sm font-semibold text-slate-600">days completed</div>
+              </div>
+              <p class="mt-2 text-sm text-slate-500">Keep it boring and consistent. That’s the trick.</p>
+          </div>
+
+        </aside>
+      </div>
+    </main>
+
+    <!-- Mobile bottom nav (main menu at the bottom) -->
+    <nav class="safe-bottom fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/90 backdrop-blur md:hidden" aria-label="Mobile">
+      <div class="mx-auto grid max-w-7xl grid-cols-3 px-4">
+        <a href="#" class="flex flex-col items-center gap-1 py-3 text-xs font-semibold text-slate-900">
+          <span class="text-base">🏠</span>
+          <span>Home</span>
+        </a>
+        <a href="#" class="flex flex-col items-center gap-1 py-3 text-xs font-semibold text-slate-600 hover:text-slate-900">
+          <span class="text-base">📈</span>
+          <span>Progress</span>
+        </a>
+        <a href="#" class="flex flex-col items-center gap-1 py-3 text-xs font-semibold text-slate-600 hover:text-slate-900">
+          <span class="text-base">⚙️</span>
+          <span>Settings</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+</body>
+</html>

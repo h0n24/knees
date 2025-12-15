@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fatigue assessment · Knees</title>
+
+    <!-- Inter (Salient uses Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind via CDN (single-file friendly) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: [
+                "Inter",
+                "ui-sans-serif",
+                "system-ui",
+                "Segoe UI",
+                "Roboto",
+                "Helvetica Neue",
+                "Arial",
+                "Noto Sans",
+                "Apple Color Emoji",
+                "Segoe UI Emoji",
+              ],
+            },
+            boxShadow: {
+              soft: "0 10px 30px rgba(2, 6, 23, 0.08)",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      :root { color-scheme: light; }
+      .safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
+
+      /* Range styling (clean, Salient-ish) */
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 0.5rem;
+        border-radius: 9999px;
+        background: rgb(241 245 249); /* slate-100 */
+        outline: none;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 9999px;
+        background: rgb(79 70 229); /* indigo-600 */
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.18);
+        border: 2px solid white;
+        cursor: pointer;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 9999px;
+        background: rgb(79 70 229);
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.18);
+        border: 2px solid white;
+        cursor: pointer;
+      }
+      input[type="range"]::-moz-range-track {
+        height: 0.5rem;
+        border-radius: 9999px;
+        background: rgb(241 245 249);
+      }
+    </style>
+  </head>
+
+  <body class="h-full bg-white font-sans text-slate-900">
+    <div class="relative isolate min-h-full">
+      <!-- Salient-like background blobs -->
+      <div class="pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80" aria-hidden="true">
+        <div
+          class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-indigo-500 to-cyan-400 opacity-25 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+          style="clip-path: polygon(74.1% 44.1%,100% 61.6%,97.5% 26.9%,85.5% 0.1%,80.7% 2%,72.5% 32.5%,60.2% 62.4%,52.4% 68.1%,47.5% 58.3%,45.2% 34.5%,27.5% 76.7%,0.1% 64.9%,17.9% 100%,27.6% 76.8%,76.1% 97.7%,74.1% 44.1%);"
+        ></div>
+      </div>
+      <div class="pointer-events-none absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]" aria-hidden="true">
+        <div
+          class="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-fuchsia-500 to-indigo-500 opacity-20 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+          style="clip-path: polygon(74.1% 44.1%,100% 61.6%,97.5% 26.9%,85.5% 0.1%,80.7% 2%,72.5% 32.5%,60.2% 62.4%,52.4% 68.1%,47.5% 58.3%,45.2% 34.5%,27.5% 76.7%,0.1% 64.9%,17.9% 100%,27.6% 76.8%,76.1% 97.7%,74.1% 44.1%);"
+        ></div>
+      </div>
+
+      <!-- Top header (desktop) -->
+      <header class="sticky top-0 z-40 border-b border-slate-200/60 bg-white/70 backdrop-blur">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+          <div class="flex items-center gap-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm" aria-hidden="true">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12" />
+              </svg>
+            </div>
+            <div class="leading-tight">
+              <div class="text-sm font-semibold tracking-tight">Knees</div>
+<div class="text-xs text-slate-500">Signed in as <span class="font-medium text-slate-700">testik2</span></div>
+            </div>
+          </div>
+
+          <nav class="hidden items-center gap-1 md:flex" aria-label="Primary">
+            <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Home</a>
+            <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Progress</a>
+            <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Settings</a>
+            <span class="mx-2 h-6 w-px bg-slate-200"></span>
+            <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Logout</a>
+          </nav>
+
+          <div class="md:hidden">
+            <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Logout</a>
+          </div>
+        </div>
+      </header>
+
+      <main class="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 lg:px-8">
+        <!-- Session header card -->
+        <section class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft">
+          <div class="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-white"></div>
+
+          <div class="relative p-6 sm:p-10">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-center">
+              <!-- Left -->
+              <div class="lg:col-span-7">
+                <h1 class="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+                  Exercise session
+                </h1>
+
+                <!-- Compact status (matches the MHTML: Step 12/12, 92% complete) -->
+                <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                  <span class="text-slate-600">
+                    <span class="font-semibold text-slate-900">Step 12</span>
+                    <span class="text-slate-500">/ 12</span>
+                  </span>
+                  <span class="text-slate-300">•</span>
+                  <span class="text-slate-600">
+                    <span class="font-semibold text-slate-900">92%</span>
+                    <span class="text-slate-500">complete</span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Right: progress -->
+              <div class="lg:col-span-5">
+                <div class="rounded-2xl bg-white/70 p-4 backdrop-blur sm:p-5">
+                  <div class="flex items-center justify-between">
+                    <div class="text-sm font-semibold text-slate-900">Progress</div>
+                    <div class="text-sm text-slate-500"><span class="font-semibold text-slate-900">12</span> / 12</div>
+                  </div>
+
+                  <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div class="h-full w-[92%] rounded-full bg-indigo-600"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Body -->
+        <section class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <!-- Left: assessment -->
+          <div class="lg:col-span-8">
+            <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft">
+              <div class="border-b border-slate-200 px-6 py-5">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <h2 class="mt-1 text-base font-semibold tracking-tight text-slate-900">
+                      Fatigue Assessment
+                    </h2>
+                    <p class="mt-1 text-sm text-slate-600">
+                      Slide to match how you feel today. This helps auto-adjust your plan.
+                    </p>
+                  </div>
+     
+                </div>
+              </div>
+
+              <form class="p-6" action="#" method="post">
+                <div class="space-y-5">
+                  <!-- Question template -->
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Question 1</p>
+                        <h3 class="mt-1 text-sm font-semibold text-slate-900">I have problems to start things</h3>
+                      </div>
+                      <span class="text-xs font-semibold text-slate-600" data-pill="q1">Never</span>
+                    </div>
+
+                    <div class="mt-4">
+                      <div class="relative">
+                        <div class="pointer-events-none absolute -top-9 left-0 w-full">
+                          <div class="relative h-0">
+                            <div data-bubble-for="q1" class="pointer-events-none absolute -translate-x-1/2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-soft">
+                              Never
+                            </div>
+                          </div>
+                        </div>
+
+                        <input id="q1" name="question_6" type="range" min="1" max="5" step="1" value="1" aria-label="I have problems to start things" class="mt-3" />
+                      </div>
+
+                      <div class="mt-3 flex items-center justify-between text-xs font-medium text-slate-500">
+                        <span>Never</span>
+                        <span>Always</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Question 2</p>
+                        <h3 class="mt-1 text-sm font-semibold text-slate-900">I don't do much during the day</h3>
+                      </div>
+                      <span class="text-xs font-semibold text-slate-600" data-pill="q2">Never</span>
+                    </div>
+
+                    <div class="mt-4">
+                      <div class="relative">
+                        <div class="pointer-events-none absolute -top-9 left-0 w-full">
+                          <div class="relative h-0">
+                            <div data-bubble-for="q2" class="pointer-events-none absolute -translate-x-1/2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-soft">
+                              Never
+                            </div>
+                          </div>
+                        </div>
+                        <input id="q2" name="question_3" type="range" min="1" max="5" step="1" value="1" aria-label="I don't do much during the day" class="mt-3" />
+                      </div>
+
+                      <div class="mt-3 flex items-center justify-between text-xs font-medium text-slate-500">
+                        <span>Never</span>
+                        <span>Always</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Question 3</p>
+                        <h3 class="mt-1 text-sm font-semibold text-slate-900">Mentally I feel exhausted</h3>
+                      </div>
+                      <span class="text-xs font-semibold text-slate-600" data-pill="q3">Never</span>
+                    </div>
+
+                    <div class="mt-4">
+                      <div class="relative">
+                        <div class="pointer-events-none absolute -top-9 left-0 w-full">
+                          <div class="relative h-0">
+                            <div data-bubble-for="q3" class="pointer-events-none absolute -translate-x-1/2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-soft">
+                              Never
+                            </div>
+                          </div>
+                        </div>
+                        <input id="q3" name="question_9" type="range" min="1" max="5" step="1" value="1" aria-label="Mentally I feel exhausted" class="mt-3" />
+                      </div>
+
+                      <div class="mt-3 flex items-center justify-between text-xs font-medium text-slate-500">
+                        <span>Never</span>
+                        <span>Always</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Question 4</p>
+                        <h3 class="mt-1 text-sm font-semibold text-slate-900">I get tired very quickly</h3>
+                      </div>
+                      <span class="text-xs font-semibold text-slate-600" data-pill="q4">Never</span>
+                    </div>
+
+                    <div class="mt-4">
+                      <div class="relative">
+                        <div class="pointer-events-none absolute -top-9 left-0 w-full">
+                          <div class="relative h-0">
+                            <div data-bubble-for="q4" class="pointer-events-none absolute -translate-x-1/2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-soft">
+                              Never
+                            </div>
+                          </div>
+                        </div>
+                        <input id="q4" name="question_2" type="range" min="1" max="5" step="1" value="1" aria-label="I get tired very quickly" class="mt-3" />
+                      </div>
+
+                      <div class="mt-3 flex items-center justify-between text-xs font-medium text-slate-500">
+                        <span>Never</span>
+                        <span>Always</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Question 5</p>
+                        <h3 class="mt-1 text-sm font-semibold text-slate-900">I am bothered by fatigue</h3>
+                      </div>
+                      <span class="text-xs font-semibold text-slate-600" data-pill="q5">Never</span>
+                    </div>
+
+                    <div class="mt-4">
+                      <div class="relative">
+                        <div class="pointer-events-none absolute -top-9 left-0 w-full">
+                          <div class="relative h-0">
+                            <div data-bubble-for="q5" class="pointer-events-none absolute -translate-x-1/2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-soft">
+                              Never
+                            </div>
+                          </div>
+                        </div>
+                        <input id="q5" name="question_1" type="range" min="1" max="5" step="1" value="1" aria-label="I am bothered by fatigue" class="mt-3" />
+                      </div>
+
+                      <div class="mt-3 flex items-center justify-between text-xs font-medium text-slate-500">
+                        <span>Never</span>
+                        <span>Always</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="text-sm text-slate-600">
+                      Tip: be honest — this only affects your own plan.
+                    </div>
+                    <div class="flex flex-col gap-2 sm:flex-row">
+                      <button type="button" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-soft hover:bg-slate-50">
+                        Back
+                      </button>
+                      <button type="submit" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-soft hover:bg-indigo-500 w-full min-w-40">
+                        Finalize
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Right: summary -->
+          <aside class="lg:col-span-4">
+            <div class="rounded-3xl border border-slate-200 bg-white shadow-soft">
+              <div class="border-b border-slate-200 px-6 py-5">
+                <h2 class="text-base font-semibold tracking-tight text-slate-900">Today’s fatigue</h2>
+                <p class="mt-1 text-sm text-slate-600">Live score while you slide</p>
+              </div>
+
+              <div class="p-6">
+                <div class="flex items-end justify-between gap-4">
+                  <div>
+                    <div class="text-3xl font-semibold tracking-tight text-slate-900" id="fatigueScore">5</div>
+                    <div class="mt-1 text-sm text-slate-600">
+                      out of <span class="font-semibold text-slate-900">25</span>
+                      <span class="text-slate-400">•</span>
+                      <span class="font-semibold text-slate-900" id="fatigueLabel">Low</span>
+                    </div>
+                  </div>
+
+                </div>
+
+
+
+                <div class="mt-5 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div id="fatigueBar" class="h-full w-[20%] rounded-full bg-indigo-600"></div>
+                </div>
+                <div class="mt-2 flex items-center justify-between text-xs font-medium text-slate-500">
+                  <span>Fresh</span>
+                  <span>Exhausted</span>
+                </div>
+
+
+                 <div class="rounded-2xl bg-slate-50 px-4 py-3 mt-5">
+                    <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Guidance</div>
+                    <div class="mt-1 text-sm font-semibold text-slate-900" id="fatigueGuidance">Keep the plan as-is.</div>
+                  </div>
+
+                <div class="mt-3 rounded-2xl bg-white p-4">
+                  <div class="text-sm font-semibold text-slate-900">What this affects</div>
+                  <ul class="mt-2 space-y-2 text-sm text-slate-600">
+                    <li class="flex gap-2"><span>•</span><span>Exercise intensity & rest times</span></li>
+                    <li class="flex gap-2"><span>•</span><span>Optional “easy day” suggestion</span></li>
+                    <li class="flex gap-2"><span>•</span><span>Future progression speed</span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </section>
+      </main>
+
+      <!-- Mobile bottom nav (main menu at the bottom) -->
+      <nav class="safe-bottom fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/90 backdrop-blur md:hidden" aria-label="Mobile">
+        <div class="mx-auto grid max-w-7xl grid-cols-3 px-4">
+          <a href="#" class="flex flex-col items-center gap-1 py-3 text-xs font-semibold text-slate-600 hover:text-slate-900">
+            <span class="text-base">🏠</span>
+            <span>Home</span>
+          </a>
+          <a href="#" class="flex flex-col items-center gap-1 py-3 text-xs font-semibold text-slate-900">
+            <span class="text-base">🦵</span>
+            <span>Session</span>
+          </a>
+          <a href="#" class="flex flex-col items-center gap-1 py-3 text-xs font-semibold text-slate-600 hover:text-slate-900">
+            <span class="text-base">⚙️</span>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+    </div>
+
+    <script>
+      (function () {
+        const labels = ["Never", "Rarely", "Sometimes", "Often", "Always"];
+
+        const inputs = Array.from(document.querySelectorAll('input[type="range"]'));
+        const scoreEl = document.getElementById("fatigueScore");
+        const labelEl = document.getElementById("fatigueLabel");
+        const guidanceEl = document.getElementById("fatigueGuidance");
+        const barEl = document.getElementById("fatigueBar");
+
+        function getLabel(value) {
+          const idx = Math.max(0, Math.min(labels.length - 1, Number(value) - 1));
+          return labels[idx];
+        }
+
+        function positionBubble(input) {
+          const id = input.id;
+          const bubble = document.querySelector(`[data-bubble-for="${id}"]`);
+          const pill = document.querySelector(`[data-pill="${id}"]`);
+          if (!bubble) return;
+
+          const min = Number(input.min || 0);
+          const max = Number(input.max || 100);
+          const val = Number(input.value || 0);
+          const pct = (val - min) / (max - min || 1);
+
+          const label = getLabel(val);
+          bubble.textContent = label;
+          if (pill) pill.textContent = label;
+
+          // Position in pixels for better accuracy
+          const rect = input.getBoundingClientRect();
+          const thumb = 18; // approx thumb px (w)
+          const x = pct * (rect.width - thumb) + thumb / 2;
+
+          // Bubble is positioned relative to the input's parent (full width)
+          bubble.style.left = x + "px";
+        }
+
+        function updateSummary() {
+          const total = inputs.reduce((sum, i) => sum + Number(i.value || 0), 0); // 5..25
+          scoreEl.textContent = String(total);
+
+          const pct = ((total - 5) / 20) * 100; // 0..100
+          barEl.style.width = Math.max(0, Math.min(100, pct)) + "%";
+
+          let label = "Low";
+          let guidance = "Keep the plan as-is.";
+          if (total >= 13 && total <= 17) { label = "Moderate"; guidance = "Consider a slightly easier pace today."; }
+          if (total >= 18) { label = "High"; guidance = "Prefer a lighter session or more rest."; }
+
+          labelEl.textContent = label;
+          guidanceEl.textContent = guidance;
+        }
+
+        function refreshAll() {
+          inputs.forEach(positionBubble);
+          updateSummary();
+        }
+
+        inputs.forEach((input) => {
+          // Initialize bubble position after layout
+          ["input", "change"].forEach((evt) => input.addEventListener(evt, () => {
+            positionBubble(input);
+            updateSummary();
+          }));
+        });
+
+        window.addEventListener("resize", refreshAll);
+        // First paint
+        requestAnimationFrame(refreshAll);
+      })();
+    </script>
+  </body>
+</html>
