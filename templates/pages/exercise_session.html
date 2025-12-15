@@ -138,7 +138,6 @@
     {% elif post_exercise_stage == 0 %}
       <div class="rounded-3xl border border-slate-200 bg-white shadow-soft">
         <div class="border-b border-slate-200 px-6 py-5">
-          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Recovery</p>
           <h2 class="mt-1 text-xl font-semibold tracking-tight text-slate-900">Sleep &amp; nutrition check-in</h2>
           <p class="mt-2 text-sm text-slate-600">Take a moment to record how you rested and what you ate today.</p>
         </div>
@@ -153,18 +152,20 @@
 
             <div>
               <label for="id_sleep_duration" class="block text-sm font-semibold text-slate-900">Sleep Time</label>
-              <div class="mt-2 flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-indigo-600/30 max-w-80">
+              <div class="mt-2 flex items-center gap-2 ">
                 {{ recovery_form.sleep_duration }}
               </div>
-              <p id="sleep-duration-help" class="mt-2 text-xs text-slate-500">Format: H:MM (example: 7:20).</p>
+              
               {% if recovery_form.sleep_duration.errors %}
-                <div class="mt-2 rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{{ recovery_form.sleep_duration.errors }}</div>
+                <div class="mt-2 text-xs font-semibold text-rose-700">{{ recovery_form.sleep_duration.errors }}</div>
+              {% else %}
+                <p class="mt-2 text-xs text-slate-500">Format: H:MM (example: 7:20).</p>
               {% endif %}
             </div>
 
             <div>
               <label for="id_sleep_quality" class="block text-sm font-semibold text-slate-900">Sleep Quality</label>
-              <div class="mt-2 flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-indigo-600/30 max-w-80">
+              <div class="mt-2 flex items-center gap-2 rounded-2xl pr-4 border border-slate-200 bg-white shadow-sm focus-within:ring-2 focus-within:ring-indigo-600/60 max-w-80">
                 {{ recovery_form.sleep_quality }}
                 <span class="text-xs font-semibold text-slate-500">%</span>
               </div>
@@ -176,7 +177,7 @@
 
             <div>
               <label for="id_nutrition" class="block text-sm font-semibold text-slate-900">Nutrition</label>
-              <div class="mt-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-indigo-600/30 max-w-80">
+              <div class="mt-2 rounded-2xl border border-slate-200 bg-white focus-within:ring-2 focus-within:ring-indigo-600/30 max-w-80">
                 {{ recovery_form.nutrition }}
               </div>
               {% if recovery_form.nutrition.errors %}
@@ -194,9 +195,6 @@
 
             <div class="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div class="flex flex-col gap-2 sm:flex-row">
-                <button type="button" onclick="history.back()" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-soft transition hover:bg-slate-50">
-                  Back
-                </button>
                 <button type="submit" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-500 w-full min-w-40">
                   Next
                   <span class="ml-2" aria-hidden="true">→</span>

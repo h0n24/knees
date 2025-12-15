@@ -23,13 +23,13 @@ class RecoveryLogForm(forms.ModelForm):
                     "min": 0,
                     "max": 100,
                     "placeholder": "80",
-                    "class": "w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none",
+                    "class": "rounded-2xl border border-transparent bg-white px-4 py-3 shadow-none focus-within:ring-2 focus-within:ring-transparent focus:outline-none focus:border-transparent",
                     "aria-describedby": "sleep-quality-help",
                 }
             ),
             "nutrition": forms.Select(
                 attrs={
-                    "class": "w-full bg-transparent text-sm font-semibold text-slate-900 focus:outline-none",
+                    "class": "w-full bg-transparent px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none",
                 }
             ),
             "comment": forms.Textarea(
@@ -46,7 +46,7 @@ class RecoveryLogForm(forms.ModelForm):
         self.fields["sleep_duration"].widget.attrs.update(
             {
                 "placeholder": "7:20",
-                "class": "w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none",
+                "class": "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-indigo-600/30 max-w-80 focus:outline-none",
                 "inputmode": "numeric",
                 "aria-describedby": "sleep-duration-help",
             }
