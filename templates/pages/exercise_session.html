@@ -54,9 +54,9 @@
         <div class="rounded-2xl bg-white/70 p-4 backdrop-blur sm:p-5">
           <div class="flex items-center justify-between">
             <div class="text-sm font-semibold text-slate-900">Progress</div>
-            {% with completed=current_step_number|add:"-1" %}
+            {% with displayed_step=current_step_number|default_if_none:1 %}
             <div class="text-sm text-slate-500">
-              <span class="font-semibold text-slate-900">{{ completed|default_if_none:0 }}</span> / {{ total_steps }}
+              <span class="font-semibold text-slate-900">{{ displayed_step }}</span> / {{ total_steps }}
             </div>
             {% endwith %}
           </div>
