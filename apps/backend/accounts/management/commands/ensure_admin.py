@@ -7,6 +7,15 @@ from django.core.management.base import BaseCommand
 class Command(BaseCommand):
     help = "Create or update the admin user from environment variables."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--noinput",
+            "--no-input",
+            action="store_true",
+            dest="noinput",
+            help="Run without interactive prompts (accepted for compatibility)",
+        )
+
     def handle(self, *args, **options):
         username = os.getenv("DJANGO_ADMIN_USER", "admin")
         password = os.getenv("DJANGO_ADMIN_PASSWORD")
