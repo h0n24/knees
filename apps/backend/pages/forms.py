@@ -18,16 +18,39 @@ class RecoveryLogForm(forms.ModelForm):
         model = RecoveryLog
         fields = ["sleep_duration", "sleep_quality", "nutrition", "comment"]
         widgets = {
-            "sleep_quality": forms.NumberInput(attrs={"min": 0, "max": 100, "placeholder": "80"}),
-            "nutrition": forms.Select(),
+            "sleep_quality": forms.NumberInput(
+                attrs={
+                    "min": 0,
+                    "max": 100,
+                    "placeholder": "80",
+                    "class": "w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none",
+                    "aria-describedby": "sleep-quality-help",
+                }
+            ),
+            "nutrition": forms.Select(
+                attrs={
+                    "class": "w-full bg-transparent text-sm font-semibold text-slate-900 focus:outline-none",
+                }
+            ),
             "comment": forms.Textarea(
-                attrs={"rows": 3, "placeholder": "Custom comment for the trainer"}
+                attrs={
+                    "rows": 3,
+                    "placeholder": "Custom comment for the trainer",
+                    "class": "mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600/30",
+                }
             ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["sleep_duration"].widget.attrs.update({"placeholder": "7:20"})
+        self.fields["sleep_duration"].widget.attrs.update(
+            {
+                "placeholder": "7:20",
+                "class": "w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none",
+                "inputmode": "numeric",
+                "aria-describedby": "sleep-duration-help",
+            }
+        )
         self.fields["sleep_quality"].label = "Sleep Quality"
         self.fields["nutrition"].label = "Nutrition"
         self.fields["comment"].label = "Custom Comment"
