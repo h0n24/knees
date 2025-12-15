@@ -4,205 +4,227 @@
 {% block title %}Exercise session | Knees{% endblock %}
 
 {% block content %}
-<section class="session">
-    <div class="session__header">
-        <div>
-            <p class="eyebrow">{{ headline }}</p>
-            <h1>{{ title }}</h1>
-        </div>
-        <div class="session__progress-meta">
-            <span>Step {{ current_step_number }} of {{ total_steps }}</span>
-            <span class="muted">{{ progress_percent|floatformat:0 }}% complete</span>
-        </div>
-    </div>
+<style>
+  .slider-field { position: relative; }
+  .slider__bubble { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translate(-50%, -4px) scale(0.98); background: #0f172a; color: white; padding: 0.4rem 0.65rem 0.5rem; border-radius: 0.75rem; min-width: 120px; text-align: center; box-shadow: 0 10px 20px rgba(15, 23, 42, 0.14); display: inline-flex; flex-direction: column; gap: 0.1rem; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease; }
+  .slider-field.is-active .slider__bubble { opacity: 1; visibility: visible; transform: translate(-50%, -6px); }
+  .slider__value { font-weight: 800; }
+  .slider__detail { font-size: 0.85rem; color: #cbd5e1; }
+  .slider__arrow { position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 7px solid #0f172a; }
+  .fas-slider { width: 100%; appearance: none; height: 8px; border-radius: 999px; background: #e2e8f0; outline: none; }
+  .fas-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #4f46e5; cursor: pointer; border: 3px solid white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+  .fas-slider::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #4f46e5; cursor: pointer; border: 3px solid white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+  .slider__labels { display: flex; justify-content: space-between; font-weight: 700; color: #475569; margin-top: 0.5rem; }
+</style>
 
-    <div class="progress">
-        <div class="progress__track">
-            <div class="progress__fill" style="width: {{ progress_percent }}%"></div>
-        </div>
+<section class="rounded-3xl border border-slate-200 bg-white shadow-soft">
+  <div class="flex flex-col gap-4 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ headline }}</p>
+      <h1 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">{{ title }}</h1>
     </div>
+    <div class="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+      <span>Step {{ current_step_number }} of {{ total_steps }}</span>
+      <span class="hidden text-slate-500 sm:inline">{{ progress_percent|floatformat:0 }}% complete</span>
+    </div>
+  </div>
 
+  <div class="px-6 pt-4">
+    <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+      <div class="h-full rounded-full bg-indigo-500 transition-all" style="width: {{ progress_percent }}%"></div>
+    </div>
+  </div>
+
+  <div class="p-6">
     {% if steps %}
-        {% if current_step %}
-            <div class="session__body">
-                <div class="session__media">
-                    <figure class="exercise-media">
-                        <img
-                            src="{% static 'exercises' %}/{{ current_step.daily_exercise.exercise.external_id }}.png"
-                            alt="{{ current_step.daily_exercise.exercise.name }} exercise demonstration"
-                            loading="lazy"
-                        />
-                    </figure>
+      {% if current_step %}
+        <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
+          <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm">
+            <figure class="aspect-square bg-slate-100">
+              <img
+                src="{% static 'exercises' %}/{{ current_step.daily_exercise.exercise.external_id }}.png"
+                alt="{{ current_step.daily_exercise.exercise.name }} exercise demonstration"
+                class="h-full w-full object-cover"
+                loading="lazy"
+              />
+            </figure>
+          </div>
+
+          <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Set {{ current_step.set_number }} of {{ current_step.daily_exercise.sets|default:1 }}</p>
+            <h2 class="mt-2 text-2xl font-semibold text-slate-900">{{ current_step.daily_exercise.exercise.name }}</h2>
+            <p class="mt-2 text-lg font-semibold text-slate-800">{{ current_step.daily_exercise.repetitions|default:"Repetitions not specified" }}</p>
+            <p class="mt-1 text-sm text-slate-500">Difficulty {{ current_step.daily_exercise.exercise.difficulty_range }}</p>
+            {% if current_step.daily_exercise.exercise.info %}
+              <p class="mt-3 text-sm text-slate-600">{{ current_step.daily_exercise.exercise.info }}</p>
+            {% endif %}
+
+            <form method="post" class="mt-6 flex items-center gap-3">
+              {% csrf_token %}
+              <button type="submit" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-500">
+                Next
+                <span class="ml-2">▶</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      {% elif post_exercise_stage == 0 %}
+        <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
+          <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft lg:col-span-2">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Recovery</p>
+            <h2 class="mt-2 text-2xl font-semibold text-slate-900">Sleep &amp; nutrition check-in</h2>
+            <p class="mt-2 text-sm text-slate-600">Take a moment to record how you rested and what you ate today.</p>
+
+            {% if recovery_form.non_field_errors %}
+              <div class="form-errors">{{ recovery_form.non_field_errors }}</div>
+            {% endif %}
+
+            <form method="post" class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+              {% csrf_token %}
+
+              <div class="space-y-2">
+                <label for="id_sleep_duration">Sleep Time</label>
+                {{ recovery_form.sleep_duration }}
+                {% if recovery_form.sleep_duration.errors %}
+                  <div class="form-errors">{{ recovery_form.sleep_duration.errors }}</div>
+                {% endif %}
+              </div>
+
+              <div class="space-y-2">
+                <label for="id_sleep_quality">Sleep Quality</label>
+                {{ recovery_form.sleep_quality }}
+                {% if recovery_form.sleep_quality.errors %}
+                  <div class="form-errors">{{ recovery_form.sleep_quality.errors }}</div>
+                {% endif %}
+              </div>
+
+              <div class="space-y-2">
+                <label for="id_nutrition">Nutrition</label>
+                {{ recovery_form.nutrition }}
+                {% if recovery_form.nutrition.errors %}
+                  <div class="form-errors">{{ recovery_form.nutrition.errors }}</div>
+                {% endif %}
+              </div>
+
+              <div class="space-y-2">
+                <label for="id_comment">Custom Comment for the trainer</label>
+                {{ recovery_form.comment }}
+                {% if recovery_form.comment.errors %}
+                  <div class="form-errors">{{ recovery_form.comment.errors }}</div>
+                {% endif %}
+              </div>
+
+              <div class="md:col-span-2">
+                <button type="submit" class="inline-flex w-full items-center justify-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-500 md:w-auto">Next</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      {% elif post_exercise_stage == 1 %}
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Feedback</p>
+          <h2 class="mt-2 text-2xl font-semibold text-slate-900">Fatigue Assessment (5 questions)</h2>
+          <p class="mt-2 text-sm text-slate-600">Answer how you usually feel.</p>
+
+          <form method="post" class="mt-6 space-y-6">
+            {% csrf_token %}
+            <div class="space-y-6">
+              {% for question in fas_questions %}
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Question {{ forloop.counter }}</p>
+                  <h3 class="mt-1 text-lg font-semibold text-slate-900">{{ question.text }}</h3>
+                  <div class="mt-3 slider-field">
+                    <div class="slider__bubble" aria-hidden="true">
+                      <span class="slider__value">Never</span>
+                      <span class="slider__detail">About monthly or less</span>
+                      <span class="slider__arrow"></span>
+                    </div>
+                    {{ question.form_field }}
+                    <div class="slider__labels">
+                      <span>Never</span>
+                      <span>Always</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="session__details">
-                    <p class="eyebrow">Set {{ current_step.set_number }} of {{ current_step.daily_exercise.sets|default:1 }}</p>
-                    <h2>{{ current_step.daily_exercise.exercise.name }}</h2>
-                    <p class="reps">{{ current_step.daily_exercise.repetitions|default:"Repetitions not specified" }}</p>
-                    <p class="muted">Difficulty {{ current_step.daily_exercise.exercise.difficulty_range }}</p>
-                    {% if current_step.daily_exercise.exercise.info %}
-                        <p class="muted exercise-info">{{ current_step.daily_exercise.exercise.info }}</p>
-                    {% endif %}
-
-                    <form method="post" class="session__actions">
-                        {% csrf_token %}
-                        <button type="submit" class="button primary">
-                            Next
-                            <span class="icon">▶</span>
-                        </button>
-                    </form>
-                </div>
+              {% endfor %}
             </div>
-        {% elif post_exercise_stage == 0 %}
-            <div class="session__body">
-                <form method="post" class="session__text-card session__form">
-                    {% csrf_token %}
-                    <p class="eyebrow">Recovery</p>
-                    <h2>Sleep &amp; nutrition check-in</h2>
-                    <p class="muted">Take a moment to record how you rested and what you ate today.</p>
 
-                    {% if recovery_form.non_field_errors %}
-                        <div class="form__errors">{{ recovery_form.non_field_errors }}</div>
-                    {% endif %}
-
-                    <label for="id_sleep_duration">Sleep Time</label>
-                    {{ recovery_form.sleep_duration }}
-                    {% if recovery_form.sleep_duration.errors %}
-                        <div class="form__errors">{{ recovery_form.sleep_duration.errors }}</div>
-                    {% endif %}
-
-                    <label for="id_sleep_quality">Sleep Quality</label>
-                    {{ recovery_form.sleep_quality }}
-                    {% if recovery_form.sleep_quality.errors %}
-                        <div class="form__errors">{{ recovery_form.sleep_quality.errors }}</div>
-                    {% endif %}
-
-                    <label for="id_nutrition">Nutrition</label>
-                    {{ recovery_form.nutrition }}
-                    {% if recovery_form.nutrition.errors %}
-                        <div class="form__errors">{{ recovery_form.nutrition.errors }}</div>
-                    {% endif %}
-
-                    <label for="id_comment">Custom Comment for the trainer</label>
-                    {{ recovery_form.comment }}
-                    {% if recovery_form.comment.errors %}
-                        <div class="form__errors">{{ recovery_form.comment.errors }}</div>
-                    {% endif %}
-
-                    <div class="session__actions">
-                        <button type="submit" class="button primary">Next</button>
-                    </div>
-                </form>
+            <div>
+              <button type="submit" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-500">Next</button>
             </div>
-        {% elif post_exercise_stage == 1 %}
-            <div class="session__body">
-                <form method="post" class="session__text-card session__form fas-form">
-                    {% csrf_token %}
-                    <p class="eyebrow">Feedback</p>
-                    <h2>Fatigue Assessment (5 questions)</h2>
-                    <p class="muted">Answer how you usually feel.</p>
+          </form>
+        </div>
+        {{ fas_options|json_script:"fas-options-data" }}
+        <script>
+            (function () {
+                const options = JSON.parse(document.getElementById("fas-options-data").textContent);
 
-                    <div class="fas-questions">
-                        {% for question in fas_questions %}
-                            <div class="fas-question">
-                                <div class="fas-question__meta">
-                                    <p class="eyebrow">Question {{ forloop.counter }}</p>
-                                </div>
-                                <h3>{{ question.text }}</h3>
-                                <div class="fas-question__scale">
-                                    <div class="slider-field">
-                                        <div class="slider__bubble" aria-hidden="true">
-                                            <span class="slider__value">Never</span>
-                                            <span class="slider__detail">About monthly or less</span>
-                                            <span class="slider__arrow"></span>
-                                        </div>
-                                        {{ question.form_field }}
-                                        <div class="slider__labels">
-                                            <span>Never</span>
-                                            <span>Always</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
+                function findOption(value) {
+                    return options.find((option) => option.value === value) || options[0];
+                }
 
-                    <div class="session__actions">
-                        <button type="submit" class="button primary">Next</button>
-                    </div>
-                </form>
-            </div>
-            {{ fas_options|json_script:"fas-options-data" }}
-            <script>
-                (function () {
-                    const options = JSON.parse(document.getElementById("fas-options-data").textContent);
+                function updateBubble(slider) {
+                    const bubble = slider.parentElement.querySelector(".slider__bubble");
+                    const value = Number(slider.value);
+                    const option = findOption(value);
 
-                    function findOption(value) {
-                        return options.find((option) => option.value === value) || options[0];
+                    bubble.querySelector(".slider__value").textContent = option.label;
+                    const detail = bubble.querySelector(".slider__detail");
+                    detail.textContent = option.detail || "";
+                    detail.style.display = option.detail ? "block" : "none";
+
+                    const min = Number(slider.min || 0);
+                    const max = Number(slider.max || 1);
+                    const percent = (value - min) / (max - min);
+
+                    const trackWidth = slider.clientWidth;
+                    const thumbWidth = 22;
+                    const available = Math.max(trackWidth - thumbWidth, 0);
+                    const position = percent * available + thumbWidth / 2;
+
+                    bubble.style.left = `${position}px`;
+                }
+
+                document.querySelectorAll(".fas-slider").forEach((slider) => {
+                    let hideTimeout;
+                    const field = slider.closest(".slider-field");
+
+                    function showBubble() {
+                        clearTimeout(hideTimeout);
+                        field.classList.add("is-active");
                     }
 
-                    function updateBubble(slider) {
-                        const bubble = slider.parentElement.querySelector(".slider__bubble");
-                        const value = Number(slider.value);
-                        const option = findOption(value);
-
-                        bubble.querySelector(".slider__value").textContent = option.label;
-                        const detail = bubble.querySelector(".slider__detail");
-                        detail.textContent = option.detail || "";
-                        detail.style.display = option.detail ? "block" : "none";
-
-                        const min = Number(slider.min || 0);
-                        const max = Number(slider.max || 1);
-                        const percent = (value - min) / (max - min);
-
-                        const trackWidth = slider.clientWidth;
-                        const thumbWidth = 22;
-                        const available = Math.max(trackWidth - thumbWidth, 0);
-                        const position = percent * available + thumbWidth / 2;
-
-                        bubble.style.left = `${position}px`;
+                    function hideBubble() {
+                        hideTimeout = setTimeout(() => field.classList.remove("is-active"), 250);
                     }
 
-                    document.querySelectorAll(".fas-slider").forEach((slider) => {
-                        let hideTimeout;
-                        const field = slider.closest(".slider-field");
+                    updateBubble(slider);
 
-                        function showBubble() {
-                            clearTimeout(hideTimeout);
-                            field.classList.add("is-active");
-                        }
-
-                        function hideBubble() {
-                            hideTimeout = setTimeout(() => field.classList.remove("is-active"), 250);
-                        }
-
+                    slider.addEventListener("input", () => {
                         updateBubble(slider);
-
-                        slider.addEventListener("input", () => {
-                            updateBubble(slider);
-                            showBubble();
-                        });
-
-                        slider.addEventListener("pointerenter", showBubble);
-                        slider.addEventListener("pointerdown", showBubble);
-                        slider.addEventListener("pointerleave", hideBubble);
-                        slider.addEventListener("focus", showBubble);
-                        slider.addEventListener("blur", hideBubble);
+                        showBubble();
                     });
-                })();
-            </script>
-        {% else %}
-            <div class="session__body">
-                <div class="session__text-card">
-                    <h2>All done for today</h2>
-                    <p class="muted">You completed all exercises and check-ins. Great work!</p>
-                    <div class="session__actions">
-                        <a class="button" href="{% url 'health' %}">Back to health overview</a>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
+
+                    slider.addEventListener("pointerenter", showBubble);
+                    slider.addEventListener("pointerdown", showBubble);
+                    slider.addEventListener("pointerleave", hideBubble);
+                    slider.addEventListener("focus", showBubble);
+                    slider.addEventListener("blur", hideBubble);
+                });
+            })();
+        </script>
+      {% else %}
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-soft">
+          <h2 class="text-2xl font-semibold text-slate-900">All done for today</h2>
+          <p class="mt-2 text-sm text-slate-600">You completed all exercises and check-ins. Great work!</p>
+          <div class="mt-5 flex justify-center">
+            <a class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-500" href="{% url 'health' %}">Back to health overview</a>
+          </div>
+        </div>
+      {% endif %}
     {% else %}
-        <p>No exercises scheduled for today yet. Come back after your plan is generated.</p>
+      <p class="text-sm text-slate-700">No exercises scheduled for today yet. Come back after your plan is generated.</p>
     {% endif %}
+  </div>
 </section>
 {% endblock %}

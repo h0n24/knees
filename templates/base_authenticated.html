@@ -1,53 +1,238 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Knees{% endblock %}</title>
-    <link rel="stylesheet" href="/static/css/base.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: [
+                "Inter",
+                "ui-sans-serif",
+                "system-ui",
+                "Segoe UI",
+                "Roboto",
+                "Helvetica Neue",
+                "Arial",
+                "Noto Sans",
+                "Apple Color Emoji",
+                "Segoe UI Emoji",
+              ],
+            },
+            boxShadow: {
+              soft: "0 10px 30px rgba(2, 6, 23, 0.08)",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      .safe-bottom {
+        padding-bottom: max(env(safe-area-inset-bottom), 0px);
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        color: #0f172a;
+        background: #fff;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        outline: none;
+        transition: box-shadow 120ms ease, border-color 120ms ease, background 120ms ease;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+      }
+
+      label {
+        display: block;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #0f172a;
+      }
+
+      .form-errors {
+        margin-top: 0.5rem;
+        border-radius: 1rem;
+        background: #fff1f2;
+        color: #be123c;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: 1px solid rgba(248, 113, 113, 0.45);
+      }
+    </style>
   </head>
-  <body class="app-shell">
+
+  <body class="h-full bg-white font-sans text-slate-900 antialiased">
     {% load user_groups %}
-    <header class="app-header">
-      <div class="app-header__inner">
-        <div class="brand">Knees</div>
-        <nav class="primary-nav" aria-label="Primary">
-          {% url 'health' as health_url %}
-          {% url 'health_progress' as progress_url %}
-          {% url 'health_settings' as settings_url %}
-          {% url 'trainer' as trainer_url %}
-          <a href="{{ health_url }}" {% if request.path == health_url %}aria-current="page"{% endif %}>Home</a>
-          <a href="{{ progress_url }}" {% if request.path == progress_url %}aria-current="page"{% endif %}>Progress</a>
-          <a href="{{ settings_url }}" {% if request.path == settings_url %}aria-current="page"{% endif %}>Settings</a>
+    <div class="relative isolate min-h-screen pb-24 md:pb-0">
+      <div
+        class="pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+        aria-hidden="true"
+      >
+        <div
+          class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-indigo-500 to-cyan-400 opacity-25 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+          style="
+            clip-path: polygon(
+              74.1% 44.1%,
+              100% 61.6%,
+              97.5% 26.9%,
+              85.5% 0.1%,
+              80.7% 2%,
+              72.5% 32.5%,
+              60.2% 62.4%,
+              52.4% 68.1%,
+              47.5% 58.3%,
+              45.2% 34.5%,
+              27.5% 76.7%,
+              0.1% 64.9%,
+              17.9% 100%,
+              27.6% 76.8%,
+              76.1% 97.7%,
+              74.1% 44.1%
+            );
+          "
+        ></div>
+      </div>
+      <div
+        class="pointer-events-none absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
+        aria-hidden="true"
+      >
+        <div
+          class="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-fuchsia-500 to-indigo-500 opacity-20 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+          style="
+            clip-path: polygon(
+              74.1% 44.1%,
+              100% 61.6%,
+              97.5% 26.9%,
+              85.5% 0.1%,
+              80.7% 2%,
+              72.5% 32.5%,
+              60.2% 62.4%,
+              52.4% 68.1%,
+              47.5% 58.3%,
+              45.2% 34.5%,
+              27.5% 76.7%,
+              0.1% 64.9%,
+              17.9% 100%,
+              27.6% 76.8%,
+              76.1% 97.7%,
+              74.1% 44.1%
+            );
+          "
+        ></div>
+      </div>
+
+      <header class="sticky top-0 z-40 border-b border-slate-200/60 bg-white/70 backdrop-blur">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+          <div class="flex items-center gap-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12" />
+              </svg>
+            </div>
+            <div class="leading-tight">
+              <div class="text-sm font-semibold tracking-tight">Knees</div>
+              <div class="text-xs text-slate-500">Signed in as <span class="font-medium text-slate-700">{{ request.user.username }}</span></div>
+            </div>
+          </div>
+
+          <nav class="hidden items-center gap-1 md:flex" aria-label="Primary">
+            {% url 'health' as health_url %}
+            {% url 'health_progress' as progress_url %}
+            {% url 'health_settings' as settings_url %}
+            {% url 'trainer' as trainer_url %}
+            <a
+              href="{{ health_url }}"
+              class="rounded-full px-4 py-2 text-sm font-semibold transition {% if request.path == health_url %}bg-slate-900 text-white shadow-soft{% else %}text-slate-700 hover:bg-slate-100{% endif %}"
+              {% if request.path == health_url %}aria-current="page"{% endif %}
+            >
+              Home
+            </a>
+            <a
+              href="{{ progress_url }}"
+              class="rounded-full px-4 py-2 text-sm font-semibold transition {% if request.path == progress_url %}bg-slate-900 text-white shadow-soft{% else %}text-slate-700 hover:bg-slate-100{% endif %}"
+              {% if request.path == progress_url %}aria-current="page"{% endif %}
+            >
+              Progress
+            </a>
+            <a
+              href="{{ settings_url }}"
+              class="rounded-full px-4 py-2 text-sm font-semibold transition {% if request.path == settings_url %}bg-slate-900 text-white shadow-soft{% else %}text-slate-700 hover:bg-slate-100{% endif %}"
+              {% if request.path == settings_url %}aria-current="page"{% endif %}
+            >
+              Settings
+            </a>
+            {% if request.user.is_staff or request.user|has_group:"trainer user" %}
+            <a
+              href="{{ trainer_url }}"
+              class="rounded-full px-4 py-2 text-sm font-semibold transition {% if request.path|starts_with:trainer_url %}bg-slate-900 text-white shadow-soft{% else %}text-slate-700 hover:bg-slate-100{% endif %}"
+              {% if request.path|starts_with:trainer_url %}aria-current="page"{% endif %}
+            >
+              Trainer
+            </a>
+            {% endif %}
+            <span class="mx-2 h-6 w-px bg-slate-200"></span>
+            <a href="/auth/logout/" class="rounded-full px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Logout</a>
+          </nav>
+
+          <div class="md:hidden">
+            <a href="/auth/logout/" class="rounded-full px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Logout</a>
+          </div>
+        </div>
+      </header>
+
+      <main class="mx-auto max-w-7xl px-4 pb-28 pt-8 sm:px-6 lg:px-8">{% block content %}{% endblock %}</main>
+
+      <nav class="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur md:hidden" aria-label="Primary">
+        <div class="mx-auto flex max-w-3xl items-center justify-around px-4 py-2 text-xs font-semibold text-slate-600">
+          <a href="{{ health_url }}" class="flex flex-col items-center gap-1 rounded-2xl px-3 py-2 {% if request.path == health_url %}text-indigo-600{% else %}hover:text-slate-900{% endif %}" {% if request.path == health_url %}aria-current="page"{% endif %}>
+            <span>🏠</span>
+            <span>Home</span>
+          </a>
+          <a href="{{ progress_url }}" class="flex flex-col items-center gap-1 rounded-2xl px-3 py-2 {% if request.path == progress_url %}text-indigo-600{% else %}hover:text-slate-900{% endif %}" {% if request.path == progress_url %}aria-current="page"{% endif %}>
+            <span>📈</span>
+            <span>Progress</span>
+          </a>
           {% if request.user.is_staff or request.user|has_group:"trainer user" %}
-          <a href="{{ trainer_url }}" {% if request.path|starts_with:trainer_url %}aria-current="page"{% endif %}>Trainer</a>
+          <a href="{{ trainer_url }}" class="flex flex-col items-center gap-1 rounded-2xl px-3 py-2 {% if request.path|starts_with:trainer_url %}text-indigo-600{% else %}hover:text-slate-900{% endif %}" {% if request.path|starts_with:trainer_url %}aria-current="page"{% endif %}>
+            <span>🧭</span>
+            <span>Trainer</span>
+          </a>
           {% endif %}
-          <a href="/auth/logout/">Logout</a>
-        </nav>
-      </div>
-    </header>
-    <main class="app-main">{% block content %}{% endblock %}</main>
-    <nav class="mobile-nav" aria-label="Primary">
-      <div class="mobile-nav__inner">
-        <a href="{{ health_url }}" {% if request.path == health_url %}aria-current="page"{% endif %}>
-          <span class="mobile-nav__icon">🏠</span>
-          <span>Home</span>
-        </a>
-        <a href="{{ progress_url }}" {% if request.path == progress_url %}aria-current="page"{% endif %}>
-          <span class="mobile-nav__icon">📈</span>
-          <span>Progress</span>
-        </a>
-        {% if request.user.is_staff or request.user|has_group:"trainer user" %}
-        <a href="{{ trainer_url }}" {% if request.path|starts_with:trainer_url %}aria-current="page"{% endif %}>
-          <span class="mobile-nav__icon">🧭</span>
-          <span>Trainer</span>
-        </a>
-        {% endif %}
-        <a href="{{ settings_url }}" {% if request.path == settings_url %}aria-current="page"{% endif %}>
-          <span class="mobile-nav__icon">⚙️</span>
-          <span>Settings</span>
-        </a>
-      </div>
-    </nav>
+          <a href="{{ settings_url }}" class="flex flex-col items-center gap-1 rounded-2xl px-3 py-2 {% if request.path == settings_url %}text-indigo-600{% else %}hover:text-slate-900{% endif %}" {% if request.path == settings_url %}aria-current="page"{% endif %}>
+            <span>⚙️</span>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+    </div>
   </body>
 </html>
