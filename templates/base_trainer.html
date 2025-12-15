@@ -3,43 +3,207 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Knees Trainer{% endblock %}</title>
-    <link rel="stylesheet" href="/static/css/base.css" />
+    <title>{% block title %}Knees · Trainer{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: [
+                "Inter",
+                "ui-sans-serif",
+                "system-ui",
+                "Segoe UI",
+                "Roboto",
+                "Helvetica Neue",
+                "Arial",
+                "Noto Sans",
+                "Apple Color Emoji",
+                "Segoe UI Emoji",
+              ],
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body class="app-shell">
-    <main class="app-main">
-      <div class="trainer-layout">
-        <aside class="trainer-sidebar" aria-label="Trainer navigation">
-          <div class="trainer-brand">
-            <div class="trainer-brand__logo">Knees</div>
-          </div>
-          <nav class="trainer-nav">
-            <a href="{% url 'trainer' %}" class="trainer-nav__item{% if trainer_nav.selected == 'users' %} is-active{% endif %}">
-              <span>Users</span>
-            </a>
-            <a href="{% url 'trainer_exercises' %}" class="trainer-nav__item{% if trainer_nav.selected == 'exercises' %} is-active{% endif %}">
-              <span>List of Exercises</span>
-            </a>
-            {% if trainer_nav.recent_reports %}
-            <p class="trainer-nav__label">Recent reports</p>
-            <div class="trainer-nav__recent">
-              {% for report in trainer_nav.recent_reports %}
-              <a href="{{ report.url }}" class="trainer-nav__item{% if report.is_active %} is-active{% endif %}">
-                <span>{{ report.name }}</span>
+  <body class="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased">
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+      <div
+        class="flex min-h-[calc(100vh-3rem)] flex-col gap-6 lg:min-h-[calc(100vh-5rem)] lg:flex-row lg:gap-10"
+      >
+        <aside class="lg:w-64 lg:shrink-0">
+          <div
+            class="sticky top-0 z-20 -mx-4 bg-zinc-50/80 backdrop-blur sm:-mx-6 lg:static lg:mx-0 lg:bg-transparent lg:backdrop-blur-0 lg:hidden"
+          >
+            <div class="flex items-center justify-between px-4 py-3 sm:px-6 lg:px-0 lg:py-0">
+              <a href="{% url 'trainer' %}" class="flex items-center gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm">
+                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12" />
+                  </svg>
+                </div>
+                <div class="text-sm font-semibold tracking-tight">Knees</div>
               </a>
-              {% endfor %}
+
+              <button
+                id="mobileMenuButton"
+                type="button"
+                class="inline-flex items-center justify-center rounded-full bg-white p-2 text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 lg:hidden"
+                aria-controls="mobileMenu"
+                aria-expanded="false"
+              >
+                <span class="sr-only">Open menu</span>
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h14M3 10h14M3 15h14" />
+                </svg>
+              </button>
             </div>
-            {% endif %}
-          </nav>
-          <div class="trainer-sidebar__spacer" aria-hidden="true"></div>
-          <a class="trainer-nav__item trainer-nav__item--logout" href="{% url 'logout' %}">Logout</a>
-        </aside>
-        <section class="trainer-page-header">
-          <div class="">
-          {% block trainer_content %}{% endblock %}
+
+            <div id="mobileMenu" class="hidden px-4 pb-4 sm:px-6 lg:hidden">
+              <nav class="space-y-1 rounded-2xl bg-white p-2 shadow-sm ring-1 ring-zinc-900/5">
+                {% with is_users=trainer_nav.selected == 'users' or trainer_nav.selected == 'user_detail' %}
+                <a
+                  href="{% url 'trainer' %}"
+                  class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition hover:bg-zinc-50 hover:text-zinc-900 {% if is_users %}font-bold text-indigo-600{% else %}font-medium text-zinc-700{% endif %}"
+                >
+                  <span>Users</span>
+                </a>
+                {% endwith %}
+
+                <a
+                  href="{% url 'trainer_exercises' %}"
+                  class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition hover:bg-zinc-50 hover:text-zinc-900 {% if trainer_nav.selected == 'exercises' %}font-bold text-indigo-600{% else %}font-medium text-zinc-700{% endif %}"
+                >
+                  <span>List of Exercises</span>
+                </a>
+
+                {% if trainer_nav.recent_reports %}
+                <div class="pt-2">
+                  <div class="px-3 pb-2 text-xs font-semibold tracking-wide text-zinc-500">Recent reports</div>
+                  <div class="space-y-1">
+                    {% for report in trainer_nav.recent_reports %}
+                    <a
+                      href="{{ report.url }}"
+                      class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition hover:bg-zinc-50 hover:text-zinc-900 {% if report.is_active %}font-bold text-indigo-600{% else %}font-medium text-zinc-700{% endif %}"
+                    >
+                      <span>{{ report.name }}</span>
+                    </a>
+                    {% endfor %}
+                  </div>
+                </div>
+                {% endif %}
+
+                <div class="pt-2">
+                  <a
+                    class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600"
+                    href="{% url 'logout' %}"
+                  >
+                    <span>Logout</span>
+                  </a>
+                </div>
+              </nav>
+            </div>
           </div>
-        </section>
+
+          <div class="hidden lg:block">
+            <div class="flex items-center gap-3 px-3">
+              <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12" />
+                </svg>
+              </div>
+              <div class="text-sm font-semibold tracking-tight">Knees</div>
+            </div>
+
+            <nav class="mt-8 space-y-1">
+              {% with is_users=trainer_nav.selected == 'users' or trainer_nav.selected == 'user_detail' %}
+              <a
+                href="{% url 'trainer' %}"
+                class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition hover:bg-white hover:text-zinc-900 {% if is_users %}font-bold text-indigo-600{% else %}font-medium text-zinc-700{% endif %}"
+              >
+                <span>Users</span>
+              </a>
+              {% endwith %}
+
+              <a
+                href="{% url 'trainer_exercises' %}"
+                class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition hover:bg-white hover:text-zinc-900 {% if trainer_nav.selected == 'exercises' %}font-bold text-indigo-600{% else %}font-medium text-zinc-700{% endif %}"
+              >
+                <span>List of Exercises</span>
+              </a>
+
+              {% if trainer_nav.recent_reports %}
+              <div class="hidden lg:block pt-8">
+                <div class="px-3 pb-2 text-xs font-semibold tracking-wide text-zinc-500">Recent reports</div>
+                <div class="space-y-1">
+                  {% for report in trainer_nav.recent_reports %}
+                    <a
+                      href="{{ report.url }}"
+                      class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition hover:bg-white hover:text-zinc-900 {% if report.is_active %}font-bold text-indigo-600{% else %}font-medium text-zinc-700{% endif %}"
+                    >
+                    <span>{{ report.name }}</span>
+                  </a>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+            </nav>
+
+            <a
+              href="{% url 'logout' %}"
+              class="mt-8 block rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 hover:bg-white hover:text-zinc-600"
+            >
+              Logout
+            </a>
+          </div>
+        </aside>
+
+        <main class="min-w-0 flex-1">
+          {% block trainer_content %}{% endblock %}
+        </main>
       </div>
-    </main>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const mobileMenuButton = document.getElementById("mobileMenuButton");
+        const mobileMenu = document.getElementById("mobileMenu");
+
+        if (mobileMenuButton && mobileMenu) {
+          mobileMenuButton.addEventListener("click", () => {
+            const isOpen = !mobileMenu.classList.contains("hidden");
+            mobileMenuButton.setAttribute("aria-expanded", String(!isOpen));
+            mobileMenu.classList.toggle("hidden");
+          });
+        }
+
+        document.querySelectorAll("[data-row-href]").forEach((row) => {
+          const href = row.getAttribute("data-row-href");
+          if (!href) return;
+
+          const activate = () => {
+            window.location.href = href;
+          };
+
+          row.addEventListener("click", activate);
+          row.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              activate();
+            }
+          });
+        });
+      });
+    </script>
   </body>
 </html>
