@@ -36,89 +36,150 @@
       <p class="mt-4 text-base leading-7 text-indigo-100">Quick to scan on desktop or mobile—no clutter, just today’s actions.</p>
     </div>
 
-    <div
-      id="landing-screenshot-grid"
-      class="mt-12 grid auto-rows-[minmax(0,1fr)] gap-4 sm:grid-cols-8 lg:grid-cols-12"
-    >
-      <a
-        href="{% static 'screens/health_main.png' %}"
-        data-pswp-width="2732"
-        data-pswp-height="2048"
-        class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-5 lg:col-span-7"
-      >
-        <img
-          src="{% static 'screens/health_main.png' %}"
-          alt="Daily health overview"
-          class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
-        />
-        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
-          <p class="text-sm font-semibold text-white">Today’s plan at a glance</p>
+    <div id="landing-screenshot-grid" class="mt-12 space-y-10">
+      <div class="space-y-4">
+        <div class="flex items-baseline justify-between gap-4">
+          <h3 class="text-left text-xl font-semibold text-white">Health views</h3>
+          <p class="text-sm text-indigo-100">Screens that start with <span class="font-semibold">health_</span></p>
         </div>
-      </a>
+        <div class="grid auto-rows-[minmax(0,1fr)] gap-4 sm:grid-cols-8 lg:grid-cols-12">
+          <a
+            href="{% static 'screens/health_main.png' %}"
+            data-pswp-width="2732"
+            data-pswp-height="2048"
+            class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-5 lg:col-span-7"
+          >
+            <img
+              src="{% static 'screens/health_main.png' %}"
+              alt="Daily health overview"
+              class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
+            />
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
+              <p class="text-sm font-semibold text-white">Today’s plan at a glance</p>
+            </div>
+          </a>
 
-      <a
-        href="{% static 'screens/health_exercise1.png' %}"
-        data-pswp-width="2732"
-        data-pswp-height="2048"
-        class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-3 lg:col-span-5"
-      >
-        <img
-          src="{% static 'screens/health_exercise1.png' %}"
-          alt="Exercise details and cues"
-          class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
-        />
-        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
-          <p class="text-sm font-semibold text-white">Guided rehab steps</p>
-        </div>
-      </a>
+          <a
+            href="{% static 'screens/health_exercise1.png' %}"
+            data-pswp-width="2732"
+            data-pswp-height="2048"
+            class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-3 lg:col-span-5"
+          >
+            <img
+              src="{% static 'screens/health_exercise1.png' %}"
+              alt="Exercise details and cues"
+              class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
+            />
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
+              <p class="text-sm font-semibold text-white">Guided rehab steps</p>
+            </div>
+          </a>
 
-      <a
-        href="{% static 'screens/trainer_exercises.png' %}"
-        data-pswp-width="2732"
-        data-pswp-height="2048"
-        class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-4 lg:col-span-4"
-      >
-        <img
-          src="{% static 'screens/trainer_exercises.png' %}"
-          alt="Trainer view of exercises"
-          class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
-        />
-        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
-          <p class="text-sm font-semibold text-white">Trainer-approved routines</p>
-        </div>
-      </a>
+          <a
+            href="{% static 'screens/health_exercise2.png' %}"
+            data-pswp-width="2732"
+            data-pswp-height="2048"
+            class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-4 lg:col-span-6"
+          >
+            <img
+              src="{% static 'screens/health_exercise2.png' %}"
+              alt="Exercise library"
+              class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
+            />
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
+              <p class="text-sm font-semibold text-white">Warmups through cooldowns</p>
+            </div>
+          </a>
 
-      <a
-        href="{% static 'screens/health_exercise2.png' %}"
-        data-pswp-width="2732"
-        data-pswp-height="2048"
-        class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-4 lg:col-span-4"
-      >
-        <img
-          src="{% static 'screens/health_exercise2.png' %}"
-          alt="Exercise library"
-          class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
-        />
-        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
-          <p class="text-sm font-semibold text-white">Warmups through cooldowns</p>
+          <a
+            href="{% static 'screens/health_exercise3.png' %}"
+            data-pswp-width="2732"
+            data-pswp-height="2048"
+            class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-4 lg:col-span-6"
+          >
+            <img
+              src="{% static 'screens/health_exercise3.png' %}"
+              alt="Health exercise selection"
+              class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
+            />
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
+              <p class="text-sm font-semibold text-white">Choose the next movement</p>
+            </div>
+          </a>
         </div>
-      </a>
+      </div>
 
-      <a
-        href="{% static 'screens/trainer_users.png' %}"
-        data-pswp-width="2732"
-        data-pswp-height="2048"
-        class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-4 lg:col-span-4"
-      >
-        <img
-          src="{% static 'screens/trainer_users.png' %}"
-          alt="Trainer user list"
-          class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
-        />
-        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
-          <p class="text-sm font-semibold text-white">Shareable progress insights</p>
+      <div class="space-y-4">
+        <div class="flex items-baseline justify-between gap-4">
+          <h3 class="text-left text-xl font-semibold text-white">Trainer views</h3>
+          <p class="text-sm text-indigo-100">Screens that start with <span class="font-semibold">trainer_</span></p>
         </div>
-      </a>
+        <div class="grid auto-rows-[minmax(0,1fr)] gap-4 sm:grid-cols-8 lg:grid-cols-12">
+          <a
+            href="{% static 'screens/trainer_exercises.png' %}"
+            data-pswp-width="2732"
+            data-pswp-height="2048"
+            class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-4 lg:col-span-5"
+          >
+            <img
+              src="{% static 'screens/trainer_exercises.png' %}"
+              alt="Trainer view of exercises"
+              class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
+            />
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
+              <p class="text-sm font-semibold text-white">Trainer-approved routines</p>
+            </div>
+          </a>
+
+          <a
+            href="{% static 'screens/trainer_users.png' %}"
+            data-pswp-width="2732"
+            data-pswp-height="2048"
+            class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-4 lg:col-span-4"
+          >
+            <img
+              src="{% static 'screens/trainer_users.png' %}"
+              alt="Trainer user list"
+              class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
+            />
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
+              <p class="text-sm font-semibold text-white">Shareable progress insights</p>
+            </div>
+          </a>
+
+          <a
+            href="{% static 'screens/trainer_admin.png' %}"
+            data-pswp-width="2732"
+            data-pswp-height="2048"
+            class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-4 lg:col-span-5"
+          >
+            <img
+              src="{% static 'screens/trainer_admin.png' %}"
+              alt="Trainer admin controls"
+              class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
+            />
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
+              <p class="text-sm font-semibold text-white">Admin oversight</p>
+            </div>
+          </a>
+
+          <a
+            href="{% static 'screens/trainer_testik4.png' %}"
+            data-pswp-width="2732"
+            data-pswp-height="2048"
+            class="group relative col-span-8 overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-white/30 sm:col-span-4 lg:col-span-7"
+          >
+            <img
+              src="{% static 'screens/trainer_testik4.png' %}"
+              alt="Trainer testing interface"
+              class="h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
+            />
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4 text-left">
+              <p class="text-sm font-semibold text-white">Testing flow preview</p>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
