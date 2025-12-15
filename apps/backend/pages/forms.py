@@ -22,14 +22,14 @@ class RecoveryLogForm(forms.ModelForm):
                 attrs={
                     "min": 0,
                     "max": 100,
-                    "placeholder": "80",
+                    "placeholder": "Eg. 80",
                     "class": "rounded-2xl border border-transparent bg-white px-4 py-3 shadow-none focus-within:ring-2 focus-within:ring-transparent focus:outline-none focus:border-transparent",
                     "aria-describedby": "sleep-quality-help",
                 }
             ),
             "nutrition": forms.Select(
                 attrs={
-                    "class": "w-full bg-transparent px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none",
+                    "class": "w-full bg-transparent px-4 py-3 text-sm shadow-none font-semibold text-slate-900 focus:outline-none",
                 }
             ),
             "comment": forms.Textarea(
