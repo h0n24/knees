@@ -1,6 +1,5 @@
 from django import forms
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import User
 
@@ -12,12 +11,88 @@ class RegisterForm(UserCreationForm):
         model = User
         fields = ("username", "email", "password1", "password2")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["username"].widget.attrs.update(
+            {
+                "class": (
+                    "block w-full rounded-md border-0 bg-slate-50 px-4 py-3 "
+                    "text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 "
+                    "placeholder:text-slate-400 placeholder:text-sm focus:ring-2 "
+                    "focus:ring-inset focus:ring-indigo-600"
+                ),
+                "placeholder": "Write your username, without space and special characters",
+                "autocomplete": "username",
+            }
+        )
+
+        self.fields["email"].widget.attrs.update(
+            {
+                "class": (
+                    "block w-full rounded-md border-0 bg-slate-50 px-4 py-3 text-slate-900 "
+                    "shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 "
+                    "placeholder:text-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+                ),
+                "placeholder": "Write your email",
+                "autocomplete": "email",
+            }
+        )
+
+        password_classes = (
+            "block w-full rounded-md border-0 bg-slate-50 px-4 py-3 pr-12 text-slate-900 "
+            "shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 placeholder:text-sm "
+            "focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+        )
+
+        self.fields["password1"].widget.attrs.update(
+            {
+                "class": password_classes,
+                "placeholder": "Write your password, longer is better. 8 chars is minimum",
+            }
+        )
+
+        self.fields["password2"].widget.attrs.update(
+            {
+                "class": password_classes,
+                "placeholder": "Make sure you remember them",
+            }
+        )
+
     def save(self, commit: bool = True) -> User:
         user = super().save(commit=False)
         user.email = self.cleaned_data["email"]
         if commit:
             user.save()
         return user
+
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["username"].widget.attrs.update(
+            {
+                "class": (
+                    "block w-full rounded-md border-0 bg-slate-50 px-4 py-3 text-slate-900 "
+                    "shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 placeholder:text-sm "
+                    "focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+                ),
+                "placeholder": "Your username or email",
+                "autocomplete": "username",
+            }
+        )
+
+        self.fields["password"].widget.attrs.update(
+            {
+                "class": (
+                    "block w-full rounded-md border-0 bg-slate-50 px-4 py-3 pr-12 text-slate-900 "
+                    "shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 placeholder:text-sm "
+                    "focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+                ),
+                "placeholder": "Your password",
+            }
+        )
 
 
 class UserSettingsForm(forms.ModelForm):
