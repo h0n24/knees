@@ -60,7 +60,12 @@ class PlanEditorForm(forms.Form):
     start_date = forms.DateField(
         label="Week start",
         initial=timezone.localdate,
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=forms.DateInput(
+            attrs={
+                "type": "date",
+                "class": "mt-1 h-10 w-full rounded-2xl bg-white px-3 text-sm ring-1 ring-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-600",
+            }
+        ),
     )
     replace_existing = forms.BooleanField(
         label="Replace existing entries",
