@@ -124,10 +124,10 @@
             </div>
 
             <nav class="mt-8 space-y-1">
-              {% with is_users=trainer_nav.selected == 'users' or trainer_nav.selected == 'user_detail' %}
+              {% with selected=trainer_nav.selected %}
               <a
                 href="{% url 'trainer' %}"
-                class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition hover:bg-white hover:text-zinc-900 {% if is_users %}font-bold text-indigo-600{% else %}font-medium text-zinc-700{% endif %}"
+                class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition hover:bg-white hover:text-zinc-900 {% if selected == 'users' or selected == 'user_detail' %}font-bold text-indigo-600{% else %}font-medium text-zinc-700{% endif %}"
               >
                 <span>Users</span>
               </a>
