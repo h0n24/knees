@@ -1,118 +1,156 @@
 {% extends "base_trainer.html" %}
 
 {% block trainer_content %}
-<div class="grid">
-  <section class="panel trainer-panel">
-    <div class="panel__heading">
-      <h2>Reports</h2>
-      <p class="hero__subdued">Recent adherence and recovery snapshots</p>
+<div class="space-y-6">
+  <div class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
+    <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
+      <div class="flex flex-wrap items-center gap-2">
+        <h1 class="text-xl font-semibold leading-tight">Report for athlete: {{ headline }}</h1>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <a
+          href="#generate-week"
+          class="inline-flex h-9 items-center justify-center rounded-2xl bg-indigo-600 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+        >
+          Generate week
+        </a>
+      </div>
     </div>
-    <div class="grid two-columns">
+  </div>
+
+  <section class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
+    <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
+      <div>
+        <h2 class="text-base font-semibold leading-6">Reports</h2>
+        <p class="mt-1 text-sm text-zinc-500">Recent adherence and recovery snapshots</p>
+      </div>
+    </div>
+    <div class="grid gap-4 px-5 pb-6 sm:px-6 sm:pb-6 md:grid-cols-2">
       {% for report in reports %}
-      <div class="card report-card">
-        <div class="card__header">
+      <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+        <div class="flex items-start justify-between gap-3">
           <div>
-            <p class="eyebrow">{{ report.title }}</p>
-            <h3 class="card-title">{{ report.range }}</h3>
+            <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">{{ report.title }}</p>
+            <h3 class="text-lg font-semibold leading-6 text-zinc-900">{{ report.range }}</h3>
           </div>
-          <span class="pill">{{ report.adherence }}% adherence</span>
+          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset bg-zinc-100 text-zinc-700 ring-zinc-600/20">{{ report.adherence }}% adherence</span>
         </div>
-        <dl class="stat-list">
-          <div class="stat-row">
-            <dt>Training load</dt>
-            <dd>{{ report.training_minutes }} min</dd>
+        <dl class="mt-4 space-y-2 text-sm text-zinc-700">
+          <div class="flex items-center justify-between">
+            <dt class="text-zinc-500">Training load</dt>
+            <dd class="font-medium text-zinc-900">{{ report.training_minutes }} min</dd>
           </div>
-          <div class="stat-row">
-            <dt>Avg sleep</dt>
-            <dd>{% if report.average_sleep %}{{ report.average_sleep }} hrs{% else %}—{% endif %}</dd>
+          <div class="flex items-center justify-between">
+            <dt class="text-zinc-500">Avg sleep</dt>
+            <dd class="font-medium text-zinc-900">{% if report.average_sleep %}{{ report.average_sleep }} hrs{% else %}—{% endif %}</dd>
           </div>
-          <div class="stat-row">
-            <dt>Avg fatigue</dt>
-            <dd>{{ report.average_fatigue }}</dd>
+          <div class="flex items-center justify-between">
+            <dt class="text-zinc-500">Avg fatigue</dt>
+            <dd class="font-medium text-zinc-900">{{ report.average_fatigue }}</dd>
           </div>
         </dl>
       </div>
+      {% empty %}
+      <div class="px-5 pb-6 text-sm text-zinc-600 sm:px-6 sm:pb-6">No reports available.</div>
       {% endfor %}
     </div>
   </section>
 
-  <section class="panel trainer-panel">
-    <div class="panel__heading">
-      <h2>Generate new week</h2>
-      <p class="hero__subdued">Build a fresh 7-day plan for this athlete.</p>
+  <section id="generate-week" class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
+    <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
+      <div>
+        <h2 class="text-base font-semibold leading-6">Generate new week</h2>
+        <p class="mt-1 text-sm text-zinc-500">Build a fresh 7-day plan for this athlete.</p>
+      </div>
     </div>
 
-    {% if plan_message %}
-    <div class="notice is-success">
-      Updated {{ plan_message.user.username }} starting {{ plan_message.start_date }} with
-      {{ plan_message.created }} scheduled exercises{% if plan_message.replace_existing %}
-      (replaced existing entries){% endif %}.
-    </div>
-    {% endif %}
-
-    <form method="post" class="form-grid">
-      {% csrf_token %}
-      {{ plan_form.user }}
-      <label>{{ plan_form.start_date.label }}{{ plan_form.start_date }}<small class="muted">Start any day to roll a 7-day plan.</small></label>
-      <label class="full-width checkbox-row">{{ plan_form.replace_existing }} {{ plan_form.replace_existing.label }}</label>
-      {% if plan_form.errors %}
-        <div class="form-errors">{{ plan_form.errors }}</div>
+    <div class="px-5 pb-6 sm:px-6 sm:pb-6">
+      {% if plan_message %}
+      <div class="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-800 ring-1 ring-emerald-200">
+        Updated {{ plan_message.user.username }} starting {{ plan_message.start_date }} with {{ plan_message.created }} scheduled exercises{% if plan_message.replace_existing %} (replaced existing entries){% endif %}.
+      </div>
       {% endif %}
-      <button type="submit" class="button">Generate week</button>
-    </form>
+
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        {{ plan_form.user }}
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-zinc-700">{{ plan_form.start_date.label }}</label>
+          <div class="text-sm text-zinc-900">{{ plan_form.start_date }}</div>
+          <p class="text-xs text-zinc-500">Start any day to roll a 7-day plan.</p>
+        </div>
+        <label class="flex items-center gap-2 text-sm font-medium text-zinc-700">
+          {{ plan_form.replace_existing }}
+          <span>{{ plan_form.replace_existing.label }}</span>
+        </label>
+        {% if plan_form.errors %}
+        <div class="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700 ring-1 ring-rose-200">{{ plan_form.errors }}</div>
+        {% endif %}
+        <button type="submit" class="inline-flex h-10 items-center justify-center rounded-2xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">
+          Generate week
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <section class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
+    <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
+      <div>
+        <h2 class="text-base font-semibold leading-6">Training snapshot</h2>
+        <p class="mt-1 text-sm text-zinc-500">Latest recovery and plan details</p>
+      </div>
+    </div>
+
+    <div class="px-5 pb-6 sm:px-6 sm:pb-6">
+      {% if summary %}
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Sleep</p>
+          <h3 class="mt-1 text-2xl font-semibold text-zinc-900">{% if summary.sleep_hours %}{{ summary.sleep_hours }} hrs{% else %}—{% endif %}</h3>
+          <p class="text-sm text-zinc-500">Last recorded</p>
+        </div>
+        <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Nutrition</p>
+          <h3 class="mt-1 text-2xl font-semibold text-zinc-900">{% if summary.nutrition %}{{ summary.nutrition }}{% else %}—{% endif %}</h3>
+          <p class="text-sm text-zinc-500">Most recent</p>
+        </div>
+        <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Fatigue</p>
+          <h3 class="mt-1 text-2xl font-semibold text-zinc-900">{% if summary.fatigue %}{{ summary.fatigue }} / 50{% else %}—{% endif %}</h3>
+          <p class="text-sm text-zinc-500">Latest check-in</p>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="min-w-full divide-y divide-zinc-200">
+          <thead class="bg-zinc-50">
+            <tr>
+              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Date</th>
+              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Exercise</th>
+              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Sets</th>
+              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Reps</th>
+              <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Difficulty</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-200 bg-white">
+            {% for row in upcoming_plan %}
+            <tr>
+              <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">{{ row.date }}</td>
+              <td class="whitespace-nowrap px-5 py-4 text-sm font-medium text-zinc-900 sm:px-6">{{ row.name }}</td>
+              <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">{% if row.sets %}{{ row.sets }}{% else %}—{% endif %}</td>
+              <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">{% if row.reps %}{{ row.reps }}{% else %}—{% endif %}</td>
+              <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">{{ row.difficulty }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="px-5 py-4 text-sm text-zinc-600 sm:px-6">No upcoming exercises scheduled.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </section>
 </div>
-
-<section class="panel trainer-panel">
-  <div class="panel__heading">
-    <h2>Training snapshot</h2>
-    <p class="hero__subdued">Latest recovery and plan details</p>
-  </div>
-  {% if summary %}
-  <div class="grid three-columns trainer-stats">
-    <div class="card small">
-      <p class="eyebrow">Sleep</p>
-      <h3 class="card-title">{% if summary.sleep_hours %}{{ summary.sleep_hours }} hrs{% else %}—{% endif %}</h3>
-      <p class="muted">Last recorded</p>
-    </div>
-    <div class="card small">
-      <p class="eyebrow">Nutrition</p>
-      <h3 class="card-title">{% if summary.nutrition %}{{ summary.nutrition }}{% else %}—{% endif %}</h3>
-      <p class="muted">Most recent</p>
-    </div>
-    <div class="card small">
-      <p class="eyebrow">Fatigue</p>
-      <h3 class="card-title">{% if summary.fatigue %}{{ summary.fatigue }} / 50{% else %}—{% endif %}</h3>
-      <p class="muted">Latest check-in</p>
-    </div>
-  </div>
-  {% endif %}
-
-  <div class="table-wrapper">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Exercise</th>
-          <th>Sets</th>
-          <th>Reps</th>
-          <th>Difficulty</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in upcoming_plan %}
-        <tr>
-          <td>{{ row.date }}</td>
-          <td>{{ row.name }}</td>
-          <td>{% if row.sets %}{{ row.sets }}{% else %}—{% endif %}</td>
-          <td>{% if row.reps %}{{ row.reps }}{% else %}—{% endif %}</td>
-          <td>{{ row.difficulty }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5">No upcoming exercises scheduled.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</section>
 {% endblock %}
