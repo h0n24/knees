@@ -146,6 +146,33 @@ def trainer_exercises_page(request):
 
     exercises = Exercise.objects.all()
 
+    category_palette = [
+        "bg-amber-100 text-amber-800 ring-amber-500/20",
+        "bg-emerald-100 text-emerald-800 ring-emerald-500/20",
+        "bg-sky-100 text-sky-800 ring-sky-500/20",
+        "bg-rose-100 text-rose-800 ring-rose-500/20",
+        "bg-indigo-100 text-indigo-800 ring-indigo-500/20",
+        "bg-fuchsia-100 text-fuchsia-800 ring-fuchsia-500/20",
+        "bg-lime-100 text-lime-800 ring-lime-500/20",
+    ]
+
+    category_colors = {}
+    palette_index = 0
+
+    for exercise in exercises:
+        exercise.category_chips = []
+
+        for category in exercise.categories:
+            if category not in category_colors:
+                category_colors[category] = category_palette[
+                    palette_index % len(category_palette)
+                ]
+                palette_index += 1
+
+            exercise.category_chips.append(
+                {"name": category, "style": category_colors[category]}
+            )
+
     context = {
         "title": "Exercises · Trainer",
         "headline": "List of Exercises",
