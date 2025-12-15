@@ -147,13 +147,13 @@ def trainer_exercises_page(request):
     exercises = Exercise.objects.all()
 
     category_palette = [
-        "bg-amber-100 text-amber-800 ring-amber-500/20",
-        "bg-emerald-100 text-emerald-800 ring-emerald-500/20",
-        "bg-sky-100 text-sky-800 ring-sky-500/20",
-        "bg-rose-100 text-rose-800 ring-rose-500/20",
-        "bg-indigo-100 text-indigo-800 ring-indigo-500/20",
-        "bg-fuchsia-100 text-fuchsia-800 ring-fuchsia-500/20",
-        "bg-lime-100 text-lime-800 ring-lime-500/20",
+        "bg-amber-50 text-amber-800 ring-amber-500/20",
+        "bg-emerald-50 text-emerald-800 ring-emerald-500/20",
+        "bg-sky-50 text-sky-800 ring-sky-500/20",
+        "bg-rose-50 text-rose-800 ring-rose-500/20",
+        "bg-indigo-50 text-indigo-800 ring-indigo-500/20",
+        "bg-fuchsia-50 text-fuchsia-800 ring-fuchsia-500/20",
+        "bg-lime-50 text-lime-800 ring-lime-500/20",
     ]
 
     category_colors = {}
