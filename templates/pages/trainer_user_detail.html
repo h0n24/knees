@@ -85,6 +85,19 @@
           </thead>
           <tbody id="checkinsBody" class="divide-y divide-zinc-200 bg-white"></tbody>
         </table>
+
+        <div class="flex items-center justify-between gap-4 border-t border-zinc-200 px-5 py-4 text-sm sm:px-6">
+          <div class="text-zinc-500" id="checkinsRange">Showing —</div>
+          <div class="flex items-center gap-2">
+            <button id="checkinsPrev" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+              Prev
+            </button>
+            <div class="text-zinc-500" id="checkinsInfo">Page —</div>
+            <button id="checkinsNext" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+              Next
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="hidden overflow-x-auto" data-recovery-panel="sessions">
@@ -98,6 +111,19 @@
           </thead>
           <tbody id="sessionsBody" class="divide-y divide-zinc-200 bg-white"></tbody>
         </table>
+
+        <div class="flex items-center justify-between gap-4 border-t border-zinc-200 px-5 py-4 text-sm sm:px-6">
+          <div class="text-zinc-500" id="sessionsRange">Showing —</div>
+          <div class="flex items-center gap-2">
+            <button id="sessionsPrev" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+              Prev
+            </button>
+            <div class="text-zinc-500" id="sessionsInfo">Page —</div>
+            <button id="sessionsNext" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -235,9 +261,9 @@
       <form method="post" class="space-y-4 max-w-2xl">
         {% csrf_token %}
         {{ plan_form.user }}
-        <div class="space-y-2">
+        <div class="space-y-2 max-w-96">
           <label class="block text-sm font-medium text-zinc-700">{{ plan_form.start_date.label }}</label>
-          <div class="text-sm text-zinc-900">{{ plan_form.start_date }}</div>
+          {{ plan_form.start_date }}
           <p class="text-xs text-zinc-500">Start any day to roll a 7-day plan.</p>
         </div>
         <label class="flex items-start gap-3 rounded-2xl bg-zinc-50 p-4 ring-1 ring-zinc-200 max-w-80">
@@ -285,45 +311,43 @@
 
     const checkinsBody = document.getElementById('checkinsBody');
     const sessionsBody = document.getElementById('sessionsBody');
+    const checkinsInfo = document.getElementById('checkinsInfo');
+    const checkinsRange = document.getElementById('checkinsRange');
+    const checkinsPrev = document.getElementById('checkinsPrev');
+    const checkinsNext = document.getElementById('checkinsNext');
+    const sessionsInfo = document.getElementById('sessionsInfo');
+    const sessionsRange = document.getElementById('sessionsRange');
+    const sessionsPrev = document.getElementById('sessionsPrev');
+    const sessionsNext = document.getElementById('sessionsNext');
+
     const entries = payload.recovery?.entries || [];
     const plan = payload.plan || [];
 
-    if (checkinsBody) {
-      const rows = entries
-        .filter((entry) => entry.balance !== null)
-        .sort((a, b) => new Date(b.iso) - new Date(a.iso))
-        .slice(0, 20)
-        .map((entry) => {
-          const noteParts = [
-            `Sleep: ${entry.sleep_hours ?? '—'}h`,
-            `Nutrition: ${entry.nutrition ?? '—'}`,
-            `Fatigue: ${entry.fatigue ?? '—'}`,
-          ];
-          const balanceClass = typeof entry.balance === 'number' && entry.balance < 0 ? 'text-rose-600' : 'text-emerald-600';
-          return `
-            <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
-              <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${entry.date}</td>
-              <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">${noteParts.join(' · ')}</td>
-              <td class="whitespace-nowrap px-5 py-4 text-right text-sm font-medium sm:px-6 ${balanceClass}">${entry.balance}</td>
-            </tr>
-          `;
-        });
-      checkinsBody.innerHTML = rows.join('') || '<tr><td colspan="3" class="px-5 py-4 text-sm text-zinc-600 sm:px-6">No recovery check-ins yet.</td></tr>';
-    }
+    const checkinRows = entries
+      .filter((entry) => entry.balance !== null)
+      .sort((a, b) => new Date(b.iso) - new Date(a.iso))
+      .map((entry) => {
+        const noteParts = [
+          `Sleep: ${entry.sleep_hours ?? '—'}h`,
+          `Nutrition: ${entry.nutrition ?? '—'}`,
+          `Fatigue: ${entry.fatigue ?? '—'}`,
+        ];
+        const balanceClass = typeof entry.balance === 'number' && entry.balance < 0 ? 'text-rose-600' : 'text-emerald-600';
+        return {
+          date: entry.date,
+          note: noteParts.join(' · '),
+          balance: entry.balance,
+          balanceClass,
+        };
+      });
 
-    if (sessionsBody) {
-      const rows = plan
-        .slice()
-        .sort((a, b) => new Date(a.iso_date) - new Date(b.iso_date))
-        .map((row) => `
-          <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${row.date}</td>
-            <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">${row.name}</td>
-            <td class="whitespace-nowrap px-5 py-4 text-right text-sm text-zinc-700 sm:px-6">${row.sets ?? '—'} sets</td>
-          </tr>
-        `);
-      sessionsBody.innerHTML = rows.join('') || '<tr><td colspan="3" class="px-5 py-4 text-sm text-zinc-600 sm:px-6">No sessions planned.</td></tr>';
-    }
+    const sessionRows = plan
+      .slice()
+      .sort((a, b) => new Date(a.iso_date) - new Date(b.iso_date))
+      .map((row) => ({ date: row.date, name: row.name, sets: row.sets }));
+
+    let checkinsPage = 1;
+    let sessionsPage = 1;
 
     const recoveryTabs = document.querySelectorAll('.recovery-tab');
     recoveryTabs.forEach((tab) => {
@@ -387,10 +411,10 @@
       });
     });
 
+    const PAGE_SIZE = 10;
     let q = '';
     let datePage = 1;
     let aggPage = 1;
-    const PAGE_SIZE = 10;
 
     function setRangeText(el, start, end, total) {
       if (!el) return;
@@ -400,6 +424,89 @@
       }
       el.textContent = `Showing ${start + 1}-${end} of ${total}`;
     }
+
+    function renderCheckins() {
+      if (!checkinsBody) return;
+
+      const total = checkinRows.length;
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      checkinsPage = Math.min(Math.max(1, checkinsPage), totalPages);
+
+      const start = (checkinsPage - 1) * PAGE_SIZE;
+      const slice = checkinRows.slice(start, start + PAGE_SIZE);
+
+      checkinsBody.innerHTML =
+        slice
+          .map(
+            (entry) => `
+          <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+            <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${entry.date}</td>
+            <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">${entry.note}</td>
+            <td class="whitespace-nowrap px-5 py-4 text-right text-sm font-medium sm:px-6 ${entry.balanceClass}">${entry.balance}</td>
+          </tr>
+        `
+          )
+          .join('') ||
+        '<tr><td colspan="3" class="px-5 py-4 text-sm text-zinc-600 sm:px-6">No recovery check-ins yet.</td></tr>';
+
+      if (checkinsInfo) checkinsInfo.textContent = `Page ${checkinsPage} of ${totalPages}`;
+      setRangeText(checkinsRange, start, Math.min(start + PAGE_SIZE, total), total);
+
+      if (checkinsPrev) checkinsPrev.disabled = checkinsPage <= 1;
+      if (checkinsNext) checkinsNext.disabled = checkinsPage >= totalPages;
+
+      [checkinsPrev, checkinsNext].forEach((btn) => {
+        if (!btn) return;
+        btn.classList.toggle('opacity-50', btn.disabled);
+        btn.classList.toggle('pointer-events-none', btn.disabled);
+      });
+    }
+
+    function renderSessions() {
+      if (!sessionsBody) return;
+
+      const total = sessionRows.length;
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      sessionsPage = Math.min(Math.max(1, sessionsPage), totalPages);
+
+      const start = (sessionsPage - 1) * PAGE_SIZE;
+      const slice = sessionRows.slice(start, start + PAGE_SIZE);
+
+      sessionsBody.innerHTML =
+        slice
+          .map(
+            (row) => `
+          <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+            <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${row.date}</td>
+            <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">${row.name}</td>
+            <td class="whitespace-nowrap px-5 py-4 text-right text-sm text-zinc-700 sm:px-6">${row.sets ?? '—'} sets</td>
+          </tr>
+        `
+          )
+          .join('') ||
+        '<tr><td colspan="3" class="px-5 py-4 text-sm text-zinc-600 sm:px-6">No sessions planned.</td></tr>';
+
+      if (sessionsInfo) sessionsInfo.textContent = `Page ${sessionsPage} of ${totalPages}`;
+      setRangeText(sessionsRange, start, Math.min(start + PAGE_SIZE, total), total);
+
+      if (sessionsPrev) sessionsPrev.disabled = sessionsPage <= 1;
+      if (sessionsNext) sessionsNext.disabled = sessionsPage >= totalPages;
+
+      [sessionsPrev, sessionsNext].forEach((btn) => {
+        if (!btn) return;
+        btn.classList.toggle('opacity-50', btn.disabled);
+        btn.classList.toggle('pointer-events-none', btn.disabled);
+      });
+    }
+
+    if (checkinsPrev) checkinsPrev.addEventListener('click', () => { checkinsPage -= 1; renderCheckins(); });
+    if (checkinsNext) checkinsNext.addEventListener('click', () => { checkinsPage += 1; renderCheckins(); });
+
+    if (sessionsPrev) sessionsPrev.addEventListener('click', () => { sessionsPage -= 1; renderSessions(); });
+    if (sessionsNext) sessionsNext.addEventListener('click', () => { sessionsPage += 1; renderSessions(); });
+
+    renderCheckins();
+    renderSessions();
 
     function filterRows(rows) {
       if (!q) return rows;
