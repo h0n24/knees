@@ -35,7 +35,7 @@
         <div class="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{{ form.non_field_errors }}</div>
       {% endif %}
 
-      <div class="space-y-2">
+      <div class="space-y-2 max-w-96">
         <label for="{{ form.username.id_for_label }}" class="block text-sm font-semibold text-slate-900">Username</label>
         {{ form.username }}
         {% if form.username.errors %}
@@ -43,7 +43,7 @@
         {% endif %}
       </div>
 
-      <div class="space-y-2">
+      <div class="space-y-2 max-w-96">
         <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-semibold text-slate-900">First name</label>
         {{ form.first_name }}
         {% if form.first_name.errors %}
@@ -51,7 +51,7 @@
         {% endif %}
       </div>
 
-      <div class="space-y-2">
+      <div class="space-y-2 max-w-96">
         <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-semibold text-slate-900">Last name</label>
         {{ form.last_name }}
         {% if form.last_name.errors %}
@@ -59,11 +59,14 @@
         {% endif %}
       </div>
 
-      <div class="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+      <div>
+      <h2 class="text-base font-semibold tracking-tight text-slate-900 mt-[3rem] mb-2">Change password</h2>
+      <div class="text-sm text-slate-700">
         Enter a new password twice to update it. Leave blank to keep your current password.
       </div>
+      </div>
 
-      <div class="space-y-2">
+      <div class="space-y-2 max-w-96">
         <label for="{{ form.password1.id_for_label }}" class="block text-sm font-semibold text-slate-900">New password</label>
         {{ form.password1 }}
         {% if form.password1.errors %}
@@ -71,7 +74,7 @@
         {% endif %}
       </div>
 
-      <div class="space-y-2">
+      <div class="space-y-2 max-w-96">
         <label for="{{ form.password2.id_for_label }}" class="block text-sm font-semibold text-slate-900">Confirm new password</label>
         {{ form.password2 }}
         {% if form.password2.errors %}
