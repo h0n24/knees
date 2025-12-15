@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Knees · Trainer · Report</title>
+
+  <!-- Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind via CDN for a single-file template -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter','ui-sans-serif','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial','Noto Sans','Apple Color Emoji','Segoe UI Emoji']
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* External tooltip for Chart.js (small bubble like the reference) */
+    .chart-tooltip { transform: translate(-50%, -115%); white-space: nowrap; }
+  </style>
+</head>
+
+<body class="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased">
+  <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+    <div class="flex min-h-[calc(100vh-3rem)] flex-col gap-6 lg:min-h-[calc(100vh-5rem)] lg:flex-row lg:gap-10">
+
+      <!-- Aside / Sidebar -->
+      <aside class="lg:w-64 lg:shrink-0">
+        <!-- Mobile + tablet header (hamburger) -->
+        <div class="sticky top-0 z-20 -mx-4 bg-zinc-50/80 backdrop-blur sm:-mx-6 lg:static lg:mx-0 lg:bg-transparent lg:backdrop-blur-0 lg:hidden">
+          <div class="flex items-center justify-between px-4 py-3 sm:px-6 lg:px-0 lg:py-0">
+            <a href="http://127.0.0.1:8000/trainer/" class="flex items-center gap-3">
+              <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12"/>
+                </svg>
+              </div>
+              <div class="text-sm font-semibold tracking-tight">Knees</div>
+            </a>
+
+            <button
+              id="mobileMenuButton"
+              type="button"
+              class="inline-flex items-center justify-center rounded-full bg-white p-2 text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 lg:hidden"
+              aria-controls="mobileMenu"
+              aria-expanded="false"
+            >
+              <span class="sr-only">Open menu</span>
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h14M3 10h14M3 15h14"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Mobile menu (collapsible) -->
+          <div id="mobileMenu" class="hidden px-4 pb-4 sm:px-6 lg:hidden">
+            <nav class="space-y-1 rounded-2xl bg-white p-2 shadow-sm ring-1 ring-zinc-900/5">
+              <a href="http://127.0.0.1:8000/trainer/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900">
+                <span>Users</span>
+              </a>
+
+              <a href="http://127.0.0.1:8000/trainer/exercises/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900">
+                <span>List of Exercises</span>
+              </a>
+
+              <a href="http://127.0.0.1:8000/trainer/testik3/report/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold transition text-indigo-600 hover:bg-zinc-50 hover:text-zinc-900">
+                <span>Report</span>
+              </a>
+
+              <div class="pt-2">
+                <a href="/auth/logout/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600">
+                  <span>Logout</span>
+                </a>
+              </div>
+            </nav>
+          </div>
+        </div>
+
+        <!-- Desktop sidebar -->
+        <div class="hidden lg:block">
+          <div class="flex items-center gap-3 px-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12"/>
+              </svg>
+            </div>
+            <div class="text-sm font-semibold tracking-tight">Knees</div>
+          </div>
+
+          <nav class="mt-8 space-y-1">
+            <a href="http://127.0.0.1:8000/trainer/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-white hover:text-zinc-900">
+              <span>Users</span>
+            </a>
+
+            <a href="http://127.0.0.1:8000/trainer/exercises/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-white hover:text-zinc-900">
+              <span>List of Exercises</span>
+            </a>
+
+
+            <!-- Recent users: desktop only -->
+            <div class="hidden lg:block pt-8">
+              <div class="px-3 pb-2 text-xs font-semibold tracking-wide text-zinc-500">Recent users</div>
+              <div class="space-y-1">
+                <a href="http://127.0.0.1:8000/trainer/testik3/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold transition text-indigo-600 hover:bg-white hover:text-zinc-900">
+                  <span>testik3</span>
+                </a>
+                <a href="http://127.0.0.1:8000/trainer/testik2/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-white hover:text-zinc-900">
+                  <span>testik2</span>
+                </a>
+                <a href="http://127.0.0.1:8000/trainer/testik4/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-white hover:text-zinc-900">
+                  <span>testik4</span>
+                </a>
+                <a href="http://127.0.0.1:8000/trainer/testik5/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-white hover:text-zinc-900">
+                  <span>test testovaci</span>
+                </a>
+              </div>
+            </div>
+          </nav>
+
+          <!-- Dimmed logout -->
+          <a href="/auth/logout/" class="mt-8 block rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 hover:bg-white hover:text-zinc-600">
+            Logout
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="min-w-0 flex-1">
+
+        <!-- Top panel -->
+        <div class="roverflow-hidden">
+          <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6 ">
+            <div  class="flex flex-wrap items-center">
+              <h1 class="text-xl font-semibold leading-1 ">Report for athlete: testik3</h1>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <label class="sr-only" for="rangeSelect">Range</label>
+              <select
+                id="rangeSelect"
+                class="h-9 rounded-2xl bg-white px-3 text-sm font-medium text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              >
+                <option selected>Last 45 days</option>
+                <option>Last 30 days</option>
+                <option>Last 7 days</option>
+              </select>
+
+              <button
+                type="button"
+                class="inline-flex h-9 items-center gap-2 rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h14M7 8h6M8 12h4M9 16h2"/>
+                </svg>
+                Export CSV
+              </button>
+
+              <a
+                href="#generate-week"
+                class="inline-flex h-9 items-center justify-center rounded-2xl bg-indigo-600 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+              >
+                Generate week
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 space-y-6">
+
+          <!-- Recovery balance (visual inspired by reporting.webp) -->
+          <section class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
+            <!-- Panel header (same style as trainer-users.html) -->
+            <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
+              <div>
+                <h2 class="text-base font-semibold leading-6">Recovery balance</h2>
+                <p class="mt-1 text-sm text-zinc-500">
+                  Daily balance (demo): sleep + nutrition − fatigue. Red zone means recovery debt.
+                </p>
+              </div>
+
+
+            </div>
+
+            <div class="px-5 pb-5 sm:px-6 sm:pb-6">
+              <div class="relative">
+                <!-- "Today" pill (positioned by a Chart.js plugin) -->
+                <div id="todayPill" class="pointer-events-none absolute -top-3 z-20 hidden" style="left: 50%;">
+                  <div class="rounded-xl bg-zinc-700 px-3 py-1 text-xs font-semibold text-white shadow-sm">Today</div>
+                </div>
+
+                <!-- External tooltip bubble -->
+                <div id="chartTooltip" class="chart-tooltip pointer-events-none absolute z-30 hidden rounded-2xl bg-white px-3 py-2 text-xs shadow-sm ring-1 ring-zinc-900/10">
+                  <div class="text-zinc-500">Projected balance</div>
+                  <div id="chartTooltipValue" class="mt-0.5 font-semibold text-zinc-900">—</div>
+                </div>
+
+                <div class="h-64 w-full">
+                  <canvas id="balanceChart" aria-label="Recovery balance chart" role="img"></canvas>
+                </div>
+              </div>
+
+              <!-- Metric strip (like the reference) -->
+              <div class="mt-5 overflow-hidden rounded-2xl bg-white ring-1 ring-zinc-200">
+                <dl class="grid grid-cols-2 divide-x divide-y divide-zinc-200 sm:grid-cols-4 sm:divide-y-0">
+                  <div class="p-4 sm:p-5">
+                    <dt class="text-sm font-medium text-zinc-500">Today’s balance</dt>
+                    <dd id="metricTodayBalance" class="mt-1 text-sm font-semibold text-rose-600">-1.84</dd>
+                  </div>
+                  <div class="p-4 sm:p-5">
+                    <dt class="text-sm font-medium text-zinc-500">Week entries</dt>
+                    <dd id="metricWeekEntries" class="mt-1 text-sm font-semibold text-zinc-900">35</dd>
+                  </div>
+                  <div class="p-4 sm:p-5">
+                    <dt class="text-sm font-medium text-zinc-500">Avg sleep (7d)</dt>
+                    <dd class="mt-1 text-sm font-semibold text-zinc-900">8.4 hrs</dd>
+                  </div>
+                  <div class="p-4 sm:p-5">
+                    <dt class="text-sm font-medium text-zinc-500">Projected (15d)</dt>
+                    <dd class="mt-1 text-sm font-semibold text-rose-600">-1.52</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <!-- Tabs + list (visual borrowed from reporting.webp) -->
+              <div class="mt-5 border-b border-zinc-200">
+                <nav class="-mb-px flex gap-6" aria-label="Recovery tabs">
+                  <button type="button" class="recovery-tab whitespace-nowrap border-b-2 border-indigo-600 px-1 pb-3 text-sm font-semibold text-indigo-600" data-recovery-tab="checkins">
+                    Check-ins
+                  </button>
+                  <button type="button" class="recovery-tab whitespace-nowrap border-b-2 border-transparent px-1 pb-3 text-sm font-semibold text-zinc-500 hover:text-zinc-700" data-recovery-tab="sessions">
+                    Sessions
+                  </button>
+                </nav>
+              </div>
+
+              <div class="overflow-x-auto" data-recovery-panel="checkins">
+                <table class="min-w-full divide-y divide-zinc-200">
+                  <thead class="bg-zinc-50">
+                    <tr>
+                      <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Date</th>
+                      <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Note</th>
+                      <th scope="col" class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-zinc-200 bg-white">
+                    <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+                      <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 14</td>
+                      <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">Sleep: 9.5h · Nutrition: Average · Fatigue: 7</td>
+                      <td class="whitespace-nowrap px-5 py-4 text-right text-sm font-medium text-rose-600 sm:px-6">-1.84</td>
+                    </tr>
+                    <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+                      <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 13</td>
+                      <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">Sleep: 8.2h · Nutrition: OK · Fatigue: 10</td>
+                      <td class="whitespace-nowrap px-5 py-4 text-right text-sm font-medium text-rose-600 sm:px-6">-2.18</td>
+                    </tr>
+                    <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+                      <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 12</td>
+                      <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">Sleep: 7.6h · Nutrition: OK · Fatigue: 13</td>
+                      <td class="whitespace-nowrap px-5 py-4 text-right text-sm font-medium text-rose-600 sm:px-6">-2.48</td>
+                    </tr>
+                    <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+                      <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 11</td>
+                      <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">Sleep: 7.9h · Nutrition: Great · Fatigue: 12</td>
+                      <td class="whitespace-nowrap px-5 py-4 text-right text-sm font-medium text-rose-600 sm:px-6">-2.41</td>
+                    </tr>
+                    <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+                      <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 10</td>
+                      <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">Sleep: 8.0h · Nutrition: Average · Fatigue: 11</td>
+                      <td class="whitespace-nowrap px-5 py-4 text-right text-sm font-medium text-rose-600 sm:px-6">-2.72</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="hidden overflow-x-auto" data-recovery-panel="sessions">
+                <table class="min-w-full divide-y divide-zinc-200">
+                  <thead class="bg-zinc-50">
+                    <tr>
+                      <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Date</th>
+                      <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Session</th>
+                      <th scope="col" class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Planned</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-zinc-200 bg-white">
+                    <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+                      <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 15</td>
+                      <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">Strength + Mobility</td>
+                      <td class="whitespace-nowrap px-5 py-4 text-right text-sm text-zinc-700 sm:px-6">5 items</td>
+                    </tr>
+                    <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+                      <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 14</td>
+                      <td class="px-5 py-4 text-sm text-zinc-700 sm:px-6">Mobility</td>
+                      <td class="whitespace-nowrap px-5 py-4 text-right text-sm text-zinc-700 sm:px-6">5 items</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- Snapshots (top reports) — no card columns -->
+          <section class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
+            <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
+              <div>
+                <h2 class="text-base font-semibold leading-6">Snapshots</h2>
+                <p class="mt-1 text-sm text-zinc-500">Today vs 7‑day and 30‑day summary.</p>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-zinc-200">
+                <thead class="bg-zinc-50">
+                  <tr>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Period</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Range</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Training load</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Avg sleep</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Avg fatigue</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Adherence</th>
+                  </tr>
+                </thead>
+                <tbody id="snapshotsBody" class="divide-y divide-zinc-200 bg-white">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Current week plan (10 items + pagination) -->
+          <section class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
+            <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
+              <div>
+                <h2 class="text-base font-semibold leading-6">Current week plan</h2>
+                <p class="mt-1 text-sm text-zinc-500">
+                  Showing 10 items per page. Difficulty is plain text.
+                </p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <div class="relative">
+                  <input
+                    id="planSearch"
+                    type="search"
+                    placeholder="Filter exercises…"
+                    class="h-9 w-64 rounded-2xl bg-white pl-10 pr-3 text-sm ring-1 ring-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                  />
+                  <svg class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12.5 12.5l4 4m-2-7a6 6 0 11-12 0 6 6 0 0112 0z"/>
+                  </svg>
+                </div>
+
+                <button type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                  <span class="sr-only">Export</span>
+                  <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 3v9m0 0l3-3m-3 3L7 9M4 14h12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Tabs (same visual idea as the reference) -->
+            <div class="border-b border-zinc-200 px-5 sm:px-6">
+              <nav class="-mb-px flex gap-6" aria-label="Plan tabs">
+                <button type="button" class="plan-tab whitespace-nowrap border-b-2 border-indigo-600 px-1 pb-3 text-sm font-semibold text-indigo-600" data-plan-tab="date">
+                  By date
+                </button>
+                <button type="button" class="plan-tab whitespace-nowrap border-b-2 border-transparent px-1 pb-3 text-sm font-semibold text-zinc-500 hover:text-zinc-700" data-plan-tab="exercise">
+                  By exercise
+                </button>
+              </nav>
+            </div>
+
+            <!-- By date -->
+            <div data-plan-panel="date" class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-zinc-200">
+                <thead class="bg-zinc-50">
+                  <tr>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Date</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Exercise</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Sets</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Reps</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Difficulty</th>
+                  </tr>
+                </thead>
+                <tbody id="planTableBody" class="divide-y divide-zinc-200 bg-white">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+
+              <div class="flex items-center justify-between gap-4 border-t border-zinc-200 px-5 py-4 text-sm sm:px-6">
+                <div class="text-zinc-500" id="planDateRange">Showing —</div>
+                <div class="flex items-center gap-2">
+                  <button id="planDatePrev" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                    Prev
+                  </button>
+                  <div class="text-zinc-500" id="planDateInfo">Page —</div>
+                  <button id="planDateNext" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- By exercise -->
+            <div data-plan-panel="exercise" class="hidden overflow-x-auto">
+              <table class="min-w-full divide-y divide-zinc-200">
+                <thead class="bg-zinc-50">
+                  <tr>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Exercise</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Times planned</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Total sets</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Total reps</th>
+                  </tr>
+                </thead>
+                <tbody id="planAggBody" class="divide-y divide-zinc-200 bg-white">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+
+              <div class="flex items-center justify-between gap-4 border-t border-zinc-200 px-5 py-4 text-sm sm:px-6">
+                <div class="text-zinc-500" id="planAggRange">Showing —</div>
+                <div class="flex items-center gap-2">
+                  <button id="planAggPrev" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                    Prev
+                  </button>
+                  <div class="text-zinc-500" id="planAggInfo">Page —</div>
+                  <button id="planAggNext" type="button" class="inline-flex h-9 items-center rounded-2xl bg-white px-3 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Generate new week -->
+          <section id="generate-week" class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
+            <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
+              <div>
+                <h2 class="text-base font-semibold leading-6">Generate new week</h2>
+                <p class="mt-1 text-sm text-zinc-500">Build a fresh 7‑day plan for this athlete.</p>
+              </div>
+
+            </div>
+
+            <div class="px-5 pb-5 sm:px-6 sm:pb-6">
+              <form action="#" method="post" class="space-y-4 max-w-96">
+                <div>
+                  <label for="startDate" class="block text-sm font-medium text-zinc-700">Week start</label>
+                  <input id="startDate" name="start_date" type="date" required
+                    class="mt-2 h-9 w-full rounded-2xl bg-white px-3 text-sm ring-1 ring-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    value="2025-12-14"
+                  />
+                  <p class="mt-2 text-sm text-zinc-500">Start any day to roll a 7‑day plan.</p>
+                </div>
+
+                <label class="flex items-start gap-3 rounded-2xl bg-zinc-50 p-4 ring-1 ring-zinc-200">
+                  <input id="replaceExisting" name="replace_existing" type="checkbox"
+                    class="mt-1 h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-600"
+                  />
+                  <span class="text-sm text-zinc-700">
+                    <span class="font-semibold">Replace existing entries</span>
+                    <span class="block text-sm text-zinc-500">Overwrite the current week plan.</span>
+                  </span>
+                </label>
+
+                <button type="submit" class="group inline-flex items-center justify-center rounded-full py-4 px-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 bg-indigo-600 text-white hover:text-slate-100 hover:bg-indigo-500 active:bg-indigo-800 active:text-indigo-100 focus-visible:outline-indigo-600 w-full max-w-64">
+                  Generate week
+                </button>
+
+                <div class="p-4">
+                  <div class="text-sm font-semibold text-zinc-900">Graph suggestions (next)</div>
+                  <ul class="mt-2 list-disc pl-5 text-sm text-zinc-700">
+                    <li><span class="font-medium">Daily training load</span> (bar) vs <span class="font-medium">adherence</span> (line).</li>
+                    <li><span class="font-medium">Sleep vs fatigue</span> (scatter) to spot patterns quickly.</li>
+                    <li><span class="font-medium">Exercise category mix</span> (stacked bars) per week.</li>
+                  </ul>
+                </div>
+              </form>
+            </div>
+          </section>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Chart.js (UMD) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <script>
+    // Placeholder payload (in Django: render with json_script)
+    window.__REPORT__ = {
+      meta: { athlete: "testik3", todayISO: "2025-12-14", weekEntries: 35 },
+      reports: [
+        { period: "Today", range: "Dec 14 – Dec 14", adherence: "100%", training_load: "0.4 min", avg_sleep: "—", avg_fatigue: "0" },
+        { period: "Last 7 days", range: "Dec 08 – Dec 14", adherence: "100%", training_load: "0.4 min", avg_sleep: "8.4 hrs", avg_fatigue: "7.8" },
+        { period: "Last 30 days", range: "Nov 15 – Dec 14", adherence: "100%", training_load: "0.4 min", avg_sleep: "7.8 hrs", avg_fatigue: "7.3" }
+      ],
+      plan: [
+        ["Dec. 14, 2025", "Quadruped Rock-Back", "2", "8", "1"],
+        ["Dec. 14, 2025", "Standing Hip Abduction", "2", "10", "2"],
+        ["Dec. 14, 2025", "Standing Quadriceps Stretch", "2", "—", "1"],
+        ["Dec. 14, 2025", "Seated Leg Cross (Isometric Thigh Press)", "1", "3", "2"],
+        ["Dec. 14, 2025", "Prone Leg Raise (Hip Extension)", "2", "10", "2"],
+        ["Dec. 15, 2025", "Static Quadriceps Set", "2", "10", "1"],
+        ["Dec. 15, 2025", "Single-Leg Calf Raise", "2", "8", "4"],
+        ["Dec. 15, 2025", "Standing Hamstring Curl", "2", "10", "2"],
+        ["Dec. 15, 2025", "Figure-Four Glute Stretch", "2", "—", "1"],
+        ["Dec. 15, 2025", "Pillow Squeeze (Isometric Hip Adduction)", "2", "10", "1"],
+        ["Dec. 16, 2025", "Heel and Calf Stretch", "2", "—", "1"],
+        ["Dec. 16, 2025", "Side-Lying Hip Adduction", "2", "10", "2"],
+        ["Dec. 16, 2025", "Standing Knee Marches", "2", "10", "1"],
+        ["Dec. 16, 2025", "Double Knee-to-Chest Stretch", "2", "5", "1"],
+        ["Dec. 16, 2025", "Glute Bridge", "2", "10", "2"],
+        ["Dec. 17, 2025", "Wall Sit", "3", "—", "3"],
+        ["Dec. 17, 2025", "Kneeling Hip Flexor Stretch", "2", "—", "1"],
+        ["Dec. 17, 2025", "Lateral Side-Step Walk", "2", "10", "2"],
+        ["Dec. 17, 2025", "Forward Lunge", "2", "8", "3"],
+        ["Dec. 17, 2025", "Standing Hamstring Stretch (Toe-Touch Stretch)", "2", "—", "1"]
+      ]
+    };
+
+    // Apply meta
+    (function () {
+      const a = window.__REPORT__?.meta?.athlete;
+      const el = document.getElementById('athleteName');
+      if (a && el) el.textContent = a;
+      const week = window.__REPORT__?.meta?.weekEntries;
+      const weekEl = document.getElementById('metricWeekEntries');
+      if (typeof week === 'number' && weekEl) weekEl.textContent = String(week);
+    })();
+
+    // Mobile menu toggle (same behavior as trainer-users.html)
+    (function () {
+      const btn = document.getElementById('mobileMenuButton');
+      const menu = document.getElementById('mobileMenu');
+      if (!btn || !menu) return;
+
+      function setOpen(open) {
+        menu.classList.toggle('hidden', !open);
+        btn.setAttribute('aria-expanded', String(open));
+      }
+
+      btn.addEventListener('click', () => setOpen(menu.classList.contains('hidden')));
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+      menu.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
+    })();
+
+    // Recovery tabs
+    (function () {
+      const tabs = Array.from(document.querySelectorAll('[data-recovery-tab]'));
+      const panels = Array.from(document.querySelectorAll('[data-recovery-panel]'));
+      if (!tabs.length || !panels.length) return;
+
+      function setActive(name) {
+        panels.forEach(p => p.classList.toggle('hidden', p.getAttribute('data-recovery-panel') !== name));
+        tabs.forEach(t => {
+          const active = t.getAttribute('data-recovery-tab') === name;
+          t.classList.toggle('border-indigo-600', active);
+          t.classList.toggle('text-indigo-600', active);
+          t.classList.toggle('border-transparent', !active);
+          t.classList.toggle('text-zinc-500', !active);
+        });
+      }
+
+      tabs.forEach(t => t.addEventListener('click', () => setActive(t.getAttribute('data-recovery-tab'))));
+      setActive('checkins');
+    })();
+
+    // Snapshots table render (no card columns)
+    (function () {
+      const tbody = document.getElementById('snapshotsBody');
+      const rows = window.__REPORT__?.reports || [];
+      if (!tbody) return;
+
+      function pill(text) {
+        return `
+          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20">
+            ${text}
+          </span>`;
+      }
+
+      tbody.innerHTML = rows.map(r => `
+        <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+          <td class="whitespace-nowrap px-5 py-4 text-sm font-medium text-zinc-900 sm:px-6">${r.period}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.range}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.training_load}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.avg_sleep}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.avg_fatigue}</td>
+          <td class="whitespace-nowrap px-5 py-4 text-sm sm:px-6">${pill(r.adherence)}</td>
+        </tr>
+      `).join('');
+    })();
+
+    // Plan tabs
+    (function () {
+      const tabs = Array.from(document.querySelectorAll('[data-plan-tab]'));
+      const panels = Array.from(document.querySelectorAll('[data-plan-panel]'));
+      if (!tabs.length || !panels.length) return;
+
+      function setActive(name) {
+        panels.forEach(p => p.classList.toggle('hidden', p.getAttribute('data-plan-panel') !== name));
+        tabs.forEach(t => {
+          const active = t.getAttribute('data-plan-tab') === name;
+          t.classList.toggle('border-indigo-600', active);
+          t.classList.toggle('text-indigo-600', active);
+          t.classList.toggle('border-transparent', !active);
+          t.classList.toggle('text-zinc-500', !active);
+        });
+      }
+
+      tabs.forEach(t => t.addEventListener('click', () => setActive(t.getAttribute('data-plan-tab'))));
+      setActive('date');
+    })();
+
+    // Plan pagination + rendering (10 items per page)
+    (function () {
+      const PAGE_SIZE = 10;
+
+      const plan = (window.__REPORT__?.plan || []).map(r => ({
+        date: r[0] || '',
+        exercise: r[1] || '',
+        sets: r[2] || '',
+        reps: r[3] || '',
+        difficulty: r[4] || ''
+      }));
+
+      const search = document.getElementById('planSearch');
+
+      // Date view elements
+      const dateBody = document.getElementById('planTableBody');
+      const datePrev = document.getElementById('planDatePrev');
+      const dateNext = document.getElementById('planDateNext');
+      const dateInfo = document.getElementById('planDateInfo');
+      const dateRange = document.getElementById('planDateRange');
+
+      // Exercise view elements
+      const aggBody = document.getElementById('planAggBody');
+      const aggPrev = document.getElementById('planAggPrev');
+      const aggNext = document.getElementById('planAggNext');
+      const aggInfo = document.getElementById('planAggInfo');
+      const aggRange = document.getElementById('planAggRange');
+
+      let q = '';
+      let datePage = 1;
+      let aggPage = 1;
+
+      function filterRows(rows) {
+        if (!q) return rows;
+        return rows.filter(r => r.exercise.toLowerCase().includes(q));
+      }
+
+      function setRangeText(el, startIdx, endIdx, total) {
+        if (!el) return;
+        if (total === 0) { el.textContent = "No results"; return; }
+        el.textContent = `Showing ${startIdx + 1}–${endIdx} of ${total}`;
+      }
+
+      function renderDate() {
+        if (!dateBody) return;
+
+        const rows = filterRows(plan);
+        const total = rows.length;
+        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+        datePage = Math.min(Math.max(1, datePage), totalPages);
+
+        const start = (datePage - 1) * PAGE_SIZE;
+        const slice = rows.slice(start, start + PAGE_SIZE);
+
+        dateBody.innerHTML = slice.map(r => `
+          <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+            <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.date}</td>
+            <td class="min-w-[18rem] px-5 py-4 text-sm sm:px-6">
+              <a href="#" class="font-medium text-indigo-600 hover:text-indigo-700 hover:underline">${r.exercise}</a>
+            </td>
+            <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.sets}</td>
+            <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.reps}</td>
+            <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.difficulty}</td>
+          </tr>
+        `).join('');
+
+        if (dateInfo) dateInfo.textContent = `Page ${datePage} of ${totalPages}`;
+        setRangeText(dateRange, start, Math.min(start + PAGE_SIZE, total), total);
+
+        if (datePrev) datePrev.disabled = datePage <= 1;
+        if (dateNext) dateNext.disabled = datePage >= totalPages;
+
+        [datePrev, dateNext].forEach(btn => {
+          if (!btn) return;
+          btn.classList.toggle('opacity-50', btn.disabled);
+          btn.classList.toggle('pointer-events-none', btn.disabled);
+        });
+      }
+
+      function buildAgg(rows) {
+        const map = new Map();
+        rows.forEach(r => {
+          const key = r.exercise;
+          if (!map.has(key)) map.set(key, { exercise: key, times: 0, sets: 0, reps: 0 });
+          const item = map.get(key);
+          item.times += 1;
+
+          const sets = parseFloat(String(r.sets).replace(',', '.'));
+          if (!Number.isNaN(sets)) item.sets += sets;
+
+          const reps = parseFloat(String(r.reps).replace(',', '.'));
+          if (!Number.isNaN(reps)) item.reps += reps;
+        });
+
+        return Array.from(map.values()).sort((a, b) => b.times - a.times);
+      }
+
+      function renderAgg() {
+        if (!aggBody) return;
+
+        const rows = filterRows(plan);
+        const agg = buildAgg(rows);
+        const total = agg.length;
+        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+        aggPage = Math.min(Math.max(1, aggPage), totalPages);
+
+        const start = (aggPage - 1) * PAGE_SIZE;
+        const slice = agg.slice(start, start + PAGE_SIZE);
+
+        aggBody.innerHTML = slice.map(r => `
+          <tr class="group hover:bg-zinc-50/70 focus-within:bg-zinc-50/70">
+            <td class="min-w-[18rem] px-5 py-4 text-sm sm:px-6">
+              <a href="#" class="font-medium text-indigo-600 hover:text-indigo-700 hover:underline">${r.exercise}</a>
+            </td>
+            <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.times}</td>
+            <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.sets ? r.sets.toFixed(0) : '—'}</td>
+            <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">${r.reps ? r.reps.toFixed(0) : '—'}</td>
+          </tr>
+        `).join('');
+
+        if (aggInfo) aggInfo.textContent = `Page ${aggPage} of ${totalPages}`;
+        setRangeText(aggRange, start, Math.min(start + PAGE_SIZE, total), total);
+
+        if (aggPrev) aggPrev.disabled = aggPage <= 1;
+        if (aggNext) aggNext.disabled = aggPage >= totalPages;
+
+        [aggPrev, aggNext].forEach(btn => {
+          if (!btn) return;
+          btn.classList.toggle('opacity-50', btn.disabled);
+          btn.classList.toggle('pointer-events-none', btn.disabled);
+        });
+      }
+
+      // Wire events
+      if (search) {
+        search.addEventListener('input', () => {
+          q = search.value.trim().toLowerCase();
+          datePage = 1;
+          aggPage = 1;
+          renderDate();
+          renderAgg();
+        });
+      }
+
+      if (datePrev) datePrev.addEventListener('click', () => { datePage -= 1; renderDate(); });
+      if (dateNext) dateNext.addEventListener('click', () => { datePage += 1; renderDate(); });
+
+      if (aggPrev) aggPrev.addEventListener('click', () => { aggPage -= 1; renderAgg(); });
+      if (aggNext) aggNext.addEventListener('click', () => { aggPage += 1; renderAgg(); });
+
+      renderDate();
+      renderAgg();
+    })();
+
+    // Chart.js: Recovery balance (styled after reporting.webp)
+    (function () {
+      const canvas = document.getElementById('balanceChart');
+      if (!canvas) return;
+
+      const labels = ["Nov 15","Nov 16","Nov 17","Nov 18","Nov 19","Nov 20","Nov 21","Nov 22","Nov 23","Nov 24","Nov 25","Nov 26","Nov 27","Nov 28","Nov 29","Nov 30","Dec 01","Dec 02","Dec 03","Dec 04","Dec 05","Dec 06","Dec 07","Dec 08","Dec 09","Dec 10","Dec 11","Dec 12","Dec 13","Dec 14","Dec 15","Dec 16","Dec 17","Dec 18","Dec 19","Dec 20","Dec 21","Dec 22","Dec 23","Dec 24","Dec 25","Dec 26","Dec 27","Dec 28","Dec 29"];
+      const series = [0.1,0.62,0.91,1.3,1.51,1.38,1.36,1.61,1.23,1.03,1.15,0.76,0.76,0.5,0.48,0.22,0.33,0.33,0.05,-0.09,-0.38,-0.92,-1.84,-2.17,-2.49,-2.72,-2.41,-2.48,-2.18,-1.84,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+      const projected = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,-1.52,-1.37,-1.15,-0.74,-0.55,-0.21,-0.05,-0.09,0.06,0.21,0.54,0.61,0.89,1.1,1.47,1.8];
+      const todayIndex = 29;
+
+      const positive = series.map(v => (typeof v === 'number' && v >= 0) ? v : null);
+      const negative = series.map(v => (typeof v === 'number' && v < 0) ? v : null);
+
+      const tooltipEl = document.getElementById('chartTooltip');
+      const tooltipVal = document.getElementById('chartTooltipValue');
+      const todayPill = document.getElementById('todayPill');
+
+      const negativeZone = {
+        id: 'negativeZone',
+        beforeDraw(chart) {
+          const {ctx, chartArea, scales} = chart;
+          if (!chartArea || !scales?.y) return;
+          const y0 = scales.y.getPixelForValue(0);
+          const bottom = chartArea.bottom;
+          const top = Math.min(Math.max(y0, chartArea.top), chartArea.bottom);
+
+          ctx.save();
+          ctx.fillStyle = 'rgba(244, 63, 94, 0.08)'; // light rose background like the reference
+          ctx.fillRect(chartArea.left, top, chartArea.right - chartArea.left, bottom - top);
+          ctx.restore();
+        }
+      };
+
+      const todayMarker = {
+        id: 'todayMarker',
+        afterDatasetsDraw(chart) {
+          const {ctx, chartArea, scales} = chart;
+          if (!chartArea || !scales?.x) return;
+
+          const label = chart.data.labels?.[todayIndex];
+          const x = scales.x.getPixelForValue(label);
+          ctx.save();
+          ctx.strokeStyle = 'rgba(24, 24, 27, 0.30)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(x, chartArea.top);
+          ctx.lineTo(x, chartArea.bottom);
+          ctx.stroke();
+          ctx.restore();
+
+          if (todayPill) {
+            todayPill.classList.remove('hidden');
+            todayPill.style.left = x + 'px';
+          }
+        }
+      };
+
+      function externalTooltip(context) {
+        const tooltip = context.tooltip;
+        if (!tooltipEl || !tooltipVal) return;
+
+        if (tooltip.opacity === 0) {
+          tooltipEl.classList.add('hidden');
+          return;
+        }
+
+        const dp = tooltip.dataPoints?.[0];
+        const yVal = (dp && typeof dp.parsed.y === 'number') ? dp.parsed.y : null;
+        tooltipVal.textContent = (yVal === null) ? '—' : (yVal >= 0 ? '+' : '') + yVal.toFixed(2);
+
+        tooltipEl.classList.remove('hidden');
+        tooltipEl.style.left = tooltip.caretX + 'px';
+        tooltipEl.style.top = tooltip.caretY + 'px';
+      }
+
+      const chart = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Positive',
+              data: positive,
+              borderColor: 'rgb(37 99 235)',
+              borderWidth: 2,
+              tension: 0.35,
+              pointRadius: 0,
+              spanGaps: false
+            },
+            {
+              label: 'Negative',
+              data: negative,
+              borderColor: 'rgb(244 63 94)',
+              backgroundColor: 'rgba(244, 63, 94, 0.12)',
+              fill: { target: { value: 0 } },
+              borderWidth: 2,
+              tension: 0.35,
+              pointRadius: 0,
+              spanGaps: false
+            },
+            {
+              label: 'Projected',
+              data: projected,
+              borderColor: 'rgba(161, 161, 170, 0.95)',
+              borderWidth: 2,
+              tension: 0.35,
+              pointRadius: 0,
+              spanGaps: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              enabled: true,
+              external: externalTooltip,
+              callbacks: { title: (items) => items?.[0]?.label || '' }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                maxRotation: 0,
+                autoSkip: true,
+                maxTicksLimit: 8,
+                color: 'rgba(113, 113, 122, 0.9)',
+                font: { size: 12 }
+              },
+              border: { display: false }
+            },
+            y: {
+              suggestedMin: -3,
+              suggestedMax: 3,
+              ticks: {
+                color: 'rgba(113, 113, 122, 0.9)',
+                font: { size: 12 },
+                callback: (v) => v === 0 ? '0' : (v > 0 ? '+' + v : v)
+              },
+              grid: { color: 'rgba(228, 228, 231, 0.9)' },
+              border: { display: false }
+            }
+          }
+        },
+        plugins: [negativeZone, todayMarker]
+      });
+
+      // Default callout (like the reference)
+      (function setDefaultTooltip() {
+        const meta = chart.getDatasetMeta(2); // projected
+        const elem = meta.data?.[todayIndex];
+        if (!elem) return;
+
+        chart.setActiveElements([{ datasetIndex: 2, index: todayIndex }]);
+        chart.tooltip.setActiveElements([{ datasetIndex: 2, index: todayIndex }], { x: elem.x, y: elem.y });
+        chart.update();
+      })();
+    })();
+  </script>
+</body>
+</html>

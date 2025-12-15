@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Knees · Trainer Dashboard</title>
+
+  <!-- Inter (Salient uses Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind via CDN for a single-file template -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji']
+          },
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased">
+  <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+    <div class="flex min-h-[calc(100vh-3rem)] flex-col gap-6 lg:min-h-[calc(100vh-5rem)] lg:flex-row lg:gap-10">
+      <!-- Aside / Sidebar -->
+      <aside class="lg:w-64 lg:shrink-0">
+        <!-- Mobile + tablet header (hamburger) -->
+        <div class="sticky top-0 z-20 -mx-4 bg-zinc-50/80 backdrop-blur sm:-mx-6 lg:static lg:mx-0 lg:bg-transparent lg:backdrop-blur-0 lg:hidden">
+          <div class="flex items-center justify-between px-4 py-3 sm:px-6 lg:px-0 lg:py-0">
+            <a href="http://127.0.0.1:8000/trainer/" class="flex items-center gap-3">
+              <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12"/>
+                </svg>
+              </div>
+              <div class="text-sm font-semibold tracking-tight">Knees</div>
+            </a>
+
+            <button
+              id="mobileMenuButton"
+              type="button"
+              class="inline-flex items-center justify-center rounded-full bg-white p-2 text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 lg:hidden"
+              aria-controls="mobileMenu"
+              aria-expanded="false"
+            >
+              <span class="sr-only">Open menu</span>
+              <!-- Hamburger -->
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h14M3 10h14M3 15h14"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Mobile menu (collapsible) -->
+          <div id="mobileMenu" class="hidden px-4 pb-4 sm:px-6 lg:hidden">
+            <nav class="space-y-1 rounded-2xl bg-white p-2 shadow-sm ring-1 ring-zinc-900/5">
+              <a href="http://127.0.0.1:8000/trainer/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold transition text-indigo-600 hover:bg-zinc-50 hover:text-zinc-900">
+                <span>Users</span>
+              </a>
+
+              <a href="http://127.0.0.1:8000/trainer/exercises/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900">
+                <span>List of Exercises</span>
+              </a>
+
+              <div class="pt-2">
+                <a href="/auth/logout/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600">
+                  <span>Logout</span>
+                </a>
+              </div>
+            </nav>
+          </div>
+        </div>
+
+        <!-- Desktop sidebar -->
+        <div class="hidden lg:block">
+          <div class="flex items-center gap-3 px-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12"/>
+              </svg>
+            </div>
+            <div class="text-sm font-semibold tracking-tight">Knees</div>
+          </div>
+
+          <nav class="mt-8 space-y-1">
+            <a href="http://127.0.0.1:8000/trainer/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold transition text-indigo-600 hover:bg-white hover:text-zinc-900">
+              <span>Users</span>
+            </a>
+
+            <a href="http://127.0.0.1:8000/trainer/exercises/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-white hover:text-zinc-900">
+              <span>List of Exercises</span>
+            </a>
+
+            <!-- Recent users: desktop only -->
+            <div class="hidden lg:block pt-8">
+              <div class="px-3 pb-2 text-xs font-semibold tracking-wide text-zinc-500">Recent users</div>
+              <div class="space-y-1">
+                <a href="http://127.0.0.1:8000/trainer/testik3/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-white hover:text-zinc-900">
+                  <span>testik3</span>
+                </a>
+                <a href="http://127.0.0.1:8000/trainer/testik2/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-white hover:text-zinc-900">
+                  <span>testik2</span>
+                </a>
+                <a href="http://127.0.0.1:8000/trainer/testik4/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-white hover:text-zinc-900">
+                  <span>testik4</span>
+                </a>
+                <a href="http://127.0.0.1:8000/trainer/testik5/" class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition text-zinc-700 hover:bg-white hover:text-zinc-900">
+                  <span>test testovaci</span>
+                </a>
+              </div>
+            </div>
+          </nav>
+
+          <!-- Dimmed logout -->
+          <a href="/auth/logout/" class="mt-8 block rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 hover:bg-white hover:text-zinc-600">
+            Logout
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="min-w-0 flex-1">
+        <div class="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-900/5 overflow-hidden">
+          <!-- Panel header -->
+          <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-6">
+            <div>
+              <h1 class="text-base font-semibold leading-6">Users</h1>
+              <p class="mt-1 text-sm text-zinc-500">Overview of everyone in training</p>
+            </div>
+
+            <button type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-zinc-700 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+              <span class="sr-only">Add</span>
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 4v12m6-6H4"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Table -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-zinc-200">
+              <thead class="bg-zinc-50">
+                <tr>
+                  <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">User</th>
+                  <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Today</th>
+                  <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Sleep</th>
+                  <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Nutrition</th>
+                  <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Fatigue</th>
+                  <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Adherence</th>
+                  <th scope="col" class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-zinc-500 sm:px-6">Next session</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-zinc-200 bg-white">
+
+                <tr class="group cursor-pointer hover:bg-zinc-50/70 focus-within:bg-zinc-50/70" tabindex="0" role="link" data-href="/trainer/admin/">
+                  <td class="whitespace-nowrap px-5 py-4 sm:px-6">
+                    <div class="text-sm font-medium text-zinc-900">admin</div>
+                    <div class="text-sm text-zinc-500">h0n24.cz@gmail.com</div>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">0 planned</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">6.0 hrs</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Amazing</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">8 / 50</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm sm:px-6">
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset bg-zinc-100 text-zinc-700 ring-zinc-600/20">0%</span>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">—</td>
+                </tr>
+
+                <tr class="group cursor-pointer hover:bg-zinc-50/70 focus-within:bg-zinc-50/70" tabindex="0" role="link" data-href="/trainer/testik/">
+                  <td class="whitespace-nowrap px-5 py-4 sm:px-6">
+                    <div class="text-sm font-medium text-zinc-900">testik</div>
+                    <div class="text-sm text-zinc-500">testik@testik.cz</div>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">5 planned</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">4.5 hrs</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Average</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">9 / 50</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm sm:px-6">
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20">100%</span>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 15, 2025</td>
+                </tr>
+
+                <tr class="group cursor-pointer hover:bg-zinc-50/70 focus-within:bg-zinc-50/70" tabindex="0" role="link" data-href="/trainer/testik2/">
+                  <td class="whitespace-nowrap px-5 py-4 sm:px-6">
+                    <div class="text-sm font-medium text-zinc-900">testik2</div>
+                    <div class="text-sm text-zinc-500">testik2@testik.cz</div>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">5 planned</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">8.2 hrs</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Below average</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">9 / 50</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm sm:px-6">
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset bg-zinc-100 text-zinc-700 ring-zinc-600/20">0%</span>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 15, 2025</td>
+                </tr>
+
+                <tr class="group cursor-pointer hover:bg-zinc-50/70 focus-within:bg-zinc-50/70" tabindex="0" role="link" data-href="/trainer/testik3/">
+                  <td class="whitespace-nowrap px-5 py-4 sm:px-6">
+                    <div class="text-sm font-medium text-zinc-900">testik3</div>
+                    <div class="text-sm text-zinc-500">testik3@testik.cz</div>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">5 planned</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">9.5 hrs</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Average</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">7 / 50</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm sm:px-6">
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20">100%</span>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 15, 2025</td>
+                </tr>
+
+                <tr class="group cursor-pointer hover:bg-zinc-50/70 focus-within:bg-zinc-50/70" tabindex="0" role="link" data-href="/trainer/testik4/">
+                  <td class="whitespace-nowrap px-5 py-4 sm:px-6">
+                    <div class="text-sm font-medium text-zinc-900">testik4</div>
+                    <div class="text-sm text-zinc-500">testik4@testik.cz</div>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">5 planned</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">7.5 hrs</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Average</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">17 / 50</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm sm:px-6">
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20">100%</span>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 15, 2025</td>
+                </tr>
+
+                <tr class="group cursor-pointer hover:bg-zinc-50/70 focus-within:bg-zinc-50/70" tabindex="0" role="link" data-href="/trainer/testik5/">
+                  <td class="whitespace-nowrap px-5 py-4 sm:px-6">
+                    <div class="text-sm font-medium text-zinc-900">testik5</div>
+                    <div class="text-sm text-zinc-500">testik5@testik.cz</div>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">5 planned</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">6.8 hrs</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Average</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">10 / 50</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm sm:px-6">
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20">100%</span>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Dec. 15, 2025</td>
+                </tr>
+
+                <tr class="group cursor-pointer hover:bg-zinc-50/70 focus-within:bg-zinc-50/70" tabindex="0" role="link" data-href="/trainer/trener/">
+                  <td class="whitespace-nowrap px-5 py-4 sm:px-6">
+                    <div class="text-sm font-medium text-zinc-900">trener</div>
+                    <div class="text-sm text-zinc-500">trener@trener.cz</div>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">0 planned</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">9.2 hrs</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">Below average</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">13 / 50</td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm sm:px-6">
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset bg-zinc-100 text-zinc-700 ring-zinc-600/20">0%</span>
+                  </td>
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-700 sm:px-6">—</td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Mobile menu toggle
+    (function () {
+      const btn = document.getElementById('mobileMenuButton');
+      const menu = document.getElementById('mobileMenu');
+      if (!btn || !menu) return;
+
+      function setOpen(open) {
+        menu.classList.toggle('hidden', !open);
+        btn.setAttribute('aria-expanded', String(open));
+      }
+
+      btn.addEventListener('click', () => {
+        const isHidden = menu.classList.contains('hidden');
+        setOpen(isHidden);
+      });
+
+      // Close on ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setOpen(false);
+      });
+
+      // Close after clicking a link
+      menu.addEventListener('click', (e) => {
+        const a = e.target.closest('a');
+        if (a) setOpen(false);
+      });
+    })();
+
+    // Optional: Make table rows clickable (uncomment if you want that behavior)
+    // document.querySelectorAll('tr[data-href]').forEach((row) => {
+    //   row.addEventListener('click', () => {
+    //     window.location.href = row.getAttribute('data-href');
+    //   });
+    //   row.addEventListener('keydown', (e) => {
+    //     if (e.key === 'Enter' || e.key === ' ') {
+    //       e.preventDefault();
+    //       window.location.href = row.getAttribute('data-href');
+    //     }
+    //   });
+    // });
+  </script>
+</body>
+</html>
