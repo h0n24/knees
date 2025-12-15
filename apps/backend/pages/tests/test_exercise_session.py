@@ -1,10 +1,12 @@
+from datetime import timedelta
+
 from django.contrib.auth.models import Group, User
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
 from apps.backend.pages import views
-from apps.backend.training.models import DailyExercise, Exercise, ExerciseLog, RecoveryLog
+from apps.backend.training.models import DailyExercise, Exercise, ExerciseLog, FatigueLog, RecoveryLog
 
 
 class ExerciseSessionTests(TestCase):
@@ -119,3 +121,40 @@ class ExerciseSessionTests(TestCase):
         self.assertContains(response, "Use the format h:mm")
         self.assertFalse(RecoveryLog.objects.exists())
         self.assertEqual(self.client.session.get("post_exercise_stage"), 0)
+
+    def test_existing_logs_count_toward_progress(self):
+        daily = self._create_daily_exercise("Exercise 1", 0, 1)
+
+        ExerciseLog.objects.create(
+            user=self.user,
+            daily_exercise=daily,
+            set_number=1,
+            duration_seconds=60,
+            started_at=timezone.now() - timedelta(minutes=2),
+            completed_at=timezone.now() - timedelta(minutes=1),
+        )
+        RecoveryLog.objects.create(
+            user=self.user,
+            recorded_for=timezone.localdate(),
+            sleep_duration=timedelta(hours=7),
+            sleep_quality=75,
+            nutrition=RecoveryLog.NutritionQuality.OK,
+            comment="",
+        )
+        FatigueLog.objects.create(
+            user=self.user,
+            recorded_for=timezone.localdate(),
+            responses=[],
+            total_score=5,
+        )
+
+        session = self.client.session
+        session.pop("post_exercise_stage", None)
+        session.save()
+
+        response = self.client.get(reverse("exercise_session"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["post_exercise_stage"], 2)
+        self.assertEqual(response.context["current_step_number"], response.context["total_steps"])
+        self.assertEqual(response.context["progress_percent"], 100.0)

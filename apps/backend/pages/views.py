@@ -793,6 +793,10 @@ def exercise_session_page(request):
         post_exercise_stage = 1
         request.session["post_exercise_stage"] = post_exercise_stage
 
+    if not editing_checkins and post_exercise_stage < completed_post_exercise_stage:
+        post_exercise_stage = completed_post_exercise_stage
+        request.session["post_exercise_stage"] = post_exercise_stage
+
     completed_steps = completed_logs + min(post_exercise_stage, 2)
     current_step_number = min(completed_steps + 1, total_steps)
     progress_percent = (completed_steps / total_steps) * 100 if total_steps else 0
