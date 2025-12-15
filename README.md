@@ -1,389 +1,183 @@
 # Knee Training Tracker
 
-A Django-based web app for **daily knee training**, **simple recovery tracking**, and **trainer oversight**.
+A Django app for tracking daily knee work, quick recovery signals, and lightweight trainer oversight.
 
-This repository is intentionally written as a **course-grade reference project**: modern, clean, and easy to understand.
+This repo is written as a **course-grade reference project**: modern, clean, and easy to understand.
 
----
-
-## 1. Why this app exists
-
-Many knee issues improve with consistent, progressive training plus adequate recovery. This app provides a **minimal daily routine tracker** that also collects a few **lightweight recovery signals**.
-
-It is a **basic layout for future research** into whether simple training habits correlate with improved knee function and (hypothetical) cartilage regeneration signals.
-
-> Medical note: this is **not** a medical device and does not diagnose or treat conditions. Data is self‑reported and for educational purposes.
+> Medical note: this is **not** a medical device. It does not diagnose, treat, or prevent disease. Data is self-reported and meant for education and habit tracking.
 
 ---
 
-## 2. Target audiences
+## Why this exists
 
-### A) Users (Daily Training)
+Many knee issues improve with **consistent, progressive training** plus **adequate recovery**. This app keeps the daily workflow short:
 
-People who want a **simple, non-obtrusive** daily workflow:
+1) See today’s plan  
+2) Do the session  
+3) Log recovery + fatigue  
+4) Get a simple progress view (and, for trainers, oversight)
 
-- See today’s knee routine
-- Do it
-- Log completion + quick recovery check
-- Get a short motivational message
-
-### B) Trainers / Admins
-
-People who oversee a group:
-
-- Monitor adherence and fatigue
-- View daily / weekly / monthly reports
-- Adjust training plans
-- Review aggregated trends
+It also serves as a clean base for future experiments (e.g., whether adherence + fatigue trends correlate with improved function).
 
 ---
 
-## 3. Core product idea
+## Who it’s for
 
-A user does a small set of knee exercises daily. After the session they log:
+**Athletes / users**
+- want a fast daily loop
+- want simple signals (sleep, nutrition, fatigue) without “forms hell”
+- want visible progress over time
 
-- **Training volume** (auto from plan + completion)
-- **Recovery signals** (sleep / nutrition / fatigue)
-
-A trainer/admin can then:
-
-- See how consistent the user is
-- Detect rising fatigue
-- Adjust the plan
-
-The app also includes a simple weekly **auto‑progression** engine that proposes the next week’s volume based on past adherence and fatigue.
+**Trainers / staff**
+- want adherence + recovery trend overview
+- want per-user drill-downs (today / 7d / 30d)
+- want to generate and adjust a weekly plan using a shared exercise library
 
 ---
 
-## 4. Feature list
-
-### 4.1 User section (daily)
-
-- **Authentication** (register/login/logout)
-- **Today view**
-  - today’s plan (exercises + sets/reps/time)
-  - one-click “Mark done”
-- **Daily check-in** form
-  - sleep duration (hours)
-  - sleep score (optional)
-  - nutrition prompts (simple yes/no or 1–5)
-  - simplified fatigue questionnaire (4 questions)
-  - fatigue score output (0–10) + manual override
-- **Motivation** after completion
-  - short quote / micro‑speech
-  - optionally tailored by streak or fatigue
-- **History**
-  - calendar / list of past days
-  - streaks and adherence summary
-
-### 4.2 Trainer/admin section
-
-- **User overview dashboard**
-  - adherence, streak, fatigue trend, planned vs done
-- **Reports**
-  - daily report (today)
-  - weekly report (last 7 days)
-  - monthly report (last 30 days)
-- **Training plan editor**
-  - modify plan items for a user or group
-  - accept/reject proposed auto‑progression
-- **Data tables**
-  - sortable/filterable tables for check-ins and training logs
-
----
-
-## 5. Daily data collected
-
-### 5.1 Training
-
-- planned exercises and volume (from plan)
-- completion status
-- optional notes (short text)
-
-### 5.2 Recovery signals
-
-Kept intentionally small and quick:
-
-- **Sleep time** (hours)
-- **Sleep score** (optional; user can input, e.g., from a tracker)
-- **Nutrition prompts** (minimal)
-  - example: “Protein adequate today?” (yes/no)
-  - example: “Hydration OK?” (yes/no)
-- **Simplified FAS (4 items)**
-  - 4 short questions answered as 0–4 or 1–5
-  - combined into **fatigue score 0–10**
-  - user can manually override the final 0–10 score
-
----
-
-## 6. Auto‑progression (weekly)
-
-Goal: generate a **suggested plan for next week**.
-
-Inputs (per user):
-
-- adherence rate (done / planned)
-- recent fatigue average (0–10)
-- fatigue trend (rising / stable / falling)
-
-Example rules (simple and explainable):
-
-- If adherence ≥ 80% and fatigue ≤ 4 → increase volume slightly (+5–10%)
-- If adherence < 60% or fatigue ≥ 7 → reduce volume (-10–20%)
-- Else → keep similar
-
-Trainer can:
-
-- approve the suggestion
-- adjust it manually
-
----
-
-## 7. UI/UX principles
-
-- **Fast daily flow**: today → done → check‑in → motivation
-- **Mobile-first** responsive layout
-- **No tiny text**: readable defaults (≥16px)
-- **Low friction** forms: few fields, good defaults
-- **Positive reinforcement**: streaks, clear progress, quotes
-
----
-
-## 8. Tech stack
-
-Backend:
-
-- Python 3.x
-- **Django** (auth, ORM, admin, forms, templates)
-
-Frontend:
-
-- HTML + CSS
-- Vanilla JavaScript
-- Optional UI framework: Bootstrap (or similar)
-- Optional table UI: DataTables (or similar)
-
-Database:
-
-- SQLite (dev + course delivery)
-
----
-
-## 9. Architecture overview
-
-### 9.1 Django apps (suggested)
-
-- `accounts` — registration/login/profile
-- `training` — plans, exercises, completions
-- `checkins` — daily recovery/fatigue entries
-- `reports` — aggregation + dashboards
-- `pages` — About, Privacy Policy
-
-### 9.2 Core models (suggested)
-
-- `UserProfile`
-  - user, role (USER / TRAINER / ADMIN)
-- `Exercise`
-  - name, description, media_url (optional)
-- `TrainingPlan`
-  - owner (user or group), week_start, status (draft/active)
-- `PlanItem`
-  - plan, exercise, prescription (sets/reps/time), target_volume
-- `TrainingLog`
-  - user, date, plan_item, completed (bool), actual_volume, notes
-- `DailyCheckIn`
-  - user, date (unique per user)
-  - sleep_hours, sleep_score (nullable)
-  - nutrition flags
-  - fas_q1..q4
-  - fatigue_score_auto (0–10)
-  - fatigue_score_final (0–10)
-
-### 9.3 Permissions
-
-- Normal users:
-  - can view and edit only their own logs/check-ins
-- Trainers/admin:
-  - can view assigned users
-  - can edit training plans
-
----
-
-## 10. Key pages
-
-Main navigation (example):
-
-- Home / Today
-- Check-in
-- History
-- Reports (trainer only)
-- Plan editor (trainer only)
-- About
-- Privacy Policy
-
-Footer:
-
-- copyright
-- Privacy Policy link
-
----
-
-## 11. Validation and data quality
-
-- Server-side validation with Django forms/model validators
-- Client-side quality-of-life checks (JS), never as the only validation
-- Prevent duplicate daily entries: `unique_together (user, date)`
-- Clear error messages and safe defaults
-
----
-
-## 12. Security and privacy
-
-- Use Django authentication, CSRF protection, and secure password storage
-- Role-based authorization for trainer/admin features
-- Minimal personal data:
-  - username/email for login
-  - self-reported daily metrics only
-- Provide a clear **Privacy Policy** page describing:
-  - what is collected
-  - why it is collected
-  - retention policy
-  - how to request deletion (if applicable)
-
----
-
-## 13. Development quality bar
-
-This is intended to be “state of the art but understandable”:
-
-- PEP 8
-- Type hints where helpful
-- Small functions, clear naming
-- Docstrings on non-trivial logic
-- DRY templates (base layout)
-- Consistent UI components
-- Tests for critical logic (e.g., auto‑progression)
-
----
-
-## 14. Project structure
-
-Defined in Structure_Plan.md in the docs.
-
----
-
-## 15. Reporting: definitions
-
-- **Adherence %** = completed plan items / planned items
-- **Load (simple)** = sum of (prescribed volume) or (actual volume)
-- **Fatigue avg** = mean of fatigue_score_final over a period
-- **Trend** = compare last 3 days vs previous 3 days (simple slope)
-
----
-
-## 19. License
-
-Educational project.
-
-# Project Milestones
-
-## Milestone 1 — Project skeleton
-
-This commit establishes the Django-first skeleton referenced in the structure plan:
-
-- **Backend (Django 5)**: `apps/backend` with project settings under `apps/backend/config`, ASGI entrypoint, and placeholder apps for accounts, training, check-ins, reports, and pages.
-- **Server-rendered UI**: Templates and static assets live under `templates/` and `static/`, keeping the frontend to HTML/CSS/vanilla JS delivered by Django.
-
-The project is intended for **local development** with a single Django server; there is no serverless or Vercel dependency.
-
-Run locally:
-
-### Backend server
-
-#### Bash
+## Run locally (SQLite by default)
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
+python manage.py createsuperuser  # optional, but needed for trainer/staff area
 python manage.py runserver
 ```
 
-#### Alternative: Win cmd.exe
-
-```bat
-python -m venv .venv
-.\.venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-```
-
-#### Creating an admin user
-
-```bash
-python manage.py createsuperuser
-```
+> On Windows, activate with `.\.venv\Scriptsctivate` instead of `source .venv/bin/activate`.
 
 ---
 
-## All milestones
+## Seed data (exercise library)
 
-1. Project skeleton
+The project includes an exercise library in `exercises.json`.
 
-- Django project + apps
-- Base template + navigation + footer
-
-2. Auth
-
-- register/login/logout
-- roles
-
-3. User daily flow
-
-- today plan view
-- training log submission
-- daily check-in form
-- motivation message
-
-4. Trainer flow
-
-- user list
-- reports
-- plan editor
-
-5. Polish
-
-- responsive UI
-- sortable/filterable tables
-- deployment (optional)
+On first use of the Health / Trainer parts, the app ensures the exercise library is present so the demo flow works out of the box.
 
 ---
 
-# Presentation Plan
+## What the app delivers
 
-## Presentation checklist
+### Health area (`/health/`)
+A guided daily flow for the signed-in user.
 
-For the 5-minute demo:
+- **Today view**: shows today’s scheduled exercises and the “next step” CTA (start / continue / finish).
+- **Exercise session** (`/health/exercise/`): walks through sets in order, logs time/duration, then collects:
+  - recovery: `sleep_duration`, `sleep_quality`, `nutrition`, optional comments
+  - fatigue: a **4-question** survey that computes a total score and stores structured responses
+- **Progress dashboard** (`/health/progress/`): visualizes recent training + recovery trends (e.g., last 30 days).
+- **Settings** (`/health/settings/`): account/profile basics.
 
-- Show registration/login
-- Show today’s plan + logging
-- Show check-in + fatigue score
-- Show trainer report page
-- Mention stack, goals, and target audience
+### Trainer area (`/trainer/`)
+Trainer routes require **staff** access or membership in the `trainer user` group.
+
+- **People overview**: lists users with quick signals (plan count, adherence, latest fatigue, sleep, nutrition label).
+- **User drill-down** (`/trainer/<username>/`):
+  - report cards for **today / 7 days / 30 days**
+  - upcoming 7-day plan view
+  - recovery timeline (sleep / fatigue / nutrition balance)
+  - tools to generate/replace a week plan starting on a chosen day, using the bundled exercise library and safe difficulty caps
+- **Exercise library** (`/trainer/exercises/`): browse seeded movements (categories + difficulty ranges).
+- **Navigation helpers**: remembers recently viewed athletes for faster switching.
+
+---
+
+## Data captured
+
+**Training**
+- scheduled plan items per day (ordered)
+- per-set (or per-item) logging with timestamps and duration
+- completion status and optional notes/comments
+
+**Recovery (daily)**
+- sleep duration
+- sleep quality/score
+- nutrition quality label/value
+- optional comments
+- enforced uniqueness per user/day
+
+**Fatigue (daily)**
+- 4 question answers stored as structured data (JSON)
+- computed fatigue total score
+
+---
+
+## Auto-progression (weekly planning)
+
+The weekly planner aims to be **simple and explainable**.
+
+Typical inputs:
+- adherence (done vs planned)
+- recent fatigue average
+- fatigue trend (rising / stable / falling)
+
+Example rules of thumb:
+- adherence ≥ 80% and fatigue ≤ 4 → nudge volume up (+5–10%)
+- adherence < 60% or fatigue ≥ 7 → deload (-10–20%)
+- otherwise → keep similar and focus on consistency
+
+Trainer can accept the proposal, override it, or regenerate.
+
+---
+
+## Roles & permissions
+
+- **User**: sees only their own health flow and history.
+- **Trainer/staff**: can view assigned users and manage plans/reports.
+
+---
+
+## UI/UX principles
+
+- fast daily loop: *today → session → check-in → progress*
+- mobile-first layout
+- readable defaults (no tiny text)
+- low-friction forms (few fields, good defaults)
+- calm visuals + positive reinforcement
+
+---
+
+## Tech stack
+
+- **Backend:** Python + Django (auth, ORM, admin, server templates)
+- **Frontend:** server-rendered templates + Tailwind styles + small JS/HTMX-friendly patterns
+- **DB:** SQLite (dev/course), easy to swap later
+
+---
+
+## Project structure (high level)
+
+- `apps/` – Django project + backend feature apps
+- `templates/` – server templates
+- `static/` – static assets
+- `tests/` – tests for critical logic
+- `exercises.json` – bundled exercise library seed
+
+---
 
 ## Course requirement mapping (quick)
 
-- Registration/Login ✅
-- At least one data input form ✅ (Daily Check‑In)
-- At least one data table view ✅ (Logs/Reports table)
-- Database ✅ (SQLite)
-- Main menu ✅
-- About page ✅
-- Footer + Privacy Policy link ✅
+- Auth (register/login/logout) ✅
+- At least one form ✅ (daily recovery/fatigue)
+- At least one table view ✅ (trainer overviews/reports)
+- DB ✅ (SQLite)
+- Main navigation ✅
+- Footer + policy link ✅
 
-Optional (extra points):
+---
 
-- Professional templates (Bootstrap) ⬜
-- Deployment + SSL ⬜
-- Interactive JS tables (DataTables) ⬜
+## Privacy note
+
+The app stores only what it needs to run the flows:
+- account identifier (username/email)
+- daily self-reported metrics (sleep/nutrition/fatigue)
+- training plan + completion logs
+
+If you deploy this publicly, add a clear Privacy Policy that states what you collect, why you collect it, retention, and deletion process.
+
+---
+
+## License
+
+Educational project.
